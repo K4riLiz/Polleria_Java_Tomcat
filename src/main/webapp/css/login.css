@@ -1,0 +1,299 @@
+/* 
+reset
+
+
+
+ */
+
+body{
+    width: 100%;
+    /* height: 100vh; */
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    background-color: #F0F4F3;
+}
+.login-wrapper{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.close{
+    position: absolute;
+    text-decoration: none;
+    right: -15px;
+    top: -15px;
+    z-index: 9999;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #a0594b;
+    border-radius: 50%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0594b;
+    background-color: #f0f4f3;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(49, 221, 233, 0.2);
+}
+.close a{
+    text-decoration: none;
+    color: inherit;        /* Hereda el color #3AB397 que ya pusiste en .close */
+    display: flex;         /* Centra el icono */
+    align-items: center;
+    justify-content: center;
+    width: 100%;           /* Para que todo el círculo sea clickable */
+    height: 100%;
+    padding-top:10px;
+}
+
+
+
+.close ion-icon {
+    /* El valor por defecto es 32px. Prueba con 48px o 64px para que sea grueso */
+    --ionicon-stroke-width: 100px; 
+    font-size: 100px; /* Esto ajusta el tamaño general del icono */
+}
+.container{
+    width: 800px;
+    height: 500px;
+    display: flex;
+    position: relative;  
+    background-color: white;
+    border-radius: 15px;
+    /* overflow: hidden; */
+    box-shadow: 0 0 10px rgb(0, 0, 0.3);
+}
+.container-form{
+    width: 100%;
+    overflow: hidden;
+}
+.container-form, .container-welcome {
+    overflow: hidden; 
+}
+.container-form form{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.container-form h2{
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+.social-networks{
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.social-networks ion-icon:hover{
+    background-color: #ff2a00;
+    color: white;
+}
+.social-networks ion-icon{
+    border: 1px solid #c9cccb;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+}
+.container-form span{
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+.container-input{
+    width: 300px;
+    height: 40px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 0 15px;
+    background-color: #eeeeee;
+}
+
+.container-input input{
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+}
+.container-input :focus-within{
+    border: 2px solid #a0594b !important;
+}
+.container-form a{
+    color: black;
+    font-size: 14px;
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+.container-form a:hover{
+    color: #a0594b;
+    font-weight: 900;
+}
+.button{
+    width: 170px;
+    height: 45px;
+    font-size: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    background-color: #ff2a00;
+    color: white;
+}
+/* ANIMATION FORM*/
+
+.sign-up{
+    transform: translateX(-100%);
+}
+.container.toggle .sign-in{
+    transform: translateX(100%);
+}
+.container.toggle .sign-up{
+    transform: translateX(0);
+}
+
+/* WELCOME */
+.container-welcome{
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    transform: translateX(100%);
+    background-color: #ff2a00;
+    transition: transform 0.5s ease-in-out, border-radius 0.5s ease-in-out;
+    overflow: hidden; /*No se muestre el contenido sque salga de ese contenedor*/
+    border-radius: 50% 0 0 50%;
+}
+.container.toggle .container-welcome{
+    transform: translateX(0);
+    border-radius: 0 50% 50% 0;
+    background-color: #ff2a00;
+}
+.container-welcome .welcome{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 0 50px;
+    color: white;
+    transition: transform 0.5s ease-in-out;
+}
+.welcome-sign-in{
+    transform: translateX(100%);
+}
+.container-welcome h3{
+    font-size: 40px;
+}
+.container-welcome p{
+    font-size: 14px;
+    text-align: center;
+}
+.container-welcome .button{ /*el TOGGLE es cuando ya se dio click*/
+    border: 2px solid white;
+    background-color: transparent; 
+}
+.container.toggle .welcome-sign-in{
+    transform: translateX(0);
+}
+.container.toggle .welcome-sign-up{
+    transform: translateX(-100%);
+}
+
+/* #logeo{
+    background-color: #fbf6f5;
+    height: 500px;
+    width: 800px;
+    border-radius: 15px;
+     box-shadow: 5px -20px 20px rgb(65, 65, 65);
+     box-shadow: 10px 10px 30px #b77466, -10px -10px 30px #b77466;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     border: 2px solid black;
+     margin: 50px 300px;
+     
+}
+
+.logeo-first{
+    height: 495px;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 50%;
+    border-top-right-radius: 50%;
+    width: 50%;;
+    background-color: #b77466;
+    color: #fbf6f5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+     padding: 40px;
+     line-height: 20px;
+    
+}
+h1{
+    color: rgb(20, 20, 19);
+    text-shadow: #1e8a27;
+    margin-bottom: 30px;
+    
+}
+h2{
+    font-size: var(--fs-h4);
+}
+label{
+    font-size: 18px;
+}
+input{
+    width: 300px;
+}
+
+.logeo-second{
+    line-height: 25px;
+    width: 50%;
+    padding: 40px;
+}
+
+.logeo-second ul{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.logeo-second ul li{
+    margin-bottom: 20px;
+    list-style: none; 
+}
+
+.logeo-second ul li a{
+    list-style: none; 
+    color: #b77466;
+}
+
+button{
+    width: 150px;
+    height: 35px;
+    border-radius: 15px;
+    border: 1px solid #b77466;
+}
+
+.button-first{
+    width: 150px;
+    height: 35px;
+    border-radius: 15px;
+    border: 2px solid #fbf6f5;
+    background-color: #b77466;
+    margin-top: 20px;
+}
+
+.option-two{
+    display: block;
+    
+} */
