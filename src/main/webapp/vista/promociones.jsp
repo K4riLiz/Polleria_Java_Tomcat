@@ -1,10 +1,11 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../dist/output.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/output.css">
     <script src="https://kit.fontawesome.com/887a835504.js" crossorigin="anonymous"></script>
 
     <title>Document</title>
@@ -12,7 +13,7 @@
 <body>
     
     <!-- HEADER -->
-    <div id="header"></div>
+    <jsp:include page="/components/header.jsp"/>
 
 <!-- PROMOCIONES -->
 <section class="max-w-7xl mx-auto px-4 py-12">
@@ -26,7 +27,7 @@
     <!-- CARD 1-->
     <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
       <div class="overflow-hidden relative">
-        <img src="../img/adicionales.png"
+        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
              class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
         <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,7 +53,7 @@
     <!-- CARD 1-->
     <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
       <div class="overflow-hidden relative">
-        <img src="../img/adicionales.png"
+        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
              class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
         <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -78,7 +79,7 @@
     <!-- CARD 1-->
     <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
       <div class="overflow-hidden relative">
-        <img src="../img/adicionales.png"
+        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
              class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
         <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -104,7 +105,7 @@
     <!-- CARD 1-->
     <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
       <div class="overflow-hidden relative">
-        <img src="../img/adicionales.png"
+        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
              class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
         <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,7 +135,7 @@
 </section>
 
     <!-- FOOTER -->
-    <div id="footer"></div>
+    <jsp:include page="/components/footer.jsp"/>
 
 
 
