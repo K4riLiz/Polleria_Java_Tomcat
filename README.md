@@ -3,9 +3,10 @@
 <br>
 
 # Pollería "El Dorado"
+<br>
 
 ## 📝 Presentación de la empresa
-Urban Style es una tienda dedicada a la venta de ropa de moda urbana, especializada en ofrecer prendas y accesorios que reflejan las últimas tendencias del estilo callejero. Ofrecen una variedad de prendas, accesorios y calzado diseñados para capturar la esencia del entorno urbano, enfocándose en un público joven de entre 17 y 30 años, tanto para hombres como para mujeres.
+La pollería El Dorado, ubicada en el distrito de Carabayllo, es un negocio gastronómico dedicado a la elaboración de pollo a la brasa y platos de alta calidad. Su propuesta se basa en combinar la excelencia culinaria con un servicio eficiente, amigable y adaptado a las nuevas tendencias tecnológicas. Con una visión orientada a la innovación, la empresa busca consolidarse como referente local mediante el uso de herramientas digitales que agilicen la atención. Su enfoque principal es garantizar la satisfacción del cliente tanto en su salón como en el servicio de delivery.
 
 ## 🚩 Problemática
 La pollería El Dorado sufre retrasos y errores operativos debido a una gestión de pedidos manual y desorganizada. Para solucionarlo, implementará un aplicativo web y carta digital que automatice el registro y control de ventas. Esta transformación digital optimizará los tiempos de atención y eliminará los fallos humanos en horas críticas. El resultado será un negocio más eficiente, con reportes precisos y un servicio al cliente superior.
