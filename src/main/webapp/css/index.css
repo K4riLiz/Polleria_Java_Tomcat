@@ -1,0 +1,89 @@
+
+body{
+    font-size: var(--fs-h4);
+    font-family:  "Times New Roman", Times, serif;
+    background-color: white;
+}
+
+:root{
+    --box-shadow-orange: rgba(234, 201, 12, 0.5);
+    --box-shadow-pink: rgba(250, 180, 235, 0.5);
+    --box-shadow-green: rgba(34, 197, 94, 0.5);
+}
+
+/* TOP HEADER */
+@keyframes apareceydesaparece {
+    0% { 
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-text {
+    animation: apareceydesaparece 1s infinite alternate;
+}
+/*------- FINAL HEADER----*/
+
+/*CATEGORIAS*/
+.categorias {
+    display: flex;
+    gap: 30px;
+    padding: 60px 32px;
+    flex-wrap: wrap; /*SI NO ENTRA, LO ENVIA ABAJO*/
+}
+
+.card {
+    position: relative;
+    width: 744.5px;
+    height: 300px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.contenido p{
+    padding-top: 10px;
+    padding-bottom: 15px;
+    font-weight: 200;
+    color: var(--text-fondo);
+}
+
+.contenido a{
+    text-decoration: none;
+    color: rgb(255, 0, 0);
+    font-weight: bold;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+}
+
+.contenido {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    color: white;
+    z-index: 2; /*z-index: 2 el dos es encima y 1 sería debajo;
+}*/
+}
+.descuentos {
+    display: flex;
+    gap: 30px;
+    /* justify-content: center; */
+    padding: 60px 32px;
+    flex-wrap: wrap; /*SI NO ENTRA, LO ENVIA ABAJO*/
+}
+/* LIBRO RECLAMACIONES */
+
+

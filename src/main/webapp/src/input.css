@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Importa tus estilos existentes en este orden */
+@import "../css/index.css";
+@import "../css/login.css";
+
+
+
