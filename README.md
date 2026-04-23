@@ -1,4 +1,4 @@
-<img width="110" height="100" align="left" alt="Prueba" src=".assets/logo.png">
+<img width="315" height="310" alt="logoeldorado" src="https://github.com/user-attachments/assets/057c939e-f222-4174-8b2a-1ba401c20032" />
 
 <br>
 
@@ -12,7 +12,6 @@ La pollería El Dorado sufre retrasos y errores operativos debido a una gestión
 
 ## 🎯 Objetivo General
 Desarrollar e implementar un aplicativo web integral de gestión de pedidos y carta digital para optimizar la operatividad, reducir los errores humanos y mejorar la experiencia de servicio al cliente en la pollería El Dorado.
-<img width="315" height="310" alt="logoeldorado" src="https://github.com/user-attachments/assets/057c939e-f222-4174-8b2a-1ba401c20032" />
 
 ## 👥 Autores 
 **Equipo de Desarrollo**
