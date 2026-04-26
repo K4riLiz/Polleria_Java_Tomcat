@@ -78,7 +78,7 @@
 
     <!-- BOTTOM -->
     <div class="bg-gray-100 text-black text-center py-4 border-t">
-        © 2026 KidsStyle. Todos los derechos reservados.
+        © 2026 Utepinas. Todos los derechos reservados.
     </div>
 
 </footer>

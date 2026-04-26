@@ -99,4 +99,23 @@
         <url-pattern>/promociones</url-pattern>
     </servlet-mapping>
  
+    
+    <servlet>
+        <servlet-name>PromocionDetalleServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.PromocionDetalleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PromocionDetalleServlet</servlet-name>
+        <url-pattern>/promocion</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+    <servlet-name>AdminProductoServlet</servlet-name>
+    <servlet-class>com.polleria.servlet.admin.AdminProductoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminProductoServlet</servlet-name>
+        <url-pattern>/admin/productos</url-pattern>
+    </servlet-mapping>
+
 </web-app>

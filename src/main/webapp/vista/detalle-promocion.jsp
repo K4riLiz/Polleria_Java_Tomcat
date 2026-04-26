@@ -8,23 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>${producto.nombre} - El Dorado</title>
+    <title>${promocion.nombre} - El Dorado</title>
     <style>
         .opcion-item input[type="radio"] { display: none; }
         .opcion-item input[type="radio"]:checked + label {
-            border-color: #c0392b;
-            background-color: #fff5f5;
-            color: #c0392b;
-            font-weight: 600;
+            border-color: #c0392b; background-color: #fff5f5;
+            color: #c0392b; font-weight: 600;
         }
         .opcion-item label {
-            cursor: pointer;
-            transition: all 0.2s;
-            display: block;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 10px 16px;
-            font-size: 14px;
+            cursor: pointer; transition: all 0.2s; display: block;
+            border: 2px solid #e5e7eb; border-radius: 10px;
+            padding: 10px 16px; font-size: 14px;
         }
         .opcion-item label:hover { border-color: #f87171; }
         .chevron { transition: transform 0.3s; }
@@ -48,16 +42,16 @@
     <div class="max-w-5xl mx-auto px-4 py-3 text-sm text-gray-400 flex items-center gap-2">
         <a href="${pageContext.request.contextPath}/home" class="hover:text-red-600">Inicio</a>
         <span>/</span>
-        <a href="${pageContext.request.contextPath}/categoria?id=${producto.categoriaId}" class="hover:text-red-600">${producto.categoriaNombre}</a>
+        <a href="${pageContext.request.contextPath}/promociones" class="hover:text-red-600">Promociones</a>
         <span>/</span>
-        <span class="text-gray-700 font-medium">${producto.nombre}</span>
+        <span class="text-gray-700 font-medium">${promocion.nombre}</span>
     </div>
 
     <!-- VOLVER -->
     <div class="max-w-5xl mx-auto px-4 mb-3">
-        <a href="${pageContext.request.contextPath}/categoria?id=${producto.categoriaId}"
+        <a href="${pageContext.request.contextPath}/promociones"
            class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-red-600 transition font-medium">
-            <i class="fa-solid fa-arrow-left text-xs"></i> Volver
+            <i class="fa-solid fa-arrow-left text-xs"></i> Volver a Promociones
         </a>
     </div>
 
@@ -67,11 +61,11 @@
 
             <!-- IMAGEN -->
             <div class="md:w-1/2 relative min-h-[280px]">
-                <img src="${pageContext.request.contextPath}/img/${producto.imagen}"
-                     alt="${producto.nombre}"
+                <img src="${pageContext.request.contextPath}/img/${promocion.imagen}"
+                     alt="${promocion.nombre}"
                      class="w-full h-full object-cover min-h-[280px]">
                 <span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
-                    ${producto.categoriaNombre}
+                    🔥 Promoción
                 </span>
             </div>
 
@@ -79,10 +73,10 @@
             <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5 overflow-y-auto max-h-[90vh]">
 
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-800 mb-1">${producto.nombre}</h1>
-                    <p class="text-gray-500 text-sm leading-relaxed mb-3">${producto.descripcion}</p>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-1">${promocion.nombre}</h1>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-3">${promocion.descripcion}</p>
                     <p class="text-3xl font-bold text-red-600">
-                        S/ <fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/>
+                        S/ <fmt:formatNumber value="${promocion.precio}" pattern="#,##0.00"/>
                     </p>
                 </div>
 
@@ -95,8 +89,7 @@
 
                     <!-- Pollo -->
                     <div>
-                        <div class="flex items-center justify-between px-4 py-3 bg-red-600 text-white cursor-pointer select-none"
-                             onclick="toggle(this)">
+                        <div class="flex items-center justify-between px-4 py-3 bg-red-600 text-white cursor-pointer select-none" onclick="toggle(this)">
                             <div class="flex items-center gap-2 text-sm font-semibold">
                                 <i class="fa-solid fa-drumstick-bite"></i> Pollo
                                 <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
@@ -113,8 +106,7 @@
 
                     <!-- Complemento -->
                     <div>
-                        <div class="flex items-center justify-between px-4 py-3 bg-orange-500 text-white cursor-pointer select-none"
-                             onclick="toggle(this)">
+                        <div class="flex items-center justify-between px-4 py-3 bg-orange-500 text-white cursor-pointer select-none" onclick="toggle(this)">
                             <div class="flex items-center gap-2 text-sm font-semibold">
                                 <i class="fa-solid fa-bowl-food"></i> Complemento
                             </div>
@@ -130,10 +122,9 @@
 
                     <!-- Guarnición -->
                     <div>
-                        <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none"
-                             onclick="toggle(this)">
+                        <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none" onclick="toggle(this)">
                             <div class="flex items-center gap-2 text-sm font-semibold">
-                                <i class="fa-solid fa-leaf"></i> Escoge tu guarnición
+                                <i class="fa-solid fa-leaf"></i> Guarnición
                             </div>
                             <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                         </div>
@@ -141,15 +132,13 @@
                             <div class="p-4 flex flex-col gap-2">
                                 <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="fresca"><label for="ef"> Ensalada Fresca</label></div>
                                 <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="cocida"><label for="ec"> Ensalada Cocida</label></div>
-                                <div class="opcion-item"><input type="radio" name="guarnicion" id="ee" value="especial"><label for="ee"> Ensalada Especial</label></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Bebida -->
                     <div>
-                        <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none"
-                             onclick="toggle(this)">
+                        <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
                             <div class="flex items-center gap-2 text-sm font-semibold">
                                 <i class="fa-solid fa-bottle-water"></i> Bebida
                                 <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
@@ -172,8 +161,7 @@
                     <label class="block text-sm font-medium text-gray-600 mb-1">
                         <i class="fa-regular fa-comment mr-1"></i> Comentario
                     </label>
-                    <textarea id="comentario" rows="2"
-                              placeholder="¿Alguna indicación especial?"
+                    <textarea rows="2" placeholder="¿Alguna indicación especial?"
                               class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 resize-none"></textarea>
                 </div>
 
@@ -190,7 +178,7 @@
                             <button onclick="agregarAlPedido()"
                                     class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                                 <i class="fa-solid fa-cart-plus"></i>
-                                Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/></span>
+                                Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${promocion.precio}" pattern="#,##0.00"/></span>
                             </button>
                         </c:when>
                         <c:otherwise>
@@ -211,7 +199,7 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script>
-        const precioBase = ${producto.precio};
+        const precioBase = ${promocion.precio};
 
         function cambiarCantidad(delta) {
             const el = document.getElementById('cantidad');
@@ -239,7 +227,6 @@
             const bebida = document.querySelector('input[name="bebida"]:checked');
             if (!pollo) { alert('Por favor selecciona el tipo de pollo.'); return; }
             if (!bebida) { alert('Por favor selecciona una bebida.'); return; }
-            
             const btn = document.querySelector('button[onclick="agregarAlPedido()"]');
             btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Agregado!';
             btn.classList.replace('bg-red-600', 'bg-green-600');

@@ -1,154 +1,77 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/output.css">
-    <script src="https://kit.fontawesome.com/887a835504.js" crossorigin="anonymous"></script>
-
-    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Promociones - El Dorado</title>
+    <style>
+        .card-promo:hover .card-img { transform: scale(1.05); }
+        .card-img { transition: transform 0.4s ease; }
+    </style>
 </head>
-<body>
-    
-    <!-- HEADER -->
+<body class="bg-gray-50">
+
     <jsp:include page="/components/header.jsp"/>
 
-<!-- PROMOCIONES -->
-<section class="max-w-7xl mx-auto px-4 py-12">
-
-  <!-- Título -->
-  <h2 class="text-3xl font-bold text-center mb-10 tracking-wide">Promociones</h2>
-
-  <!-- GRID DE CARDS -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-
-    <!-- CARD 1-->
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
-      <div class="overflow-hidden relative">
-        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
-             class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
-        <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="p-3 flex flex-col flex-1">
-        <h3 class="font-semibold text-sm mb-1">Familiar</h3>
-        <p class="text-xs text-gray-500 leading-tight flex-1">
-          1 pollo, papas fritas familiares, gaseosa 1.5L y salsas.
-        </p>
-        <div class="mt-3 flex items-center justify-between">
-          <span class="text-base font-bold text-gray-800">S/50.90</span>
-          <button class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-            Agregar
-          </button>
-        </div>
-      </div>
+    <!-- BANNER -->
+    <div class="w-full bg-red-600 py-10 text-center text-white">
+        <h1 class="text-4xl font-bold mb-2">🔥 Promociones</h1>
+        <p class="text-red-100 text-sm">Las mejores ofertas para ti y tu familia</p>
     </div>
 
-    <!-- CARD 1-->
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
-      <div class="overflow-hidden relative">
-        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
-             class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
-        <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="p-3 flex flex-col flex-1">
-        <h3 class="font-semibold text-sm mb-1">Familiar</h3>
-        <p class="text-xs text-gray-500 leading-tight flex-1">
-          1 pollo, papas fritas familiares, gaseosa 1.5L y salsas.
-        </p>
-        <div class="mt-3 flex items-center justify-between">
-          <span class="text-base font-bold text-gray-800">S/50.90</span>
-          <button class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-            Agregar
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- GRID PROMOCIONES -->
+    <section class="max-w-7xl mx-auto px-4 py-12">
 
-    <!-- CARD 1-->
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
-      <div class="overflow-hidden relative">
-        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
-             class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
-        <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="p-3 flex flex-col flex-1">
-        <h3 class="font-semibold text-sm mb-1">Familiar</h3>
-        <p class="text-xs text-gray-500 leading-tight flex-1">
-          1 pollo, papas fritas familiares, gaseosa 1.5L y salsas.
-        </p>
-        <div class="mt-3 flex items-center justify-between">
-          <span class="text-base font-bold text-gray-800">S/50.90</span>
-          <button class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-            Agregar
-          </button>
-        </div>
-      </div>
-    </div>
+        <c:if test="${not empty error}">
+            <div class="bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-6">${error}</div>
+        </c:if>
 
-    <!-- CARD 1-->
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group">
-      <div class="overflow-hidden relative">
-        <img src="${pageContext.request.contextPath}/img/pollobrasa.png"
-             class="w-full h-[140px] sm:h-[160px] object-cover group-hover:scale-105 transition duration-400">
-        <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="p-3 flex flex-col flex-1">
-        <h3 class="font-semibold text-sm mb-1">Familiar</h3>
-        <p class="text-xs text-gray-500 leading-tight flex-1">
-          1 pollo, papas fritas familiares, gaseosa 1.5L y salsas.
-        </p>
-        <div class="mt-3 flex items-center justify-between">
-          <span class="text-base font-bold text-gray-800">S/50.90</span>
-          <button class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-            Agregar
-          </button>
-        </div>
-      </div>
-    </div>
+        <c:choose>
+            <c:when test="${empty promociones}">
+                <div class="text-center py-20 text-gray-400">
+                    <i class="fa-solid fa-tag text-6xl mb-4"></i>
+                    <p class="text-xl">No hay promociones disponibles por el momento.</p>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <c:forEach items="${promociones}" var="promo">
+                        <a href="${pageContext.request.contextPath}/promocion?id=${promo.id}"
+                           class="card-promo bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col hover:shadow-xl transition">
+                            <div class="overflow-hidden relative">
+                                <img src="${pageContext.request.contextPath}/img/${promo.imagen}"
+                                     class="card-img w-full h-[160px] object-cover">
+                                <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                    PROMO
+                                </div>
+                            </div>
+                            <div class="p-3 flex flex-col flex-1">
+                                <h3 class="font-semibold text-sm mb-1">${promo.nombre}</h3>
+                                <p class="text-xs text-gray-500 leading-tight flex-1">${promo.descripcion}</p>
+                                <div class="mt-3 flex items-center justify-between">
+                                    <span class="text-base font-bold text-gray-800">
+                                        S/<fmt:formatNumber value="${promo.precio}" pattern="#,##0.00"/>
+                                    </span>
+                                    <span class="bg-orange-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
+                                        Ver detalle
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </c:forEach>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </section>
 
-
-    <!-- Repite el bloque anterior para cada promo, cambiando imagen, nombre, descripción y precio -->
-
-  </div>
-</section>
-
-    <!-- FOOTER -->
     <jsp:include page="/components/footer.jsp"/>
-
-
-
-    <script src="../js/carrusel.js"></script>
-    <script src="../js/current.js" ></script>
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-
-
 </body>
 </html>
-
-
-
