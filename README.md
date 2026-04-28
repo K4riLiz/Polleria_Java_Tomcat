@@ -1,6 +1,6 @@
 <img width="160" height="160" align="left" alt="logoeldorado" src="https://github.com/user-attachments/assets/057c939e-f222-4174-8b2a-1ba401c20032" />
 
-<br>
+
 
 # Pollería "El Dorado"
 <br>
