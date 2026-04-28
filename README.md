@@ -1,4 +1,4 @@
-<img width="90" height="110" align="left" alt="logoeldorado" src="https://github.com/user-attachments/assets/057c939e-f222-4174-8b2a-1ba401c20032">
+<img width="110" height="110" align="left" alt="logoeldorado" src="https://github.com/user-attachments/assets/057c939e-f222-4174-8b2a-1ba401c20032">
 
 <br>
 
