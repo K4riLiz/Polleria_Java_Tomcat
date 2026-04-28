@@ -1,8 +1,8 @@
-<img width="110" height="110" align="left" alt="logoeldorado" src="https://github.com/user-attachments/assets/057c939e-f222-4174-8b2a-1ba401c20032">
-
-<br>
-
 # Pollería "El Dorado"
+
+<img src="https://github.com/user-attachments/assets/057c939e-f222-4174-8b2a-1ba401c20032" width="110" alt="logoeldorado">
+
+> **¡El mejor sabor de Lima en un solo lugar!**
 
 ## 📝 Presentación de la empresa
 La pollería El Dorado, ubicada en el distrito de Carabayllo, es un negocio gastronómico dedicado a la elaboración de pollo a la brasa y platos de alta calidad. Su propuesta se basa en combinar la excelencia culinaria con un servicio eficiente, amigable y adaptado a las nuevas tendencias tecnológicas. Con una visión orientada a la innovación, la empresa busca consolidarse como referente local mediante el uso de herramientas digitales que agilicen la atención. Su enfoque principal es garantizar la satisfacción del cliente tanto en su salón como en el servicio de delivery.
