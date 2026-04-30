@@ -41,7 +41,7 @@
 
             <!-- Libro -->
             <div>
-                <a href="libroreclamaciones.html">
+                <a href="${pageContext.request.contextPath}/libro-reclamaciones">
                     <i class="fa-solid fa-book-open text-3xl hover:text-red-500 transition"></i>
                 </a>
                 <h2 class="mt-2">Libro de reclamaciones</h2>

@@ -82,7 +82,9 @@
                 </c:otherwise>
             </c:choose>
             <a href="#" class="hover:text-red-500 transition"><ion-icon name="heart-outline"></ion-icon></a>
-            <a href="#" class="hover:text-red-500 transition"><ion-icon name="bag-outline"></ion-icon></a>
+            <a href="${pageContext.request.contextPath}/carrito" class="hover:text-red-500 transition relative">
+                <ion-icon name="bag-outline"></ion-icon>
+            </a>
         </div>
 
     </div>

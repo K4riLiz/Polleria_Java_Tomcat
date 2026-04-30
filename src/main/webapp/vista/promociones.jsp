@@ -20,8 +20,8 @@
 
     <!-- BANNER -->
     <div class="w-full bg-red-600 py-10 text-center text-white">
-        <h1 class="text-4xl font-bold mb-2">🔥 Promociones</h1>
-        <p class="text-red-100 text-sm">Las mejores ofertas para ti y tu familia</p>
+        <h1 class="text-4xl font-bold mb-2"> Promociones</h1>
+        <p class="text-red-100 text-sm">Aprovecha las mejores ofertas en pollería "El Dorado"</p>
     </div>
 
     <!-- GRID PROMOCIONES -->

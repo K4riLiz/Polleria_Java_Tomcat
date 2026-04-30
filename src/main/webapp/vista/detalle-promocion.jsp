@@ -65,7 +65,7 @@
                      alt="${promocion.nombre}"
                      class="w-full h-full object-cover min-h-[280px]">
                 <span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
-                    🔥 Promoción
+                     Promoción
                 </span>
             </div>
 
@@ -173,21 +173,11 @@
                         <button class="btn-cantidad" onclick="cambiarCantidad(1)">+</button>
                     </div>
 
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.usuario}">
-                            <button onclick="agregarAlPedido()"
-                                    class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
-                                <i class="fa-solid fa-cart-plus"></i>
-                                Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${promocion.precio}" pattern="#,##0.00"/></span>
-                            </button>
-                        </c:when>
-                        <c:otherwise>
-                            <a href="${pageContext.request.contextPath}/login"
-                               class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-user"></i> Inicia sesión para pedir
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
+                    <button onclick="agregarAlPedido()"
+                            class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-cart-plus"></i>
+                        Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${promocion.precio}" pattern="#,##0.00"/></span>
+                    </button>
                 </div>
 
             </div>
@@ -197,44 +187,67 @@
     <jsp:include page="/components/footer.jsp"/>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <script>
-        const precioBase = ${promocion.precio};
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-        function cambiarCantidad(delta) {
-            const el = document.getElementById('cantidad');
-            let v = parseInt(el.textContent) + delta;
-            if (v < 1) v = 1;
-            if (v > 20) v = 20;
-            el.textContent = v;
-            document.getElementById('precioTotal').textContent = (precioBase * v).toFixed(2);
-        }
+<!-- FORM OCULTO -->
+<form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
+    <input type="hidden" name="action" value="agregar">
+    <input type="hidden" name="productoId" value="${promocion.id}">
+    <input type="hidden" name="nombre" value="${promocion.nombre}">
+    <input type="hidden" name="precio" value="${promocion.precio}">
+    <input type="hidden" name="imagen" value="${promocion.imagen}">
+    <input type="hidden" name="tipo" value="promocion">
+    <input type="hidden" name="cantidad" id="cantidadInput" value="1">
+    <input type="hidden" name="opciones" id="opcionesInput" value="">
+</form>
 
-        function toggle(header) {
-            const content = header.nextElementSibling;
-            const chevron = header.querySelector('.chevron');
-            if (chevron.classList.contains('abierto')) {
-                content.style.maxHeight = '0px';
-                chevron.classList.remove('abierto');
-            } else {
-                content.style.maxHeight = '200px';
-                chevron.classList.add('abierto');
-            }
+<script>
+    const precioBase = ${promocion.precio};
+
+    function cambiarCantidad(delta) {
+        const el = document.getElementById('cantidad');
+        let v = parseInt(el.textContent) + delta;
+        if (v < 1) v = 1;
+        if (v > 20) v = 20;
+        el.textContent = v;
+        document.getElementById('precioTotal').textContent = (precioBase * v).toFixed(2);
+        document.getElementById('cantidadInput').value = v;
+    }
+
+    function toggle(header) {
+        const content = header.nextElementSibling;
+        const chevron = header.querySelector('.chevron');
+        if (chevron.classList.contains('abierto')) {
+            content.style.maxHeight = '0px';
+            chevron.classList.remove('abierto');
+        } else {
+            content.style.maxHeight = '200px';
+            chevron.classList.add('abierto');
         }
+    }
 
         function agregarAlPedido() {
-            const pollo = document.querySelector('input[name="pollo"]:checked');
-            const bebida = document.querySelector('input[name="bebida"]:checked');
-            if (!pollo) { alert('Por favor selecciona el tipo de pollo.'); return; }
-            if (!bebida) { alert('Por favor selecciona una bebida.'); return; }
-            const btn = document.querySelector('button[onclick="agregarAlPedido()"]');
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Agregado!';
-            btn.classList.replace('bg-red-600', 'bg-green-600');
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Añadir a mi pedido — S/ <span id="precioTotal">' + (precioBase * parseInt(document.getElementById("cantidad").textContent)).toFixed(2) + '</span>';
-                btn.classList.replace('bg-green-600', 'bg-red-600');
-            }, 2000);
-        }
-    </script>
+        const pollo = document.querySelector('input[name="pollo"]:checked');
+        const bebida = document.querySelector('input[name="bebida"]:checked');
+        if (!pollo) { alert('Por favor selecciona el tipo de pollo.'); return; }
+        if (!bebida) { alert('Por favor selecciona una bebida.'); return; }
+
+        const complemento = document.querySelector('input[name="complemento"]:checked');
+        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
+
+        const opciones = [
+            '🍗 ' + pollo.value,
+            complemento ? '🍽️ ' + complemento.value : null,
+            guarnicion ? '🥗 ' + guarnicion.value : null,
+            '🥤 ' + bebida.value
+        ].filter(Boolean).join(', ');
+
+        // Agregar campo opciones al form
+        const input = document.getElementById('opcionesInput');
+        if (input) input.value = opciones;
+
+        document.getElementById('formCarrito').submit();
+    }
+</script>
 </body>
 </html>
