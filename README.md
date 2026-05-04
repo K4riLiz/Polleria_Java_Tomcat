@@ -16,7 +16,7 @@ Desarrollar e implementar un aplicativo web integral de gestión de pedidos y ca
 ## 👥 Autores 
 **Equipo de Desarrollo**
 - **👤 Susaniabr Quispe, Danna Roxanne**
-- **👤 SANCHEZ PACHECO KARINA **
+- **👤 SANCHEZ PACHECO KARINA**
 - **👤 ROJAS MUNAYA, XIOMARA HATSUMI**
 - **👤 MAYURI MONTES, DANA PALOMA**
 - **👤 FERREYRA VARGAS, DAYANNA NICOLE**
