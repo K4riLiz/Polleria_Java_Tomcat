@@ -136,4 +136,14 @@
         <url-pattern>/libro-reclamaciones</url-pattern>
     </servlet-mapping>
 
+    <!-- Servlet: AdminReclamaciones -->
+    <servlet>
+        <servlet-name>AdminReclamacionServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.AdminReclamacionServlet</servlet-class>
+        </servlet>
+        <servlet-mapping>
+        <servlet-name>AdminReclamacionServlet</servlet-name>
+        <url-pattern>/admin/reclamaciones</url-pattern>
+    </servlet-mapping>
+
 </web-app>

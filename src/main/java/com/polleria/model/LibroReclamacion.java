@@ -12,6 +12,7 @@ public class LibroReclamacion {
     private String pedidoId;
     private String fecha;
     private String estado;
+    private int usuarioId;
 
     public LibroReclamacion() {}
 
@@ -47,4 +48,7 @@ public class LibroReclamacion {
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+
+    public int getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(int usuarioId) { this.usuarioId = usuarioId; }
 }

@@ -33,6 +33,10 @@
                     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
                     <i class="fa-solid fa-bowl-food"></i> Productos
                 </a>
+                <a href="${pageContext.request.contextPath}/admin/reclamaciones"
+                    lass="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-book-open"></i> Reclamaciones
+                </a>
                 <a href="${pageContext.request.contextPath}/home"
                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition mt-auto">
                     <i class="fa-solid fa-arrow-left"></i> Volver al sitio

@@ -11,7 +11,7 @@ public class LibroReclamacionDAO {
 
     public boolean registrar(LibroReclamacion r) throws SQLException {
         String sql = "INSERT INTO libro_reclamaciones (nombre, email, telefono, tipo_documento, " +
-                     "numero_documento, tipo_reclamo, descripcion, pedido_id) VALUES (?,?,?,?,?,?,?,?)";
+             "numero_documento, tipo_reclamo, descripcion, pedido_id, usuario_id) VALUES (?,?,?,?,?,?,?,?,?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, r.getNombre());
@@ -22,6 +22,7 @@ public class LibroReclamacionDAO {
             ps.setString(6, r.getTipoReclamo());
             ps.setString(7, r.getDescripcion());
             ps.setString(8, r.getPedidoId());
+            ps.setInt(9, r.getUsuarioId());
             return ps.executeUpdate() > 0;
         }
     }
