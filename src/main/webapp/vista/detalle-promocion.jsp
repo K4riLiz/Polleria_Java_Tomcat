@@ -237,8 +237,8 @@
 
         const opciones = [
             '🍗 ' + pollo.value,
-            complemento ? '🍽️ ' + complemento.value : null,
-            guarnicion ? '🥗 ' + guarnicion.value : null,
+            complemento ? ' ' + complemento.value : null,
+            guarnicion ? ' ' + guarnicion.value : null,
             '🥤 ' + bebida.value
         ].filter(Boolean).join(', ');
 

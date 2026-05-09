@@ -146,4 +146,22 @@
         <url-pattern>/admin/reclamaciones</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+    <servlet-name>CheckoutServlet</servlet-name>
+    <servlet-class>com.polleria.servlet.CheckoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CheckoutServlet</servlet-name>
+        <url-pattern>/checkout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ConfirmacionServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.ConfirmacionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ConfirmacionServlet</servlet-name>
+        <url-pattern>/confirmacion</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -131,9 +131,10 @@
 
                             <c:choose>
                                 <c:when test="${not empty sessionScope.usuario}">
-                                    <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-bag-shopping"></i> Realizar pedido
-                                    </button>
+                                    <a href="${pageContext.request.contextPath}/checkout"
+                                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-lock"></i> Realizar pedido
+                                    </a>
                                 </c:when>
                                 <c:otherwise>
                                     <a href="${pageContext.request.contextPath}/login"

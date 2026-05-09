@@ -108,8 +108,8 @@
                             </div>
                             <div class="contenido-opcion" style="max-height:200px">
                                 <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="complemento" id="papas" value="Papas Fritas"><label for="papas">🍟 Papas Fritas</label></div>
-                                    <div class="opcion-item"><input type="radio" name="complemento" id="arroz" value="Arroz"><label for="arroz">🍚 Arroz</label></div>
+                                    <div class="opcion-item"><input type="radio" name="complemento" id="papas" value="Papas Fritas"><label for="papas"> Papas Fritas</label></div>
+                                    <div class="opcion-item"><input type="radio" name="complemento" id="arroz" value="Arroz"><label for="arroz"> Arroz</label></div>
                                 </div>
                             </div>
                         </div>
@@ -124,9 +124,9 @@
                             </div>
                             <div class="contenido-opcion" style="max-height:200px">
                                 <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="Ensalada Fresca"><label for="ef">🥗 Ensalada Fresca</label></div>
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="Ensalada Cocida"><label for="ec">🥗 Ensalada Cocida</label></div>
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ee" value="Ensalada Especial"><label for="ee">🥗 Ensalada Especial</label></div>
+                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="Ensalada Fresca"><label for="ef"> Ensalada Fresca</label></div>
+                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="Ensalada Cocida"><label for="ec"> Ensalada Cocida</label></div>
+                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ee" value="Ensalada Especial"><label for="ee"> Ensalada Especial</label></div>
                                 </div>
                             </div>
                         </div>
@@ -146,9 +146,9 @@
                             </div>
                             <div class="contenido-opcion" style="max-height:200px">
                                 <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="inca" value="Inca Kola 500ml"><label for="inca">🥤 Inca Kola 500ml</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="gaseosa15" value="Gaseosa 1.5L"><label for="gaseosa15">🥤 Gaseosa 1.5L</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="jugo" value="Jugo Natural"><label for="jugo">🍊 Jugo Natural</label></div>
+                                    <div class="opcion-item"><input type="radio" name="bebida" id="inca" value="Inca Kola 500ml"><label for="inca"> Inca Kola 500ml</label></div>
+                                    <div class="opcion-item"><input type="radio" name="bebida" id="gaseosa15" value="Gaseosa 1.5L"><label for="gaseosa15"> Gaseosa 1.5L</label></div>
+                                    <div class="opcion-item"><input type="radio" name="bebida" id="jugo" value="Jugo Natural"><label for="jugo"> Jugo Natural</label></div>
                                 </div>
                             </div>
                         </div>
@@ -168,9 +168,9 @@
                             </div>
                             <div class="contenido-opcion" style="max-height:200px">
                                 <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="fresca" value="Fresca"><label for="fresca">🥗 Fresca</label></div>
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="cocida" value="Cocida"><label for="cocida">🥗 Cocida</label></div>
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="especial" value="Especial"><label for="especial">🥗 Especial</label></div>
+                                    <div class="opcion-item"><input type="radio" name="ensalada" id="fresca" value="Fresca"><label for="fresca"> Fresca</label></div>
+                                    <div class="opcion-item"><input type="radio" name="ensalada" id="cocida" value="Cocida"><label for="cocida"> Cocida</label></div>
+                                    <div class="opcion-item"><input type="radio" name="ensalada" id="especial" value="Especial"><label for="especial"> Especial</label></div>
                                 </div>
                             </div>
                         </div>
@@ -188,10 +188,10 @@
                             </div>
                             <div class="contenido-opcion" style="max-height:200px">
                                 <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="cocacola" value="Coca Cola"><label for="cocacola">🥤 Coca Cola</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="inkakola" value="Inca Kola"><label for="inkakola">🥤 Inca Kola</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="pepsi" value="Pepsi"><label for="pepsi">🥤 Pepsi</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="sprite" value="Sprite"><label for="sprite">🥤 Sprite</label></div>
+                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="cocacola" value="Coca Cola"><label for="cocacola"> Coca Cola</label></div>
+                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="inkakola" value="Inca Kola"><label for="inkakola"> Inca Kola</label></div>
+                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="pepsi" value="Pepsi"><label for="pepsi"> Pepsi</label></div>
+                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="sprite" value="Sprite"><label for="sprite"> Sprite</label></div>
                                 </div>
                             </div>
                         </div>
@@ -303,11 +303,11 @@
         const ensalada    = document.querySelector('input[name="ensalada"]:checked');
         const bebidaTipo  = document.querySelector('input[name="bebidaTipo"]:checked');
 
-        if (complemento) opciones.push('🍽️ ' + complemento.value);
-        if (guarnicion)  opciones.push('🥗 ' + guarnicion.value);
-        if (bebida)      opciones.push('🥤 ' + bebida.value);
-        if (ensalada)    opciones.push('🥗 ' + ensalada.value);
-        if (bebidaTipo)  opciones.push('🥤 ' + bebidaTipo.value);
+        if (complemento) opciones.push(' ' + complemento.value);
+        if (guarnicion)  opciones.push(' ' + guarnicion.value);
+        if (bebida)      opciones.push(' ' + bebida.value);
+        if (ensalada)    opciones.push(' ' + ensalada.value);
+        if (bebidaTipo)  opciones.push(' ' + bebidaTipo.value);
 
         document.getElementById('opcionesInput').value = opciones.join(', ');
         document.getElementById('formCarrito').submit();
