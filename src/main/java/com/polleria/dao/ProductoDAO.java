@@ -97,4 +97,20 @@ public class ProductoDAO {
         p.setCategoriaNombre(rs.getString("cat_nombre"));
         return p;
     }
+
+    public List<Producto> buscar(String query) throws SQLException {
+    List<Producto> lista = new ArrayList<>();
+    String sql = "SELECT p.*, c.nombre as cat_nombre FROM productos p " +
+                 "JOIN categorias c ON p.categoria_id = c.id " +
+                 "WHERE p.activo = 1 AND (p.nombre LIKE ? OR p.descripcion LIKE ?)";
+    try (Connection con = DBConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        String like = "%" + query + "%";
+        ps.setString(1, like);
+        ps.setString(2, like);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) lista.add(mapear(rs));
+    }
+    return lista;
+}
 }

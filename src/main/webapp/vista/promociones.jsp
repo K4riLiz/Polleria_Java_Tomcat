@@ -39,7 +39,7 @@
                 </div>
             </c:when>
             <c:otherwise>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="grid-promociones">
                     <c:forEach items="${promociones}" var="promo">
                         <a href="${pageContext.request.contextPath}/promocion?id=${promo.id}"
                            class="card-promo bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col hover:shadow-xl transition">
@@ -73,5 +73,6 @@
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
 </body>
 </html>

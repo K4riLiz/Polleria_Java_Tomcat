@@ -164,4 +164,13 @@
         <url-pattern>/confirmacion</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+    <servlet-name>BuscarServlet</servlet-name>
+    <servlet-class>com.polleria.servlet.BuscarServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BuscarServlet</servlet-name>
+        <url-pattern>/buscar</url-pattern>
+    </servlet-mapping>
+
 </web-app>

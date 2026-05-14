@@ -41,4 +41,18 @@ public class PromocionDAO {
         p.setActivo(rs.getBoolean("activo"));
         return p;
     }
+
+    public List<Promocion> buscar(String query) throws SQLException {
+    List<Promocion> lista = new ArrayList<>();
+    String sql = "SELECT * FROM promociones WHERE activo = 1 AND (nombre LIKE ? OR descripcion LIKE ?)";
+    try (Connection con = DBConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        String like = "%" + query + "%";
+        ps.setString(1, like);
+        ps.setString(2, like);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) lista.add(mapear(rs));
+    }
+    return lista;
+}
 }
