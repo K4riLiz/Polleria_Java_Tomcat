@@ -41,7 +41,7 @@
 
             <!-- Libro -->
             <div>
-                <a href="libroreclamaciones.html">
+                <a href="${pageContext.request.contextPath}/libro-reclamaciones">
                     <i class="fa-solid fa-book-open text-3xl hover:text-red-500 transition"></i>
                 </a>
                 <h2 class="mt-2">Libro de reclamaciones</h2>
@@ -78,7 +78,7 @@
 
     <!-- BOTTOM -->
     <div class="bg-gray-100 text-black text-center py-4 border-t">
-        © 2026 KidsStyle. Todos los derechos reservados.
+        © 2026 Utepinas. Todos los derechos reservados.
     </div>
 
 </footer>

@@ -64,8 +64,10 @@
 
         <!-- BUSCADOR -->
         <div class="flex items-center border rounded-full px-4 py-1 w-[450px]">
-            <input type="text" class="w-full outline-none text-sm" placeholder="Buscar...">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="buscadorHeader" class="w-full outline-none text-sm" 
+                placeholder="Buscar productos..."
+                onkeydown="if(event.key==='Enter') buscar()">
+            <i class="fa-solid fa-magnifying-glass cursor-pointer" onclick="buscar()"></i>
         </div>
 
         <!-- ICONOS USUARIO -->
@@ -82,7 +84,9 @@
                 </c:otherwise>
             </c:choose>
             <a href="#" class="hover:text-red-500 transition"><ion-icon name="heart-outline"></ion-icon></a>
-            <a href="#" class="hover:text-red-500 transition"><ion-icon name="bag-outline"></ion-icon></a>
+            <a href="${pageContext.request.contextPath}/carrito" class="hover:text-red-500 transition relative">
+                <ion-icon name="bag-outline"></ion-icon>
+            </a>
         </div>
 
     </div>
@@ -90,4 +94,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        function buscar() {
+            const texto = document.getElementById('buscadorHeader').value.trim();
+            if (texto) {
+                window.location.href = '${pageContext.request.contextPath}/buscar?q=' + encodeURIComponent(texto);
+            }
+        }
+    </script>
+
+
 </header>

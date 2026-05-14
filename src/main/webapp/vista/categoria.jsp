@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -33,6 +34,7 @@
     <section class="max-w-7xl mx-auto px-6 pb-16">
         <h2 class="text-2xl font-bold mb-8">${categoria.nombre}</h2>
 
+
         <c:choose>
             <c:when test="${empty productos}">
                 <div class="text-center py-20 text-gray-400">
@@ -41,7 +43,7 @@
                 </div>
             </c:when>
             <c:otherwise>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6" id="grid-productos">
                     <c:forEach items="${productos}" var="prod">
                         <a href="${pageContext.request.contextPath}/producto?id=${prod.id}"
                            class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group hover:shadow-xl transition">
@@ -72,5 +74,8 @@
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+
+
 </body>
 </html>

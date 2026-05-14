@@ -16,7 +16,7 @@
         <%-- SIDEBAR --%>
         <aside class="w-64 bg-gray-900 text-white flex flex-col">
             <div class="p-6 border-b border-gray-700">
-                <h1 class="text-xl font-bold text-red-400">🍗 Admin Panel</h1>
+                <h1 class="text-xl font-bold text-red-400"> Hola, admin</h1>
                 <p class="text-xs text-gray-400 mt-1">${sessionScope.usuario.nombre}</p>
             </div>
             <nav class="flex flex-col p-4 gap-2 flex-1">
@@ -27,6 +27,14 @@
                 <a href="${pageContext.request.contextPath}/admin/roles"
                    class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
                     <i class="fa-solid fa-shield-halved"></i> Roles
+                </a>
+                <a href="${pageContext.request.contextPath}/admin/productos"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-bowl-food"></i> Productos
+                </a>
+                <a href="${pageContext.request.contextPath}/admin/reclamaciones"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-book-open"></i> Reclamaciones
                 </a>
                 <a href="${pageContext.request.contextPath}/home"
                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
