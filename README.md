@@ -20,3 +20,4 @@ Desarrollar e implementar un aplicativo web integral de gestión de pedidos y ca
 - **👤 ROJAS MUNAYA, XIOMARA HATSUMI**
 - **👤 MAYURI MONTES, DANA PALOMA**
 - **👤 FERREYRA VARGAS, DAYANNA NICOLE**
+- **👤 Cruz, Lizbeth**
