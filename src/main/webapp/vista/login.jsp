@@ -58,7 +58,8 @@
 
         <!-- FORMULARIO REGISTRO -->
         <section class="container-form">
-            <form class="sign-up" action="${pageContext.request.contextPath}/login" method="post">
+            <form class="sign-up" action="${pageContext.request.contextPath}/login" method="post"
+                onsubmit="return validarRegistro()">
                 <input type="hidden" name="action" value="registro">
                 <h2>Regístrate</h2>
 
@@ -75,9 +76,23 @@
                     <p style="color:red;font-size:13px;margin-bottom:8px;">${errorRegistro}</p>
                 <% } %>
 
+                <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    Las contraseñas no coinciden
+                </p>
+
                 <div class="container-input">
                     <ion-icon name="person-outline"></ion-icon>
                     <input type="text" name="nombre" placeholder="Nombre completo" required>
+                </div>
+
+                <div class="container-input">
+                    <ion-icon name="card-outline"></ion-icon>
+                    <input type="text" name="dni" placeholder="DNI" maxlength="8" required>
+                </div>
+
+                <div class="container-input">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <input type="text" name="telefono" placeholder="Teléfono" maxlength="9" required>
                 </div>
 
                 <div class="container-input">
@@ -87,7 +102,12 @@
 
                 <div class="container-input">
                     <ion-icon name="lock-open-outline"></ion-icon>
-                    <input type="password" name="password" placeholder="Contraseña" required>
+                    <input type="password" name="password" id="pass1" placeholder="Contraseña" required>
+                </div>
+
+                <div class="container-input">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" id="pass2" placeholder="Repetir contraseña" required>
                 </div>
 
                 <button type="submit" class="button">Registrarse</button>
@@ -114,5 +134,18 @@
 <script src="${pageContext.request.contextPath}/js/login.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script>
+    function validarRegistro() {
+        const p1 = document.getElementById('pass1').value;
+        const p2 = document.getElementById('pass2').value;
+        if (p1 !== p2) {
+            document.getElementById('errorPass').style.display = 'block';
+            return false;
+        }
+        document.getElementById('errorPass').style.display = 'none';
+        return true;
+    }
+</script>
+
 </body>
 </html>

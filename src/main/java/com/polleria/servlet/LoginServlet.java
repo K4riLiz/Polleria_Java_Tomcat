@@ -67,6 +67,7 @@ public class LoginServlet extends HttpServlet {
         String nombre = req.getParameter("nombre");
         String email = req.getParameter("email");
         String password = req.getParameter("password");
+        String telefono = req.getParameter("telefono");
 
         try {
             UsuarioDAO dao = new UsuarioDAO();
@@ -79,6 +80,7 @@ public class LoginServlet extends HttpServlet {
             u.setNombre(nombre);
             u.setEmail(email);
             u.setPassword(password);
+            u.setTelefono(telefono);
 
             if (dao.registrar(u)) {
                 req.setAttribute("exito", "Cuenta creada exitosamente. Inicia sesión.");

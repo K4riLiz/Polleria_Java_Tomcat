@@ -9,7 +9,7 @@
     </div>
 
     <!-- Contenedor principal -->
-    <div class="w-full flex items-center justify-between px-10 py-1 gap-6">
+    <div class="w-full flex items-center justify-between px-4 md:px-10 py-1 gap-6">>
 
         <a href="${pageContext.request.contextPath}/home">
             <img src="${pageContext.request.contextPath}/img/logoheader.png" class="h-20 w-auto object-contain">
@@ -63,7 +63,7 @@
         </nav>
 
         <!-- BUSCADOR -->
-        <div class="flex items-center border rounded-full px-4 py-1 w-[450px]">
+        <div class="hidden md:flex items-center border rounded-full px-4 py-1 md:w-[450px]">
             <input type="text" id="buscadorHeader" class="w-full outline-none text-sm" 
                 placeholder="Buscar productos..."
                 onkeydown="if(event.key==='Enter') buscar()">
