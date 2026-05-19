@@ -4,8 +4,8 @@ WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Etapa 2: Imagen liviana con solo el JAR
-FROM tomcat:9.0.95-jdk20-temurin-jammy
+# Etapa 2: Imagen liviana con solo el WAR
+FROM tomcat:9.0-jdk17-temurin-jammy
 WORKDIR /usr/local/tomcat
 RUN rm -rf webapps/*
 COPY --from=builder /app/target/Polleria_Java_Tomcat-1.0-SNAPSHOT.war ./webapps/ROOT.war
