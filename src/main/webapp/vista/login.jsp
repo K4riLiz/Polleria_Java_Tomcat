@@ -76,6 +76,19 @@
                     <p style="color:red;font-size:13px;margin-bottom:8px;">${errorRegistro}</p>
                 <% } %>
 
+                <p id="errorDni" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    El DNI debe tener exactamente 8 números.
+                </p>
+                <p id="errorTel" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    El teléfono debe tener exactamente 9 números.
+                </p>
+                <p id="errorRobusta" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial (@$!%*?&._-)
+                </p>
+                <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    Las contraseñas no coinciden.
+                </p>    
+
                 <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
                     Las contraseñas no coinciden
                 </p>
@@ -136,15 +149,58 @@
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script>
     function validarRegistro() {
-        const p1 = document.getElementById('pass1').value;
-        const p2 = document.getElementById('pass2').value;
+        const nombre   = document.querySelector('input[name="nombre"]').value;
+        const dni      = document.querySelector('input[name="dni"]').value;
+        const telefono = document.querySelector('input[name="telefono"]').value;
+        const email    = document.querySelector('input[name="email"]').value;
+        const p1       = document.getElementById('pass1').value;
+        const p2       = document.getElementById('pass2').value;
+
+        // Limpiar errores previos
+        document.getElementById('errorPass').style.display = 'none';
+        document.getElementById('errorDni').style.display = 'none';
+        document.getElementById('errorTel').style.display = 'none';
+        document.getElementById('errorRobusta').style.display = 'none';
+
+        // Validar DNI: solo 8 números
+        if (!/^\d{8}$/.test(dni)) {
+            document.getElementById('errorDni').style.display = 'block';
+            return false;
+        }
+
+        // Validar Teléfono: solo 9 números
+        if (!/^\d{9}$/.test(telefono)) {
+            document.getElementById('errorTel').style.display = 'block';
+            return false;
+        }
+
+        // Validar contraseña robusta
+        const passRobusta = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/;
+        if (!passRobusta.test(p1)) {
+            document.getElementById('errorRobusta').style.display = 'block';
+            return false;
+        }
+
+        // Validar que contraseñas coincidan
         if (p1 !== p2) {
             document.getElementById('errorPass').style.display = 'block';
             return false;
         }
-        document.getElementById('errorPass').style.display = 'none';
+
         return true;
     }
+
+    // Solo números en DNI
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('input[name="dni"]').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
+        });
+
+        // Solo números en teléfono
+        document.querySelector('input[name="telefono"]').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);
+        });
+    });
 </script>
 
 </body>
