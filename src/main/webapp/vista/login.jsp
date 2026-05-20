@@ -58,7 +58,8 @@
 
         <!-- FORMULARIO REGISTRO -->
         <section class="container-form">
-            <form class="sign-up" action="${pageContext.request.contextPath}/login" method="post">
+            <form class="sign-up" action="${pageContext.request.contextPath}/login" method="post"
+                onsubmit="return validarRegistro()">
                 <input type="hidden" name="action" value="registro">
                 <h2>Regístrate</h2>
 
@@ -75,9 +76,36 @@
                     <p style="color:red;font-size:13px;margin-bottom:8px;">${errorRegistro}</p>
                 <% } %>
 
+                <p id="errorDni" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    El DNI debe tener exactamente 8 números.
+                </p>
+                <p id="errorTel" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    El teléfono debe tener exactamente 9 números.
+                </p>
+                <p id="errorRobusta" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial (@$!%*?&._-)
+                </p>
+                <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    Las contraseñas no coinciden.
+                </p>    
+
+                <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    Las contraseñas no coinciden
+                </p>
+
                 <div class="container-input">
                     <ion-icon name="person-outline"></ion-icon>
                     <input type="text" name="nombre" placeholder="Nombre completo" required>
+                </div>
+
+                <div class="container-input">
+                    <ion-icon name="card-outline"></ion-icon>
+                    <input type="text" name="dni" placeholder="DNI" maxlength="8" required>
+                </div>
+
+                <div class="container-input">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <input type="text" name="telefono" placeholder="Teléfono" maxlength="9" required>
                 </div>
 
                 <div class="container-input">
@@ -87,7 +115,12 @@
 
                 <div class="container-input">
                     <ion-icon name="lock-open-outline"></ion-icon>
-                    <input type="password" name="password" placeholder="Contraseña" required>
+                    <input type="password" name="password" id="pass1" placeholder="Contraseña" required>
+                </div>
+
+                <div class="container-input">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" id="pass2" placeholder="Repetir contraseña" required>
                 </div>
 
                 <button type="submit" class="button">Registrarse</button>
@@ -114,5 +147,61 @@
 <script src="${pageContext.request.contextPath}/js/login.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script>
+    function validarRegistro() {
+        const nombre   = document.querySelector('input[name="nombre"]').value;
+        const dni      = document.querySelector('input[name="dni"]').value;
+        const telefono = document.querySelector('input[name="telefono"]').value;
+        const email    = document.querySelector('input[name="email"]').value;
+        const p1       = document.getElementById('pass1').value;
+        const p2       = document.getElementById('pass2').value;
+
+        // Limpiar errores previos
+        document.getElementById('errorPass').style.display = 'none';
+        document.getElementById('errorDni').style.display = 'none';
+        document.getElementById('errorTel').style.display = 'none';
+        document.getElementById('errorRobusta').style.display = 'none';
+
+        // Validar DNI: solo 8 números
+        if (!/^\d{8}$/.test(dni)) {
+            document.getElementById('errorDni').style.display = 'block';
+            return false;
+        }
+
+        // Validar Teléfono: solo 9 números
+        if (!/^\d{9}$/.test(telefono)) {
+            document.getElementById('errorTel').style.display = 'block';
+            return false;
+        }
+
+        // Validar contraseña robusta
+        const passRobusta = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/;
+        if (!passRobusta.test(p1)) {
+            document.getElementById('errorRobusta').style.display = 'block';
+            return false;
+        }
+
+        // Validar que contraseñas coincidan
+        if (p1 !== p2) {
+            document.getElementById('errorPass').style.display = 'block';
+            return false;
+        }
+
+        return true;
+    }
+
+    // Solo números en DNI
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('input[name="dni"]').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
+        });
+
+        // Solo números en teléfono
+        document.querySelector('input[name="telefono"]').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);
+        });
+    });
+</script>
+
 </body>
 </html>
