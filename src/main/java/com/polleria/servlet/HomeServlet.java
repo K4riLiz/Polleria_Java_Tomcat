@@ -16,6 +16,8 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        
+        
         try {
             CategoriaDAO catDao = new CategoriaDAO();
             req.setAttribute("categorias", catDao.listarTodas());

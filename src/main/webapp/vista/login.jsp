@@ -85,6 +85,9 @@
                 <p id="errorRobusta" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
                     La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial (@$!%*?&._-)
                 </p>
+                <p id="errorNombre" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
+                    El nombre solo debe contener letras y espacios.
+                </p>
                 <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
                     Las contraseñas no coinciden.
                 </p>    
@@ -155,12 +158,21 @@
         const email    = document.querySelector('input[name="email"]').value;
         const p1       = document.getElementById('pass1').value;
         const p2       = document.getElementById('pass2').value;
+        // Validar nombre
+        const regexNombre = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/;
+
+        if (!regexNombre.test(nombre)) {
+            document.getElementById('errorNombre').style.display = 'block';
+            return false;
+        }
 
         // Limpiar errores previos
+        document.getElementById('errorNombre').style.display = 'none';
         document.getElementById('errorPass').style.display = 'none';
         document.getElementById('errorDni').style.display = 'none';
         document.getElementById('errorTel').style.display = 'none';
         document.getElementById('errorRobusta').style.display = 'none';
+        
 
         // Validar DNI: solo 8 números
         if (!/^\d{8}$/.test(dni)) {
@@ -190,8 +202,14 @@
         return true;
     }
 
-    // Solo números en DNI
+    
     document.addEventListener('DOMContentLoaded', function() {
+        // Solo letras en nombre
+        document.querySelector('input[name="nombre"]').addEventListener('input', function() {
+            this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '');
+        });
+
+        // Solo números en DNI
         document.querySelector('input[name="dni"]').addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
         });
