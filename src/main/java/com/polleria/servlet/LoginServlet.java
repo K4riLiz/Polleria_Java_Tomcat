@@ -70,6 +70,57 @@ public class LoginServlet extends HttpServlet {
         String telefono = req.getParameter("telefono");
 
         try {
+            // validacion de nombre
+            if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$")) {
+
+                req.setAttribute("errorRegistro", "El nombre solo debe contener letras");
+                req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+
+                return;
+            }
+
+            // LIMITE DE NOMBRE
+            if (nombre.length() < 3 || nombre.length() > 50) {
+
+                req.setAttribute("errorRegistro", "El nombre debe tener entre 3 y 50 caracteres");
+                req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+
+                return;
+            }
+
+            // validacion de formato email
+            if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                req.setAttribute("errorRegistro", "Formato de correo inválido");
+                req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+                return;
+            }
+
+            // validacion de dominios reales
+            String[] dominiosValidos = {
+                    "gmail.com",
+                    "hotmail.com",
+                    "outlook.com",
+                    "yahoo.com",
+                    "icloud.com"
+            };
+
+            boolean valido = false;
+
+            for (String dominio : dominiosValidos) {
+                if (email.toLowerCase().endsWith("@" + dominio)) {
+                    valido = true;
+                    break;
+                }
+            }
+
+            if (!valido) {
+                req.setAttribute("errorRegistro",
+                        "Debes usar un correo válido");
+                req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+                return;
+            }
+
+            // VALIDAR DUPLICADOS
             UsuarioDAO dao = new UsuarioDAO();
             if (dao.emailExiste(email)) {
                 req.setAttribute("errorRegistro", "El correo ya está registrado");
