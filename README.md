@@ -13,6 +13,16 @@ La pollería El Dorado sufre retrasos y errores operativos debido a una gestión
 ## 🎯 Objetivo General
 Desarrollar e implementar un aplicativo web integral de gestión de pedidos y carta digital para optimizar la operatividad, reducir los errores humanos y mejorar la experiencia de servicio al cliente en la pollería El Dorado.
 
+## 📌 Objetivos Específicos
+
+1. Diseñar e implementar una **carta digital interactiva** accesible desde dispositivos móviles y web.
+2. Desarrollar un **módulo de registro y seguimiento de pedidos** en tiempo real para el personal de caja y cocina.
+3. Implementar un **sistema de control de ventas** con generación de reportes diarios, semanales y mensuales.
+4. Integrar un **módulo de delivery** que permita gestionar pedidos a domicilio de forma centralizada.
+5. Garantizar una **interfaz intuitiva y responsiva** que minimice el tiempo de capacitación del personal.
+
+---
+
 ## 👥 Autores 
 **Equipo de Desarrollo**
 - **👤 Susaniabr Quispe, Danna Roxanne**
