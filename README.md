@@ -32,29 +32,41 @@ Desarrollar e implementar un aplicativo web integral de gestión de pedidos y ca
 
 ## 🛠️ Tecnologías Utilizadas
 
-### Frontend — JSP (JavaServer Pages)
+- [Java JDK](https://www.oracle.com/java/technologies/downloads/) v21
+- [Apache Tomcat](https://tomcat.apache.org/) v9 
+- [Apache NetBeans IDE](https://netbeans.apache.org/) v21 
+- [MySQL](https://www.mysql.com/) v8 
+- [Git](https://git-scm.com/)
 
-Las vistas del sistema están construidas con **JavaServer Pages (JSP)**, una tecnología de Java que permite generar contenido HTML dinámico desde el servidor. Las páginas se estructuran con **HTML5** y **CSS3** para lograr una interfaz responsiva y amigable, mientras que fragmentos de **JavaScript** gestionan interacciones del lado del cliente como validaciones de formularios y actualizaciones dinámicas.
 
-### Backend — Servlets Java
+### JSP (JavaServer Pages) — Vistas del sistema
 
-La lógica de negocio del sistema se implementa mediante **Java Servlets**, componentes que se ejecutan sobre el servidor de aplicaciones **Apache Tomcat**. Los Servlets reciben las peticiones HTTP del navegador, procesan la información (registro de pedidos, gestión de usuarios, generación de reportes) y devuelven la respuesta correspondiente a las vistas JSP. Este enfoque sigue el patrón de arquitectura **MVC (Modelo-Vista-Controlador)**, separando claramente la lógica, los datos y la presentación.
+Se utilizó JSP para construir las páginas que el cliente ve en el navegador. Concretamente, se aplicó en la **carta digital**, donde cada plato del menú se muestra de forma dinámica consultando la base de datos, y en las **páginas de login**, donde el formulario de autenticación valida las credenciales del usuario y redirige según su rol (administrador o cajero). HTML5 y CSS3 complementan el diseño visual de cada vista.
 
-### Base de Datos — MySQL
+### Java Servlets — Lógica del sistema
 
-El almacenamiento y gestión de datos se realiza con **MySQL**, un sistema de gestión de bases de datos relacional. Se utiliza para persistir la información de pedidos, productos, usuarios, ventas y reclamos, garantizando integridad referencial mediante claves primarias y foráneas.
+Los Servlets son los encargados de procesar lo que ocurre entre el usuario y la base de datos. Por ejemplo, cuando un usuario ingresa sus credenciales en el login, un Servlet recibe esos datos, consulta MySQL para verificarlos y decide si redirige al panel principal o muestra un mensaje de error. De la misma forma, cuando se carga la carta digital, un Servlet obtiene los productos disponibles y los envía a la vista JSP para mostrarlos.
 
-### Entorno de Desarrollo — Apache NetBeans IDE
+### Apache Tomcat — Servidor de aplicaciones
 
-El desarrollo del proyecto se lleva a cabo en **Apache NetBeans IDE**, un entorno de desarrollo integrado que ofrece soporte nativo para proyectos Java Web con Servlets y JSP, integración con Apache Tomcat para despliegue local, y herramientas de depuración y control de versiones incorporadas.
+Tomcat es el servidor sobre el cual corre toda la aplicación. Durante el desarrollo, cada integrante ejecuta el proyecto localmente desde NetBeans apuntando a Tomcat, lo que permite probar los Servlets y las páginas JSP antes de subir cambios al repositorio.
 
-### Control de Versiones — Git y GitHub
+### MySQL — Base de datos
 
-El equipo utiliza **Git** como sistema de control de versiones distribuido, gestionando el historial de cambios y el trabajo colaborativo entre las integrantes. El repositorio remoto está alojado en **GitHub**, donde se aplica un flujo de trabajo basado en ramas (`main`, `develop`) con revisión de código mediante pull requests.
+Se utiliza MySQL para almacenar la información del sistema. Hasta el momento contiene las tablas de **usuarios** (con sus roles y credenciales cifradas) y **productos** (nombre, precio, categoría y disponibilidad para la carta digital). 
 
-### Despliegue — Render
+### Apache NetBeans IDE — Entorno de desarrollo
 
-El despliegue de la aplicación web se realiza en **Render**, una plataforma en la nube que permite publicar aplicaciones Java Web de forma sencilla y gratuita en su plan básico. Render gestiona automáticamente el servidor, facilitando que el sistema sea accesible desde cualquier dispositivo con conexión a internet.
+Todo el equipo trabaja con NetBeans por su integración directa con proyectos Java Web y Apache Tomcat. Permite ejecutar y depurar la aplicación en un solo clic, facilitando el trabajo con Servlets y JSP sin configuración adicional.
+
+### Git y GitHub — Control de versiones
+
+El equipo gestiona el código con Git y lo centraliza en el repositorio **K4riLiz/Polleria_Java_Tomcat** en GitHub. Cada integrante trabaja en su propia rama y sube los cambios mediante commits, evitando conflictos y manteniendo un historial claro del avance del proyecto.
+
+### Render - Despliegue en la nube
+
+El equipo La aplicación ya se encuentra desplegada en **Render**. El render toma el proyecto directamente desde el repositorio de GitHub y lo pública de forma automática cada vez que se actualiza la rama principal.
+
 ---
 
 ## 👥 Autores 
