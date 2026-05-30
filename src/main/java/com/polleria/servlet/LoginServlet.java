@@ -35,9 +35,37 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
+    // ── CAPTCHA V3 ──────────────────────────────────────────────────────────────────
+    private boolean verificarCaptcha(String token) {
+      
+        try {
+            String secretKey = "6LcthQQtAAAAAI2EqzSF_4VOyEW3ydK1SncOt8JS";
+            java.net.URL url = new java.net.URL("https://www.google.com/recaptcha/api/siteverify");
+            java.net.HttpURLConnection con = (java.net.HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+            String params = "secret=" + secretKey + "&response=" + token;
+            con.getOutputStream().write(params.getBytes());
+            java.util.Scanner sc = new java.util.Scanner(con.getInputStream());
+            String response = sc.useDelimiter("\\A").next();
+            return response.contains("\"success\": true") && !response.contains("\"score\": 0.0");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
     // ── LOGIN ──────────────────────────────────────────────────────────────────
     private void handleLogin(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        
+        // Verificar captcha
+        String captchaToken = req.getParameter("g-recaptcha-response");
+        if (!verificarCaptcha(captchaToken)) {
+            req.setAttribute("error", "Verificación de seguridad fallida. Intenta de nuevo.");
+            req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+            return;
+        }
+        
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
@@ -70,6 +98,15 @@ public class LoginServlet extends HttpServlet {
     // ── REGISTRO ───────────────────────────────────────────────────────────────
     private void handleRegistro(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        
+        // Verificar captcha
+        String captchaToken = req.getParameter("g-recaptcha-response");
+        if (!verificarCaptcha(captchaToken)) {
+            req.setAttribute("errorRegistro", "Verificación de seguridad fallida. Intenta de nuevo.");
+            req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+            return;
+        }
+        
         String nombre   = req.getParameter("nombre");
         String email    = req.getParameter("email");
         String password = req.getParameter("password");
