@@ -18,6 +18,13 @@
 
     <dependencies>
 
+        <!-- JavaMail -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        
         <!-- Servlet API (javax, compatible con Tomcat 8/9) -->
         <dependency>
             <groupId>javax.servlet</groupId>

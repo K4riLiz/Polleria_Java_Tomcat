@@ -55,6 +55,16 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
+    
+    <!-- Servlet: Verificación de código -->
+    <servlet>
+        <servlet-name>VerificacionServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.VerificacionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VerificacionServlet</servlet-name>
+        <url-pattern>/verificacion</url-pattern>
+    </servlet-mapping>
  
     <!-- Servlet: Categoria -->
     <servlet>
