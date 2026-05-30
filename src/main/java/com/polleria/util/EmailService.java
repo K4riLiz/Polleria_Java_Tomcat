@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.polleria.util;
 
 import javax.mail.*;
@@ -10,8 +6,8 @@ import java.util.Properties;
 
 public class EmailService {
 
-    private static final String REMITENTE = "992485707kari@gmail.com"; // cambia esto
-    private static final String CLAVE     = "lopkwinxnvvbcnzg";   // los 16 caracteres
+    private static final String REMITENTE = "992485707kari@gmail.com";
+    private static final String CLAVE     = "lopkwinxnvvbcnzg";
 
     public static void enviarCodigo(String destinatario, String codigo) throws MessagingException {
         Properties props = new Properties();
@@ -29,10 +25,7 @@ public class EmailService {
         String htmlContent
                 = "<div style='font-family:Arial,sans-serif;max-width:480px;margin:0 auto;'>"
                 + "<div style='background:#c0392b;padding:28px 32px;text-align:center;border-radius:8px 8px 0 0;'>"
-                + "<img src='http://localhost:8082/Polleria_Java_Tomcat-1.0-SNAPSHOT/img/logoheader.png' "
-                + "width='80' height='80' style='border-radius:50%;border:3px solid white;'/>"
-                + "<br/><br/>"
-                + "<span style='color:white;font-size:18px;font-weight:bold;'>Pollería El Dorado</span>"
+                + "<span style='color:white;font-size:24px;font-weight:bold;'>Pollería El Dorado</span>"
                 + "</div>"
                 + "<div style='background:white;padding:32px;border:1px solid #eee;'>"
                 + "<h2 style='color:#1a1a1a;font-size:18px;'>Verifica tu cuenta</h2>"
@@ -55,7 +48,6 @@ public class EmailService {
         mensaje.setFrom(new InternetAddress(REMITENTE));
         mensaje.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
         mensaje.setSubject("Código de verificación - Pollería El Dorado");
-        // Enviar como HTML
         mensaje.setContent(htmlContent, "text/html; charset=UTF-8");
 
         Transport.send(mensaje);
