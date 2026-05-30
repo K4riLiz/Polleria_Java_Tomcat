@@ -63,13 +63,6 @@
                 <input type="hidden" name="action" value="registro">
                 <h2>Regístrate</h2>
 
-                <div class="social-networks">
-                    <ion-icon name="logo-facebook"></ion-icon>
-                    <ion-icon name="logo-instagram"></ion-icon>
-                    <ion-icon name="logo-whatsapp"></ion-icon>
-                    <ion-icon name="logo-tiktok"></ion-icon>
-                </div>
-
                 <span>Use su correo electrónico para registrarse</span>
 
                 <% if (request.getAttribute("errorRegistro") != null) { %>

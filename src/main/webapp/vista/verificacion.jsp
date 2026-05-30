@@ -87,7 +87,7 @@
 </head>
 <body>
 <div class="verificacion-box">
-    <h2>Verifica tu correo 📧</h2>
+    <h2>Verifica tu correo</h2>
     <p>Te enviamos un código de 6 dígitos.<br>Ingrésalo antes de que expire el tiempo.</p>
 
     <% if (request.getAttribute("error") != null) { %>
