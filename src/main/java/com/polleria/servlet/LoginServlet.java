@@ -136,6 +136,9 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = req.getSession();
             session.setAttribute("usuarioPendiente", u);
             session.setAttribute("codigoVerificacion", codigo);
+            
+            // Guardar tiempo de expiración (5 minutos)
+            session.setAttribute("codigoExpiracion", System.currentTimeMillis() + (5 * 60 * 1000));
 
             // Enviar código al correo del usuario
             EmailService.enviarCodigo(email, codigo);

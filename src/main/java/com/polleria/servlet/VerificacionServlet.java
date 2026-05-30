@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.polleria.servlet;
 
 import com.polleria.dao.UsuarioDAO;
@@ -32,6 +28,39 @@ public class VerificacionServlet extends HttpServlet {
 
         String accion = req.getParameter("accion");
 
+        // Si es reenviar, NO verificar expiración — se genera código nuevo
+        if ("reenviar".equals(accion)) {
+            Usuario u = (Usuario) session.getAttribute("usuarioPendiente");
+            if (u == null) {
+                resp.sendRedirect(req.getContextPath() + "/login");
+                return;
+            }
+            // Generar nuevo código y nueva expiración de 5 minutos
+            String nuevoCodigo = generarCodigo();
+            session.setAttribute("codigoVerificacion", nuevoCodigo);
+            session.setAttribute("codigoExpiracion", System.currentTimeMillis() + (5 * 60 * 1000));
+            try {
+                EmailService.enviarCodigo(u.getEmail(), nuevoCodigo);
+                req.setAttribute("info", "Código reenviado a tu correo.");
+            } catch (Exception e) {
+                req.setAttribute("error", "Error al reenviar el código.");
+            }
+            req.getRequestDispatcher("/vista/verificacion.jsp").forward(req, resp);
+            return;
+        }
+
+        // Para cualquier otra acción, verificar si el código expiró
+        Long expiracion = (Long) session.getAttribute("codigoExpiracion");
+        if (expiracion == null || System.currentTimeMillis() > expiracion) {
+            // Limpiar sesión y mandar de vuelta al login
+            session.removeAttribute("codigoVerificacion");
+            session.removeAttribute("codigoExpiracion");
+            session.removeAttribute("usuarioPendiente");
+            req.setAttribute("errorRegistro", "El código expiró. Vuelve a registrarte.");
+            req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+            return;
+        }
+
         if ("verificar".equals(accion)) {
             String codigoIngresado = req.getParameter("codigo");
             String codigoSession   = (String) session.getAttribute("codigoVerificacion");
@@ -43,10 +72,13 @@ public class VerificacionServlet extends HttpServlet {
             }
 
             if (codigoIngresado.equals(codigoSession)) {
+                // Código correcto → registrar en BD
                 try {
                     UsuarioDAO dao = new UsuarioDAO();
                     if (dao.registrar(u)) {
+                        // Limpiar sesión después de registrar
                         session.removeAttribute("codigoVerificacion");
+                        session.removeAttribute("codigoExpiracion");
                         session.removeAttribute("usuarioPendiente");
                         req.setAttribute("exito", "Cuenta creada exitosamente. Inicia sesión.");
                     } else {
@@ -57,28 +89,14 @@ public class VerificacionServlet extends HttpServlet {
                 }
                 req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
             } else {
+                // Código incorrecto → volver a verificación
                 req.setAttribute("error", "Código incorrecto. Intenta de nuevo.");
                 req.getRequestDispatcher("/vista/verificacion.jsp").forward(req, resp);
             }
-
-        } else if ("reenviar".equals(accion)) {
-            Usuario u = (Usuario) session.getAttribute("usuarioPendiente");
-            if (u == null) {
-                resp.sendRedirect(req.getContextPath() + "/login");
-                return;
-            }
-            String nuevoCodigo = generarCodigo();
-            session.setAttribute("codigoVerificacion", nuevoCodigo);
-            try {
-                EmailService.enviarCodigo(u.getEmail(), nuevoCodigo);
-                req.setAttribute("info", "Código reenviado a tu correo.");
-            } catch (Exception e) {
-                req.setAttribute("error", "Error al reenviar el código.");
-            }
-            req.getRequestDispatcher("/vista/verificacion.jsp").forward(req, resp);
         }
     }
 
+    // Genera un código de 6 dígitos aleatorio
     private String generarCodigo() {
         return String.valueOf(100000 + new Random().nextInt(900000));
     }
