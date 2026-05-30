@@ -6,16 +6,10 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-<<<<<<< Updated upstream
-    private static final String URL = System.getenv("DB_URL");
-    private static final String USER = System.getenv("DB_USER");
-    private static final String PASSWORD = System.getenv("DB_PASSWORD");
-=======
-    private static final String URL = "jdbc:mysql://localhost:3306/polleria_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String URL = "jdbc:mysql://localhost:3306/polleria_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true";
     private static final String USER = "root";
     private static final String PASSWORD = "12345678";
->>>>>>> Stashed changes
-
+    
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
