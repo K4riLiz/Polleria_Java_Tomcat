@@ -77,7 +77,7 @@
             </div>
 
             <!-- INFO -->
-            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5 overflow-y-auto max-h-[90vh]">
+            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5">
 
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 mb-1">${producto.nombre}</h1>
@@ -106,7 +106,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                             </div>
-                            <div class="contenido-opcion" style="max-height:200px">
+                            <div class="contenido-opcion" style="max-height:none">
                                 <div class="p-4 flex flex-col gap-2">
                                     <div class="opcion-item"><input type="radio" name="complemento" id="papas" value="Papas Fritas"><label for="papas"> Papas Fritas</label></div>
                                     <div class="opcion-item"><input type="radio" name="complemento" id="arroz" value="Arroz"><label for="arroz"> Arroz</label></div>
@@ -122,7 +122,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                             </div>
-                            <div class="contenido-opcion" style="max-height:200px">
+                            <div class="contenido-opcion" style="max-height:none">
                                 <div class="p-4 flex flex-col gap-2">
                                     <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="Ensalada Fresca"><label for="ef"> Ensalada Fresca</label></div>
                                     <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="Ensalada Cocida"><label for="ec"> Ensalada Cocida</label></div>
@@ -144,7 +144,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                             </div>
-                            <div class="contenido-opcion" style="max-height:200px">
+                            <div class="contenido-opcion" style="max-height:none">
                                 <div class="p-4 flex flex-col gap-2">
                                     <div class="opcion-item"><input type="radio" name="bebida" id="inca" value="Inca Kola 500ml"><label for="inca"> Inca Kola 500ml</label></div>
                                     <div class="opcion-item"><input type="radio" name="bebida" id="gaseosa15" value="Gaseosa 1.5L"><label for="gaseosa15"> Gaseosa 1.5L</label></div>
@@ -166,7 +166,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                             </div>
-                            <div class="contenido-opcion" style="max-height:200px">
+                            <div class="contenido-opcion" style="max-height:none">
                                 <div class="p-4 flex flex-col gap-2">
                                     <div class="opcion-item"><input type="radio" name="ensalada" id="fresca" value="Fresca"><label for="fresca"> Fresca</label></div>
                                     <div class="opcion-item"><input type="radio" name="ensalada" id="cocida" value="Cocida"><label for="cocida"> Cocida</label></div>
@@ -186,7 +186,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                             </div>
-                            <div class="contenido-opcion" style="max-height:200px">
+                            <div class="contenido-opcion" style="max-height:none">
                                 <div class="p-4 flex flex-col gap-2">
                                     <div class="opcion-item"><input type="radio" name="bebidaTipo" id="cocacola" value="Coca Cola"><label for="cocacola"> Coca Cola</label></div>
                                     <div class="opcion-item"><input type="radio" name="bebidaTipo" id="inkakola" value="Inca Kola"><label for="inkakola"> Inca Kola</label></div>
@@ -224,7 +224,9 @@
                 <div class="flex items-center gap-4 mt-auto">
                     <div class="flex items-center gap-3">
                         <button class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
-                        <span id="cantidad" class="text-xl font-bold w-8 text-center">1</span>
+                        <span id="cantidad" class="text-xl font-bold w-8 text-center">
+                            ${not empty cantidadEnCarrito ? cantidadEnCarrito : 1}
+                        </span>
                         <button class="btn-cantidad" onclick="cambiarCantidad(1)">+</button>
                     </div>
 
@@ -242,7 +244,7 @@
     <jsp:include page="/components/footer.jsp"/>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
 <!-- FORM OCULTO -->
 <form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
@@ -258,6 +260,10 @@
 
 <script>
     const precioBase = ${producto.precio};
+
+    const cantidadInicial = ${not empty cantidadEnCarrito ? cantidadEnCarrito : 1};
+    document.getElementById('cantidadInput').value = cantidadInicial;
+    document.getElementById('precioTotal').textContent = (precioBase * cantidadInicial).toFixed(2);
 
     function cambiarCantidad(delta) {
         const el = document.getElementById('cantidad');

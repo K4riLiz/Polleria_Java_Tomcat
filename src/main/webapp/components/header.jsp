@@ -33,24 +33,24 @@
                         </div>
                         <div class="flex gap-12">
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Pollo a la brasa</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=1" class="text-lg font-bold text-red-500 mb-2 hover:underline">Pollo a la brasa</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=1" class="hover:text-red-500 py-1">1/4 Pollo</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=1" class="hover:text-red-500 py-1">1/2 Pollo</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=1" class="hover:text-red-500 py-1">1 Pollo entero</a>
                             </div>
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Ensaladas</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=2" class="text-lg font-bold text-red-500 mb-2 hover:underline">Ensaladas</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=2" class="hover:text-red-500 py-1">Fresca</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=2" class="hover:text-red-500 py-1">Cocida</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=2" class="hover:text-red-500 py-1">Especial</a>
                             </div>
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Bebidas</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=5" class="text-lg font-bold text-red-500 mb-2 hover:underline">Bebidas</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=5" class="hover:text-red-500 py-1">Gaseosas</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=5" class="hover:text-red-500 py-1">Jugos</a>
                             </div>
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Postres</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=6" class="text-lg font-bold text-red-500 mb-2 hover:underline">Postres</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=6" class="hover:text-red-500 py-1">Helados</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=6" class="hover:text-red-500 py-1">Tortas</a>
                             </div>

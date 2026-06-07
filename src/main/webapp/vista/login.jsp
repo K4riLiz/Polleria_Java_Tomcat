@@ -25,12 +25,7 @@
                 <input type="hidden" name="action" value="login">
                 <h2>Iniciar sesión</h2>
 
-                <div class="social-networks">
-                    <ion-icon name="logo-facebook"></ion-icon>
-                    <ion-icon name="logo-instagram"></ion-icon>
-                    <ion-icon name="logo-whatsapp"></ion-icon>
-                    <ion-icon name="logo-tiktok"></ion-icon>
-                </div>
+                
 
                 <span>Use su correo y contraseña</span>
 
@@ -53,6 +48,15 @@
 
                 <a href="#">¿Olvidaste tu contraseña?</a>
                 <button type="submit" class="button">Iniciar sesión</button>
+                <br>
+
+                <p>Síguenos en nuestras redes sociales</p>
+                <div class="social-networks">
+                    <ion-icon name="logo-facebook"></ion-icon>
+                    <ion-icon name="logo-instagram"></ion-icon>
+                    <ion-icon name="logo-whatsapp"></ion-icon>
+                    <ion-icon name="logo-tiktok"></ion-icon>
+                </div>
             </form>
         </section>
 

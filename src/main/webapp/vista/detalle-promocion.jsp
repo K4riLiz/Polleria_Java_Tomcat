@@ -70,7 +70,7 @@
             </div>
 
             <!-- INFO -->
-            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5 overflow-y-auto max-h-[90vh]">
+            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5">
 
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 mb-1">${promocion.nombre}</h1>
@@ -96,7 +96,7 @@
                             </div>
                             <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                         </div>
-                        <div class="contenido-opcion" style="max-height:200px">
+                        <div class="contenido-opcion" style="max-height:none">
                             <div class="p-4 flex flex-col gap-2">
                                 <div class="opcion-item"><input type="radio" name="pollo" id="pierna" value="pierna"><label for="pierna"> Pierna</label></div>
                                 <div class="opcion-item"><input type="radio" name="pollo" id="pecho" value="pecho"><label for="pecho"> Pecho</label></div>
@@ -112,7 +112,7 @@
                             </div>
                             <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                         </div>
-                        <div class="contenido-opcion" style="max-height:200px">
+                        <div class="contenido-opcion" style="max-height:none">
                             <div class="p-4 flex flex-col gap-2">
                                 <div class="opcion-item"><input type="radio" name="complemento" id="papas" value="papas"><label for="papas"> Papas Fritas</label></div>
                                 <div class="opcion-item"><input type="radio" name="complemento" id="arroz" value="arroz"><label for="arroz"> Arroz</label></div>
@@ -128,7 +128,7 @@
                             </div>
                             <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                         </div>
-                        <div class="contenido-opcion" style="max-height:200px">
+                        <div class="contenido-opcion" style="max-height:none">
                             <div class="p-4 flex flex-col gap-2">
                                 <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="fresca"><label for="ef"> Ensalada Fresca</label></div>
                                 <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="cocida"><label for="ec"> Ensalada Cocida</label></div>
@@ -145,7 +145,7 @@
                             </div>
                             <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                         </div>
-                        <div class="contenido-opcion" style="max-height:200px">
+                        <div class="contenido-opcion" style="max-height:none">
                             <div class="p-4 flex flex-col gap-2">
                                 <div class="opcion-item"><input type="radio" name="bebida" id="inca" value="inca"><label for="inca"> Inca Kola 500ml</label></div>
                                 <div class="opcion-item"><input type="radio" name="bebida" id="gaseosa15" value="gaseosa"><label for="gaseosa15"> Gaseosa 1.5L</label></div>
