@@ -83,11 +83,10 @@
                 <p class="text-xs text-gray-400 italic">
                     Por favor, elige tus opciones para continuar con tu pedido.
                 </p>
-
                 <!-- OPCIONES -->
                 <div class="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-100">
 
-                    <!-- Pollo -->
+                    <!-- Pollo — siempre fijo -->
                     <div>
                         <div class="flex items-center justify-between px-4 py-3 bg-red-600 text-white cursor-pointer select-none" onclick="toggle(this)">
                             <div class="flex items-center gap-2 text-sm font-semibold">
@@ -98,63 +97,83 @@
                         </div>
                         <div class="contenido-opcion" style="max-height:200px">
                             <div class="p-4 flex flex-col gap-2">
-                                <div class="opcion-item"><input type="radio" name="pollo" id="pierna" value="pierna"><label for="pierna"> Pierna</label></div>
-                                <div class="opcion-item"><input type="radio" name="pollo" id="pecho" value="pecho"><label for="pecho"> Pecho</label></div>
+                                <div class="opcion-item"><input type="radio" name="pollo" id="pierna" value="Pierna"><label for="pierna"> Pierna</label></div>
+                                <div class="opcion-item"><input type="radio" name="pollo" id="pecho" value="Pecho"><label for="pecho"> Pecho</label></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Complemento -->
-                    <div>
-                        <div class="flex items-center justify-between px-4 py-3 bg-orange-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                            <div class="flex items-center gap-2 text-sm font-semibold">
-                                <i class="fa-solid fa-bowl-food"></i> Complemento
-                            </div>
-                            <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                        </div>
-                        <div class="contenido-opcion" style="max-height:200px">
-                            <div class="p-4 flex flex-col gap-2">
-                                <div class="opcion-item"><input type="radio" name="complemento" id="papas" value="papas"><label for="papas"> Papas Fritas</label></div>
-                                <div class="opcion-item"><input type="radio" name="complemento" id="arroz" value="arroz"><label for="arroz"> Arroz</label></div>
-                            </div>
-                        </div>
-                    </div>
+                    <%-- Guarnición dinámica --%>
+                    <c:set var="tieneGuarnicion" value="false"/>
+                    <c:forEach var="op" items="${opciones}">
+                        <c:if test="${op.grupo == 'Guarnición'}"><c:set var="tieneGuarnicion" value="true"/></c:if>
+                    </c:forEach>
 
-                    <!-- Guarnición -->
-                    <div>
-                        <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                            <div class="flex items-center gap-2 text-sm font-semibold">
-                                <i class="fa-solid fa-leaf"></i> Guarnición
+                    <c:if test="${tieneGuarnicion}">
+                        <div>
+                            <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none" onclick="toggle(this)">
+                                <div class="flex items-center gap-2 text-sm font-semibold">
+                                    <i class="fa-solid fa-leaf"></i> Guarnición
+                                </div>
+                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                             </div>
-                            <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                        </div>
-                        <div class="contenido-opcion" style="max-height:200px">
-                            <div class="p-4 flex flex-col gap-2">
-                                <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="fresca"><label for="ef"> Ensalada Fresca</label></div>
-                                <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="cocida"><label for="ec"> Ensalada Cocida</label></div>
+                            <div class="contenido-opcion" style="max-height:300px">
+                                <div class="p-4 flex flex-col gap-2">
+                                    <c:forEach var="op" items="${opciones}">
+                                        <c:if test="${op.grupo == 'Guarnición'}">
+                                            <div class="opcion-item">
+                                                <input type="radio" name="guarnicion"
+                                                       id="guar${op.id}"
+                                                       value="${op.nombre}"
+                                                       data-precio="${op.precioAdicional}">
+                                                <label for="guar${op.id}">
+                                                    ${op.nombre}
+                                                    <c:if test="${op.precioAdicional > 0}">
+                                                        <span class="text-red-500 text-xs ml-1">+S/ <fmt:formatNumber value="${op.precioAdicional}" pattern="#,##0.00"/></span>
+                                                    </c:if>
+                                                </label>
+                                            </div>
+                                        </c:if>
+                                    </c:forEach>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </c:if>
 
-                    <!-- Bebida -->
-                    <div>
-                        <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                            <div class="flex items-center gap-2 text-sm font-semibold">
-                                <i class="fa-solid fa-bottle-water"></i> Bebida
-                                <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
+                    <%-- Bebida dinámica --%>
+                    <c:set var="tieneBebida" value="false"/>
+                    <c:forEach var="op" items="${opciones}">
+                        <c:if test="${op.grupo == 'Bebida'}"><c:set var="tieneBebida" value="true"/></c:if>
+                    </c:forEach>
+
+                    <c:if test="${tieneBebida}">
+                        <div>
+                            <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
+                                <div class="flex items-center gap-2 text-sm font-semibold">
+                                    <i class="fa-solid fa-bottle-water"></i> Bebida
+                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                             </div>
-                            <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                        </div>
-                        <div class="contenido-opcion" style="max-height:200px">
-                            <div class="p-4 flex flex-col gap-2">
-                                <div class="opcion-item"><input type="radio" name="bebida" id="inca" value="inca"><label for="inca"> Inca Kola 500ml</label></div>
-                                <div class="opcion-item"><input type="radio" name="bebida" id="gaseosa15" value="gaseosa"><label for="gaseosa15"> Gaseosa 1.5L</label></div>
-                                <div class="opcion-item"><input type="radio" name="bebida" id="jugo" value="jugo"><label for="jugo"> Jugo Natural</label></div>
+                            <div class="contenido-opcion" style="max-height:300px">
+                                <div class="p-4 flex flex-col gap-2">
+                                    <c:forEach var="op" items="${opciones}">
+                                        <c:if test="${op.grupo == 'Bebida'}">
+                                            <div class="opcion-item">
+                                                <input type="radio" name="bebida"
+                                                       id="beb${op.id}"
+                                                       value="${op.nombre}">
+                                                <label for="beb${op.id}">${op.nombre}</label>
+                                            </div>
+                                        </c:if>
+                                    </c:forEach>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </c:if>
 
                 </div>
+                
 
                 <!-- COMENTARIO -->
                 <div>
@@ -200,9 +219,34 @@
     <input type="hidden" name="cantidad" id="cantidadInput" value="1">
     <input type="hidden" name="opciones" id="opcionesInput" value="">
 </form>
-
 <script>
     const precioBase = ${promocion.precio};
+
+    function agregarAlPedido() {
+        let precioExtra = 0;
+
+        const pollo = document.querySelector('input[name="pollo"]:checked');
+        if (!pollo) { alert('Por favor selecciona el tipo de pollo.'); return; }
+
+        const bebida = document.querySelector('input[name="bebida"]:checked');
+        if (!bebida) { alert('Por favor selecciona una bebida.'); return; }
+
+        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
+        if (guarnicion) precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+
+        const opciones = [
+            pollo.value,
+            guarnicion ? guarnicion.value : null,
+            bebida.value
+        ].filter(Boolean).join(', ');
+
+        const cantidad = parseInt(document.getElementById('cantidad').textContent);
+        const precioFinal = (precioBase + precioExtra) * cantidad;
+        document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
+        document.getElementById('opcionesInput').value = opciones;
+        document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
+        document.getElementById('formCarrito').submit();
+    }
 
     function cambiarCantidad(delta) {
         const el = document.getElementById('cantidad');
@@ -210,7 +254,12 @@
         if (v < 1) v = 1;
         if (v > 20) v = 20;
         el.textContent = v;
-        document.getElementById('precioTotal').textContent = (precioBase * v).toFixed(2);
+
+        let precioExtra = 0;
+        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
+        if (guarnicion) precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+
+        document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
         document.getElementById('cantidadInput').value = v;
     }
 
@@ -224,29 +273,6 @@
             content.style.maxHeight = '200px';
             chevron.classList.add('abierto');
         }
-    }
-
-        function agregarAlPedido() {
-        const pollo = document.querySelector('input[name="pollo"]:checked');
-        const bebida = document.querySelector('input[name="bebida"]:checked');
-        if (!pollo) { alert('Por favor selecciona el tipo de pollo.'); return; }
-        if (!bebida) { alert('Por favor selecciona una bebida.'); return; }
-
-        const complemento = document.querySelector('input[name="complemento"]:checked');
-        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
-
-        const opciones = [
-            '🍗 ' + pollo.value,
-            complemento ? ' ' + complemento.value : null,
-            guarnicion ? ' ' + guarnicion.value : null,
-            '🥤 ' + bebida.value
-        ].filter(Boolean).join(', ');
-
-        // Agregar campo opciones al form
-        const input = document.getElementById('opcionesInput');
-        if (input) input.value = opciones;
-
-        document.getElementById('formCarrito').submit();
     }
 </script>
 </body>

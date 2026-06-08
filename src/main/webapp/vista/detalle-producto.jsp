@@ -91,114 +91,202 @@
                     Por favor, elige tus opciones para continuar con tu pedido.
                 </p>
 
-                
-                <!-- OPCIONES SEGÚN CATEGORÍA uu -->
+                <!-- OPCIONES -->
                 <div class="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-100">
+                    <c:if test="${not empty opciones}">
 
-                    <%-- CATEGORÍA 1: Pollo a la Brasa --%>
-                    <c:if test="${producto.categoriaId == 1}">
+                        <%-- Complemento --%>
+                        <c:set var="tieneComplemento" value="false"/>
+                        <c:forEach var="op" items="${opciones}">
+                            <c:if test="${op.grupo == 'Complemento'}">
+                                <c:set var="tieneComplemento" value="true"/>
+                            </c:if>
+                        </c:forEach>
 
-                        <!-- Complemento -->
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-orange-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-bowl-food"></i> Complemento
+                        <c:if test="${tieneComplemento}">
+                            <div>
+                                <div class="flex items-center justify-between px-4 py-3 bg-orange-500 text-white cursor-pointer select-none" onclick="toggle(this)">
+                                    <div class="flex items-center gap-2 text-sm font-semibold">
+                                        <i class="fa-solid fa-bowl-food"></i> Complemento
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                                 </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="complemento" id="papas" value="Papas Fritas"><label for="papas"> Papas Fritas</label></div>
-                                    <div class="opcion-item"><input type="radio" name="complemento" id="arroz" value="Arroz"><label for="arroz"> Arroz</label></div>
+                                <div class="contenido-opcion" style="max-height:300px">
+                                    <div class="p-4 flex flex-col gap-2">
+                                        <c:forEach var="op" items="${opciones}">
+                                            <c:if test="${op.grupo == 'Complemento'}">
+                                                <div class="opcion-item">
+                                                    <input type="radio" name="complemento"
+                                                           id="comp${op.id}"
+                                                           value="${op.nombre}"
+                                                           data-precio="${op.precioAdicional}">
+                                                    <label for="comp${op.id}">
+                                                        ${op.nombre}
+                                                        <c:if test="${op.precioAdicional > 0}">
+                                                            <span class="text-red-500 text-xs ml-1">+S/ <fmt:formatNumber value="${op.precioAdicional}" pattern="#,##0.00"/></span>
+                                                        </c:if>
+                                                    </label>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </c:if>
 
-                        <!-- Guarnición -->
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-leaf"></i> Guarnición
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="Ensalada Fresca"><label for="ef"> Ensalada Fresca</label></div>
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="Ensalada Cocida"><label for="ec"> Ensalada Cocida</label></div>
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ee" value="Ensalada Especial"><label for="ee"> Ensalada Especial</label></div>
-                                </div>
-                            </div>
-                        </div>
+                        <%-- Guarnición --%>
+                        <c:set var="tieneGuarnicion" value="false"/>
+                        <c:forEach var="op" items="${opciones}">
+                            <c:if test="${op.grupo == 'Guarnición'}">
+                                <c:set var="tieneGuarnicion" value="true"/>
+                            </c:if>
+                        </c:forEach>
 
-                        <!-- Bebida -->
-                        <%-- Bebida solo si la descripción la menciona --%>
-                    <c:if test="${fn:containsIgnoreCase(producto.descripcion, 'bebida') or
-                                fn:containsIgnoreCase(producto.descripcion, 'gaseosa') or
-                                fn:containsIgnoreCase(producto.descripcion, 'kola')}">
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-bottle-water"></i> Bebida
-                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Opcional</span>
+                        <c:if test="${tieneGuarnicion}">
+                            <div>
+                                <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none" onclick="toggle(this)">
+                                    <div class="flex items-center gap-2 text-sm font-semibold">
+                                        <i class="fa-solid fa-leaf"></i> Guarnición
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
                                 </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="inca" value="Inca Kola 500ml"><label for="inca"> Inca Kola 500ml</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="gaseosa15" value="Gaseosa 1.5L"><label for="gaseosa15"> Gaseosa 1.5L</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="jugo" value="Jugo Natural"><label for="jugo"> Jugo Natural</label></div>
+                                <div class="contenido-opcion" style="max-height:300px">
+                                    <div class="p-4 flex flex-col gap-2">
+                                        <c:forEach var="op" items="${opciones}">
+                                            <c:if test="${op.grupo == 'Guarnición'}">
+                                                <div class="opcion-item">
+                                                    <input type="radio" name="guarnicion"
+                                                           id="guar${op.id}"
+                                                           value="${op.nombre}"
+                                                           data-precio="${op.precioAdicional}">
+                                                    <label for="guar${op.id}">
+                                                        ${op.nombre}
+                                                        <c:if test="${op.precioAdicional > 0}">
+                                                            <span class="text-red-500 text-xs ml-1">+S/ <fmt:formatNumber value="${op.precioAdicional}" pattern="#,##0.00"/></span>
+                                                        </c:if>
+                                                    </label>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </c:if>
+
+                        <%-- Tipo de Ensalada --%>
+                        <c:set var="tieneEnsalada" value="false"/>
+                        <c:forEach var="op" items="${opciones}">
+                            <c:if test="${op.grupo == 'Tipo de Ensalada'}">
+                                <c:set var="tieneEnsalada" value="true"/>
+                            </c:if>
+                        </c:forEach>
+
+                        <c:if test="${tieneEnsalada}">
+                            <div>
+                                <div class="flex items-center justify-between px-4 py-3 bg-green-500 text-white cursor-pointer select-none" onclick="toggle(this)">
+                                    <div class="flex items-center gap-2 text-sm font-semibold">
+                                        <i class="fa-solid fa-leaf"></i> Tipo de Ensalada
+                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
+                                </div>
+                                <div class="contenido-opcion" style="max-height:300px">
+                                    <div class="p-4 flex flex-col gap-2">
+                                        <c:forEach var="op" items="${opciones}">
+                                            <c:if test="${op.grupo == 'Tipo de Ensalada'}">
+                                                <div class="opcion-item">
+                                                    <input type="radio" name="ensalada"
+                                                           id="ens${op.id}"
+                                                           value="${op.nombre}"
+                                                           data-precio="${op.precioAdicional}">
+                                                    <label for="ens${op.id}">
+                                                        ${op.nombre}
+                                                        <c:if test="${op.precioAdicional > 0}">
+                                                            <span class="text-red-500 text-xs ml-1">+S/ <fmt:formatNumber value="${op.precioAdicional}" pattern="#,##0.00"/></span>
+                                                        </c:if>
+                                                    </label>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <%-- Tipo de Bebida --%>
+                        <c:set var="tieneBebida" value="false"/>
+                        <c:forEach var="op" items="${opciones}">
+                            <c:if test="${op.grupo == 'Tipo de Bebida'}">
+                                <c:set var="tieneBebida" value="true"/>
+                            </c:if>
+                        </c:forEach>
+
+                        <c:if test="${tieneBebida}">
+                            <div>
+                                <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
+                                    <div class="flex items-center gap-2 text-sm font-semibold">
+                                        <i class="fa-solid fa-bottle-water"></i> Tipo de Bebida
+                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
+                                </div>
+                                <div class="contenido-opcion" style="max-height:300px">
+                                    <div class="p-4 flex flex-col gap-2">
+                                        <c:forEach var="op" items="${opciones}">
+                                            <c:if test="${op.grupo == 'Tipo de Bebida'}">
+                                                <div class="opcion-item">
+                                                    <input type="radio" name="bebidaTipo"
+                                                           id="beb${op.id}"
+                                                           value="${op.nombre}"
+                                                           data-precio="${op.precioAdicional}">
+                                                    <label for="beb${op.id}">${op.nombre}</label>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <%-- Tipo de Jugo --%>
+                        <c:set var="tieneJugo" value="false"/>
+                        <c:forEach var="op" items="${opciones}">
+                            <c:if test="${op.grupo == 'Tipo de Jugo'}">
+                                <c:set var="tieneJugo" value="true"/>
+                            </c:if>
+                        </c:forEach>
+
+                        <c:if test="${tieneJugo}">
+                            <div>
+                                <div class="flex items-center justify-between px-4 py-3 bg-blue-400 text-white cursor-pointer select-none" onclick="toggle(this)">
+                                    <div class="flex items-center gap-2 text-sm font-semibold">
+                                        <i class="fa-solid fa-lemon"></i> Tipo de Jugo
+                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
+                                </div>
+                                <div class="contenido-opcion" style="max-height:300px">
+                                    <div class="p-4 flex flex-col gap-2">
+                                        <c:forEach var="op" items="${opciones}">
+                                            <c:if test="${op.grupo == 'Tipo de Jugo'}">
+                                                <div class="opcion-item">
+                                                    <input type="radio" name="jugoTipo"
+                                                           id="jug${op.id}"
+                                                           value="${op.nombre}"
+                                                           data-precio="${op.precioAdicional}">
+                                                    <label for="jug${op.id}">${op.nombre}</label>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+
                     </c:if>
 
-                    </c:if>
-
-                    <%-- CATEGORÍA 2: Ensaladas --%>
-                    <c:if test="${producto.categoriaId == 2}">
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-green-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-leaf"></i> Tipo de Ensalada
-                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="fresca" value="Fresca"><label for="fresca"> Fresca</label></div>
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="cocida" value="Cocida"><label for="cocida"> Cocida</label></div>
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="especial" value="Especial"><label for="especial"> Especial</label></div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <%-- CATEGORÍA 5: Bebidas --%>
-                    <c:if test="${producto.categoriaId == 5}">
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-bottle-water"></i> Elige tu bebida
-                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="cocacola" value="Coca Cola"><label for="cocacola"> Coca Cola</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="inkakola" value="Inca Kola"><label for="inkakola"> Inca Kola</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="pepsi" value="Pepsi"><label for="pepsi"> Pepsi</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="sprite" value="Sprite"><label for="sprite"> Sprite</label></div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <%-- CATEGORÍAS 3,4,6: Adicionales, Arroces, Postres - sin opciones extra --%>
-                    <c:if test="${producto.categoriaId == 3 or producto.categoriaId == 4 or producto.categoriaId == 6}">
+                    <%-- Sin opciones --%>
+                    <c:if test="${empty opciones}">
                         <div class="p-4 text-center text-gray-400 text-sm">
                             <i class="fa-solid fa-circle-check text-green-500 text-2xl mb-2"></i>
                             <p>Solo selecciona la cantidad y agrega al carrito</p>
@@ -206,8 +294,6 @@
                     </c:if>
 
                 </div>
-
-
         
 
                 <!-- COMENTARIO -->
@@ -255,9 +341,56 @@
     <input type="hidden" name="cantidad" id="cantidadInput" value="1">
     <input type="hidden" name="opciones" id="opcionesInput" value=""> 
 </form>
-
-<script>
+    <script>
     const precioBase = ${producto.precio};
+
+    function agregarAlPedido() {
+        let precioExtra = 0;
+        const opciones = [];
+
+        const complemento = document.querySelector('input[name="complemento"]:checked');
+        if (complemento) {
+            precioExtra += parseFloat(complemento.dataset.precio || 0);
+            opciones.push(complemento.value);
+        }
+
+        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
+        if (guarnicion) {
+            precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+            opciones.push(guarnicion.value);
+        }
+
+        const ensalada = document.querySelector('input[name="ensalada"]:checked');
+        if (document.querySelector('input[name="ensalada"]') && !ensalada) {
+            alert('Por favor selecciona el tipo de ensalada.');
+            return;
+        }
+        if (ensalada) {
+            precioExtra += parseFloat(ensalada.dataset.precio || 0);
+            opciones.push(ensalada.value);
+        }
+
+        const bebidaTipo = document.querySelector('input[name="bebidaTipo"]:checked');
+        if (document.querySelector('input[name="bebidaTipo"]') && !bebidaTipo) {
+            alert('Por favor selecciona el tipo de bebida.');
+            return;
+        }
+        if (bebidaTipo) opciones.push(bebidaTipo.value);
+
+        const jugoTipo = document.querySelector('input[name="jugoTipo"]:checked');
+        if (document.querySelector('input[name="jugoTipo"]') && !jugoTipo) {
+            alert('Por favor selecciona el tipo de jugo.');
+            return;
+        }
+        if (jugoTipo) opciones.push(jugoTipo.value);
+
+        const cantidad = parseInt(document.getElementById('cantidad').textContent);
+        const precioFinal = (precioBase + precioExtra) * cantidad;
+        document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
+        document.getElementById('opcionesInput').value = opciones.join(', ');
+        document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
+        document.getElementById('formCarrito').submit();
+    }
 
     function cambiarCantidad(delta) {
         const el = document.getElementById('cantidad');
@@ -265,7 +398,16 @@
         if (v < 1) v = 1;
         if (v > 20) v = 20;
         el.textContent = v;
-        document.getElementById('precioTotal').textContent = (precioBase * v).toFixed(2);
+
+        let precioExtra = 0;
+        const complemento = document.querySelector('input[name="complemento"]:checked');
+        const guarnicion  = document.querySelector('input[name="guarnicion"]:checked');
+        const ensalada    = document.querySelector('input[name="ensalada"]:checked');
+        if (complemento) precioExtra += parseFloat(complemento.dataset.precio || 0);
+        if (guarnicion)  precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+        if (ensalada)    precioExtra += parseFloat(ensalada.dataset.precio || 0);
+
+        document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
         document.getElementById('cantidadInput').value = v;
     }
 
@@ -280,39 +422,6 @@
             chevron.classList.add('abierto');
         }
     }
-
-        function agregarAlPedido() {
-        const categoriaId = ${producto.categoriaId};
-
-        // Validaciones según categoría
-        if (categoriaId == 1) {
-            // Pollo: no hay obligatorio estricto, solo capturar lo seleccionado
-        } else if (categoriaId == 2) {
-            const ensalada = document.querySelector('input[name="ensalada"]:checked');
-            if (!ensalada) { alert('Por favor selecciona el tipo de ensalada.'); return; }
-        } else if (categoriaId == 5) {
-            const bebida = document.querySelector('input[name="bebidaTipo"]:checked');
-            if (!bebida) { alert('Por favor selecciona el tipo de bebida.'); return; }
-        }
-
-        // Capturar opciones seleccionadas
-        const opciones = [];
-        const complemento = document.querySelector('input[name="complemento"]:checked');
-        const guarnicion  = document.querySelector('input[name="guarnicion"]:checked');
-        const bebida      = document.querySelector('input[name="bebida"]:checked');
-        const ensalada    = document.querySelector('input[name="ensalada"]:checked');
-        const bebidaTipo  = document.querySelector('input[name="bebidaTipo"]:checked');
-
-        if (complemento) opciones.push(' ' + complemento.value);
-        if (guarnicion)  opciones.push(' ' + guarnicion.value);
-        if (bebida)      opciones.push(' ' + bebida.value);
-        if (ensalada)    opciones.push(' ' + ensalada.value);
-        if (bebidaTipo)  opciones.push(' ' + bebidaTipo.value);
-
-        document.getElementById('opcionesInput').value = opciones.join(', ');
-        document.getElementById('formCarrito').submit();
-    }
-    
 </script>
 </body>
 </html>
