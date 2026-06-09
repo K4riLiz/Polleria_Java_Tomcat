@@ -50,7 +50,7 @@ public class LibroReclamacionServlet extends HttpServlet {
 
         try {
             LibroReclamacionDAO dao = new LibroReclamacionDAO();
-            dao.registrar(r);
+            dao.crear(r);
             req.setAttribute("exito", "Tu reclamo fue registrado correctamente. Número: #" +
                     System.currentTimeMillis() % 10000);
         } catch (SQLException e) {

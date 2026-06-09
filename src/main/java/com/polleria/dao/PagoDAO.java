@@ -24,19 +24,22 @@ public class PagoDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, pedidoId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Pago p = new Pago();
-                p.setId(rs.getInt("id"));
-                p.setPedidoId(rs.getInt("pedido_id"));
-                p.setMetodo(rs.getString("metodo"));
-                p.setMonto(rs.getDouble("monto"));
-                p.setEstado(rs.getString("estado"));
-                p.setReferencia(rs.getString("referencia"));
-                p.setFecha(rs.getString("fecha"));
-                return p;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapear(rs);
             }
         }
         return null;
+    }
+
+    private Pago mapear(ResultSet rs) throws SQLException {
+        Pago p = new Pago();
+        p.setId(rs.getInt("id"));
+        p.setPedidoId(rs.getInt("pedido_id"));
+        p.setMetodo(rs.getString("metodo"));
+        p.setMonto(rs.getDouble("monto"));
+        p.setEstado(rs.getString("estado"));
+        p.setReferencia(rs.getString("referencia"));
+        p.setFecha(rs.getString("fecha"));
+        return p;
     }
 }

@@ -18,12 +18,12 @@ public class UsuarioDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
+            try(ResultSet rs = ps.executeQuery()){
             if (rs.next()) {
                 if (BCrypt.checkpw(password, rs.getString("password"))) {
                     return mapear(rs);
                 }
-            }
+            }}
         }
         return null;
     }

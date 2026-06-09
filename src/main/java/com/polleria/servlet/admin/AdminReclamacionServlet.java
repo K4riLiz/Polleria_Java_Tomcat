@@ -20,7 +20,7 @@ public class AdminReclamacionServlet extends HttpServlet {
 
         try {
             LibroReclamacionDAO dao = new LibroReclamacionDAO();
-            req.setAttribute("reclamaciones", dao.listarTodos());
+            req.setAttribute("reclamaciones", dao.listarTodas());
             req.getRequestDispatcher("/vista/admin/reclamaciones.jsp").forward(req, resp);
         } catch (SQLException e) {
             req.setAttribute("error", "Error: " + e.getMessage());
