@@ -7,7 +7,7 @@ public class ProductoOpcion {
     private String grupo;
     private double precioAdicional;
     private boolean activo;
-
+    
     public ProductoOpcion() {}
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
