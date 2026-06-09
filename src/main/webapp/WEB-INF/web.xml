@@ -201,4 +201,44 @@
         <url-pattern>/buscar</url-pattern>
     </servlet-mapping>
 
+    <!-- Servlet: Admin Pedidos -->
+    <servlet>
+        <servlet-name>AdminPedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.AdminPedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminPedidoServlet</servlet-name>
+        <url-pattern>/admin/pedidos</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet: Chef Pedidos -->
+    <servlet>
+        <servlet-name>ChefPedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.ChefPedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ChefPedidoServlet</servlet-name>
+        <url-pattern>/chef/pedidos</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet: Delivery Pedidos -->
+    <servlet>
+        <servlet-name>DeliveryPedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.DeliveryPedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeliveryPedidoServlet</servlet-name>
+        <url-pattern>/delivery/pedidos</url-parameter>
+    </servlet-mapping>
+
+    <!-- Servlet: Cliente Pedidos (historial) -->
+    <servlet>
+        <servlet-name>ClientePedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.ClientePedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ClientePedidoServlet</servlet-name>
+        <url-pattern>/historial</url-pattern>
+    </servlet-mapping>
+    
 </web-app>

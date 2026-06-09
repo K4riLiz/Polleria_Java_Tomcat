@@ -169,4 +169,59 @@ public class PedidoDAO {
         d.setTipo(rs.getString("tipo"));
         return d;
     }
+    
+    // ── NUEVO: historial solo entregados del cliente ───────
+    public List<Pedido> listarEntregadosPorUsuario(int usuarioId) throws SQLException {
+        List<Pedido> lista = new ArrayList<>();
+        String sql = "SELECT * FROM pedidos WHERE usuario_id = ? AND estado = 'Entregado' ORDER BY fecha DESC";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, usuarioId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+// ── NUEVO: listar por estado (chef / delivery) ─────────
+    public List<Pedido> listarPorEstado(String estado) throws SQLException {
+        List<Pedido> lista = new ArrayList<>();
+        String sql = "SELECT p.*, u.nombre as usuario_nombre FROM pedidos p "
+                + "JOIN usuarios u ON p.usuario_id = u.id "
+                + "WHERE p.estado = ? ORDER BY p.fecha ASC";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, estado);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+// ── NUEVO: listar por múltiples estados ───────────────
+    public List<Pedido> listarPorEstados(String... estados) throws SQLException {
+        List<Pedido> lista = new ArrayList<>();
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < estados.length; i++) {
+            placeholders.append(i == 0 ? "?" : ",?");
+        }
+        String sql = "SELECT p.*, u.nombre as usuario_nombre FROM pedidos p "
+                + "JOIN usuarios u ON p.usuario_id = u.id "
+                + "WHERE p.estado IN (" + placeholders + ") ORDER BY p.fecha ASC";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            for (int i = 0; i < estados.length; i++) {
+                ps.setString(i + 1, estados[i]);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
 }
