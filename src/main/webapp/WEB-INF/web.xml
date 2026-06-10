@@ -228,13 +228,13 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>DeliveryPedidoServlet</servlet-name>
-        <url-pattern>/delivery/pedidos</url-parameter>
+        <url-pattern>/delivery/pedidos</url-pattern>
     </servlet-mapping>
 
     <!-- Servlet: Cliente Pedidos (historial) -->
     <servlet>
         <servlet-name>ClientePedidoServlet</servlet-name>
-        <servlet-class>com.polleria.servlet.admin.ClientePedidoServlet</servlet-class>
+        <servlet-class>com.polleria.servlet.ClientePedidoServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ClientePedidoServlet</servlet-name>
