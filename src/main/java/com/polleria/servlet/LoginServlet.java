@@ -52,11 +52,25 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("rolNombre", usuario.getRolNombre());
 
                 // Redirigir según rol
-                if ("ADMIN".equals(usuario.getRolNombre())) {
-                    resp.sendRedirect(req.getContextPath() + "/admin/usuarios");
-                } else {
-                    resp.sendRedirect(req.getContextPath() + "/home");
+                switch (usuario.getRolNombre()){
+                    case "ADMIN":
+                        resp.sendRedirect(req.getContextPath()+"/admin/usuarios");
+                        break;
+                    case "CHEF":
+                        resp.sendRedirect(req.getContextPath() + "/chef/pedidos");
+                        break;
+                    case "DELIVERY":
+                        resp.sendRedirect(req.getContextPath() + "/delivery/pedidos");
+                        break;
+                    default:
+                        resp.sendRedirect(req.getContextPath()+"/home");
+                        break;
+                        
                 }
+                
+                
+                //termina
+               
             } else {
                 req.setAttribute("error", "Correo o contraseña incorrectos");
                 req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
