@@ -115,11 +115,17 @@
         <!-- BOTONES -->
         <div class="flex gap-3">
             <a href="${pageContext.request.contextPath}/home"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition text-center">
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition text-center">
                 <i class="fa-solid fa-home mr-2"></i>Volver al inicio
             </a>
+            
+            <a href="${pageContext.request.contextPath}/boleta?pedidoId=${pedido.id}"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-pdf"></i> Descargar Boleta
+            </a>
+
             <a href="${pageContext.request.contextPath}/mis-pedidos"
-               class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-3 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
+            class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-3 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
                 <i class="fa-solid fa-list"></i> Mis pedidos
             </a>
         </div>

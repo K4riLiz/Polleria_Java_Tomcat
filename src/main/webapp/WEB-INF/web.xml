@@ -201,4 +201,13 @@
         <url-pattern>/buscar</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+    <servlet-name>BoletaServlet</servlet-name>
+    <servlet-class>com.polleria.servlet.BoletaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BoletaServlet</servlet-name>
+        <url-pattern>/boleta</url-pattern>
+    </servlet-mapping>
+
 </web-app>
