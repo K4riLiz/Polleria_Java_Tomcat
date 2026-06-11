@@ -24,7 +24,7 @@ public class ChefPedidoServlet extends HttpServlet {
             PedidoDAO dao = new PedidoDAO();
             DetallePedidoOpcionDAO opcionDAO = new DetallePedidoOpcionDAO();
 
-            // Cargar pedidos Pendiente y En cocina
+            // Cargar pedidos Pendiente y En cocina con nombre del cliente
             List<Pedido> pedidos = dao.listarPorEstados("Pendiente", "En cocina");
 
             // Cargar detalles y opciones de cada pedido

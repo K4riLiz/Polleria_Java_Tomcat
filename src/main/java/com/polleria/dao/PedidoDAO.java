@@ -153,6 +153,11 @@ public class PedidoDAO {
         p.setLatitud((Double) rs.getObject("latitud"));
         p.setLongitud((Double) rs.getObject("longitud"));
         p.setFecha(rs.getString("fecha"));
+        // usuarioNombre solo viene cuando hay JOIN con usuarios
+        try {
+            p.setUsuarioNombre(rs.getString("usuario_nombre"));
+        } catch (SQLException e) {
+        }
         return p;
     }
 

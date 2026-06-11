@@ -11,6 +11,11 @@ public class Pedido {
     private String fecha;
     private List<DetallePedido> detalles;
     
+    //Nuevo- para llamar nombre
+    private String usuarioNombre;
+    public String getUsuarioNombre() { return usuarioNombre; }
+    public void setUsuarioNombre(String usuarioNombre) { this.usuarioNombre = usuarioNombre; }
+    
     public Pedido() {}
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
