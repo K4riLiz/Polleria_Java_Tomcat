@@ -77,7 +77,7 @@
             </div>
 
             <!-- INFO -->
-            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5 overflow-y-auto max-h-[90vh]">
+            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5">
 
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 mb-1">${producto.nombre}</h1>
@@ -91,7 +91,7 @@
                     Por favor, elige tus opciones para continuar con tu pedido.
                 </p>
 
-                <!-- OPCIONES -->
+                <!-- OPCIONES DINÁMICAS DESDE BD -->
                 <div class="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-100">
                     <c:if test="${not empty opciones}">
 
@@ -102,7 +102,6 @@
                                 <c:set var="tieneComplemento" value="true"/>
                             </c:if>
                         </c:forEach>
-
                         <c:if test="${tieneComplemento}">
                             <div>
                                 <div class="flex items-center justify-between px-4 py-3 bg-orange-500 text-white cursor-pointer select-none" onclick="toggle(this)">
@@ -141,7 +140,6 @@
                                 <c:set var="tieneGuarnicion" value="true"/>
                             </c:if>
                         </c:forEach>
-
                         <c:if test="${tieneGuarnicion}">
                             <div>
                                 <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none" onclick="toggle(this)">
@@ -180,7 +178,6 @@
                                 <c:set var="tieneEnsalada" value="true"/>
                             </c:if>
                         </c:forEach>
-
                         <c:if test="${tieneEnsalada}">
                             <div>
                                 <div class="flex items-center justify-between px-4 py-3 bg-green-500 text-white cursor-pointer select-none" onclick="toggle(this)">
@@ -220,7 +217,6 @@
                                 <c:set var="tieneBebida" value="true"/>
                             </c:if>
                         </c:forEach>
-
                         <c:if test="${tieneBebida}">
                             <div>
                                 <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
@@ -255,7 +251,6 @@
                                 <c:set var="tieneJugo" value="true"/>
                             </c:if>
                         </c:forEach>
-
                         <c:if test="${tieneJugo}">
                             <div>
                                 <div class="flex items-center justify-between px-4 py-3 bg-blue-400 text-white cursor-pointer select-none" onclick="toggle(this)">
@@ -294,7 +289,6 @@
                     </c:if>
 
                 </div>
-        
 
                 <!-- COMENTARIO -->
                 <div>
@@ -310,14 +304,15 @@
                 <div class="flex items-center gap-4 mt-auto">
                     <div class="flex items-center gap-3">
                         <button class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
-                        <span id="cantidad" class="text-xl font-bold w-8 text-center">1</span>
+                        <span id="cantidad" class="text-xl font-bold w-8 text-center">
+                            ${not empty cantidadEnCarrito ? cantidadEnCarrito : 1}
+                        </span>
                         <button class="btn-cantidad" onclick="cambiarCantidad(1)">+</button>
                     </div>
-
                     <button onclick="agregarAlPedido()"
                             class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-cart-plus"></i>
-                            Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/></span>
+                        Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/></span>
                     </button>
                 </div>
 
@@ -328,100 +323,106 @@
     <jsp:include page="/components/footer.jsp"/>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-<!-- FORM OCULTO -->
-<form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
-    <input type="hidden" name="action" value="agregar">
-    <input type="hidden" name="productoId" value="${producto.id}">
-    <input type="hidden" name="nombre" value="${producto.nombre}">
-    <input type="hidden" name="precio" value="${producto.precio}">
-    <input type="hidden" name="imagen" value="${producto.imagen}">
-    <input type="hidden" name="tipo" value="producto">
-    <input type="hidden" name="cantidad" id="cantidadInput" value="1">
-    <input type="hidden" name="opciones" id="opcionesInput" value=""> 
-</form>
+    <!-- FORM OCULTO -->
+    <form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
+        <input type="hidden" name="action" value="agregar">
+        <input type="hidden" name="productoId" value="${producto.id}">
+        <input type="hidden" name="nombre" value="${producto.nombre}">
+        <input type="hidden" name="precio" value="${producto.precio}">
+        <input type="hidden" name="imagen" value="${producto.imagen}">
+        <input type="hidden" name="tipo" value="producto">
+        <input type="hidden" name="cantidad" id="cantidadInput" value="1">
+        <input type="hidden" name="opciones" id="opcionesInput" value="">
+    </form>
+
     <script>
-    const precioBase = ${producto.precio};
+        const precioBase = ${producto.precio};
 
-    function agregarAlPedido() {
-        let precioExtra = 0;
-        const opciones = [];
+        // Inicializar cantidad y precio
+        const cantidadInicial = ${not empty cantidadEnCarrito ? cantidadEnCarrito : 1};
+        document.getElementById('cantidadInput').value = cantidadInicial;
+        document.getElementById('precioTotal').textContent = (precioBase * cantidadInicial).toFixed(2);
 
-        const complemento = document.querySelector('input[name="complemento"]:checked');
-        if (complemento) {
-            precioExtra += parseFloat(complemento.dataset.precio || 0);
-            opciones.push(complemento.value);
+        function agregarAlPedido() {
+            let precioExtra = 0;
+            const opciones = [];
+
+            const complemento = document.querySelector('input[name="complemento"]:checked');
+            if (complemento) {
+                precioExtra += parseFloat(complemento.dataset.precio || 0);
+                opciones.push(complemento.value);
+            }
+
+            const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
+            if (guarnicion) {
+                precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+                opciones.push(guarnicion.value);
+            }
+
+            const ensalada = document.querySelector('input[name="ensalada"]:checked');
+            if (document.querySelector('input[name="ensalada"]') && !ensalada) {
+                alert('Por favor selecciona el tipo de ensalada.');
+                return;
+            }
+            if (ensalada) {
+                precioExtra += parseFloat(ensalada.dataset.precio || 0);
+                opciones.push(ensalada.value);
+            }
+
+            const bebidaTipo = document.querySelector('input[name="bebidaTipo"]:checked');
+            if (document.querySelector('input[name="bebidaTipo"]') && !bebidaTipo) {
+                alert('Por favor selecciona el tipo de bebida.');
+                return;
+            }
+            if (bebidaTipo) opciones.push(bebidaTipo.value);
+
+            const jugoTipo = document.querySelector('input[name="jugoTipo"]:checked');
+            if (document.querySelector('input[name="jugoTipo"]') && !jugoTipo) {
+                alert('Por favor selecciona el tipo de jugo.');
+                return;
+            }
+            if (jugoTipo) opciones.push(jugoTipo.value);
+
+            const cantidad = parseInt(document.getElementById('cantidad').textContent);
+            const precioFinal = (precioBase + precioExtra) * cantidad;
+            document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
+            document.getElementById('opcionesInput').value = opciones.join(', ');
+            document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
+            document.getElementById('formCarrito').submit();
         }
 
-        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
-        if (guarnicion) {
-            precioExtra += parseFloat(guarnicion.dataset.precio || 0);
-            opciones.push(guarnicion.value);
+        function cambiarCantidad(delta) {
+            const el = document.getElementById('cantidad');
+            let v = parseInt(el.textContent) + delta;
+            if (v < 1) v = 1;
+            if (v > 20) v = 20;
+            el.textContent = v;
+
+            let precioExtra = 0;
+            const complemento = document.querySelector('input[name="complemento"]:checked');
+            const guarnicion  = document.querySelector('input[name="guarnicion"]:checked');
+            const ensalada    = document.querySelector('input[name="ensalada"]:checked');
+            if (complemento) precioExtra += parseFloat(complemento.dataset.precio || 0);
+            if (guarnicion)  precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+            if (ensalada)    precioExtra += parseFloat(ensalada.dataset.precio || 0);
+
+            document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
+            document.getElementById('cantidadInput').value = v;
         }
 
-        const ensalada = document.querySelector('input[name="ensalada"]:checked');
-        if (document.querySelector('input[name="ensalada"]') && !ensalada) {
-            alert('Por favor selecciona el tipo de ensalada.');
-            return;
+        function toggle(header) {
+            const content = header.nextElementSibling;
+            const chevron = header.querySelector('.chevron');
+            if (chevron.classList.contains('abierto')) {
+                content.style.maxHeight = '0px';
+                chevron.classList.remove('abierto');
+            } else {
+                content.style.maxHeight = '300px';
+                chevron.classList.add('abierto');
+            }
         }
-        if (ensalada) {
-            precioExtra += parseFloat(ensalada.dataset.precio || 0);
-            opciones.push(ensalada.value);
-        }
-
-        const bebidaTipo = document.querySelector('input[name="bebidaTipo"]:checked');
-        if (document.querySelector('input[name="bebidaTipo"]') && !bebidaTipo) {
-            alert('Por favor selecciona el tipo de bebida.');
-            return;
-        }
-        if (bebidaTipo) opciones.push(bebidaTipo.value);
-
-        const jugoTipo = document.querySelector('input[name="jugoTipo"]:checked');
-        if (document.querySelector('input[name="jugoTipo"]') && !jugoTipo) {
-            alert('Por favor selecciona el tipo de jugo.');
-            return;
-        }
-        if (jugoTipo) opciones.push(jugoTipo.value);
-
-        const cantidad = parseInt(document.getElementById('cantidad').textContent);
-        const precioFinal = (precioBase + precioExtra) * cantidad;
-        document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
-        document.getElementById('opcionesInput').value = opciones.join(', ');
-        document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
-        document.getElementById('formCarrito').submit();
-    }
-
-    function cambiarCantidad(delta) {
-        const el = document.getElementById('cantidad');
-        let v = parseInt(el.textContent) + delta;
-        if (v < 1) v = 1;
-        if (v > 20) v = 20;
-        el.textContent = v;
-
-        let precioExtra = 0;
-        const complemento = document.querySelector('input[name="complemento"]:checked');
-        const guarnicion  = document.querySelector('input[name="guarnicion"]:checked');
-        const ensalada    = document.querySelector('input[name="ensalada"]:checked');
-        if (complemento) precioExtra += parseFloat(complemento.dataset.precio || 0);
-        if (guarnicion)  precioExtra += parseFloat(guarnicion.dataset.precio || 0);
-        if (ensalada)    precioExtra += parseFloat(ensalada.dataset.precio || 0);
-
-        document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
-        document.getElementById('cantidadInput').value = v;
-    }
-
-    function toggle(header) {
-        const content = header.nextElementSibling;
-        const chevron = header.querySelector('.chevron');
-        if (chevron.classList.contains('abierto')) {
-            content.style.maxHeight = '0px';
-            chevron.classList.remove('abierto');
-        } else {
-            content.style.maxHeight = '200px';
-            chevron.classList.add('abierto');
-        }
-    }
-</script>
+    </script>
 </body>
 </html>

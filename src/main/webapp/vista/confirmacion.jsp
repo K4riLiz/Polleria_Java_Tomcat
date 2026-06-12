@@ -34,7 +34,6 @@
             <h2 class="text-lg font-semibold mb-4">
                 <i class="fa-solid fa-receipt text-red-600 mr-2"></i>Detalle del pedido
             </h2>
-
             <div class="flex flex-col gap-3 mb-4">
                 <c:forEach items="${detalles}" var="d">
                     <div class="flex justify-between items-start py-2 border-b border-gray-50">
@@ -50,7 +49,6 @@
                     </div>
                 </c:forEach>
             </div>
-
             <div class="flex justify-between font-bold text-lg text-gray-800 pt-2">
                 <span>Total pagado</span>
                 <span class="text-red-600">S/<fmt:formatNumber value="${pedido.total}" pattern="#,##0.00"/></span>
@@ -86,7 +84,7 @@
             </div>
         </div>
 
-        <!-- ESTADO DEL PEDIDO -->
+        <!-- SEGUIMIENTO -->
         <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
             <h2 class="text-lg font-semibold mb-6">
                 <i class="fa-solid fa-timeline text-red-600 mr-2"></i>Seguimiento del pedido
@@ -103,7 +101,7 @@
                         pedido.estado == 'Entregado'     ? '100%' : '0%'}">
                 </div>
 
-                <%-- Paso 1 --%>
+                <%-- Paso 1: Pendiente --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Pendiente' || pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
@@ -113,7 +111,7 @@
                     <p class="text-xs text-gray-500 text-center w-16">Pendiente</p>
                 </div>
 
-                <%-- Paso 2 --%>
+                <%-- Paso 2: En cocina --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
@@ -123,7 +121,7 @@
                     <p class="text-xs text-gray-500 text-center w-16">En cocina</p>
                 </div>
 
-                <%-- Paso 3 --%>
+                <%-- Paso 3: Despachando --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
@@ -133,7 +131,7 @@
                     <p class="text-xs text-gray-500 text-center w-16">Despachando</p>
                 </div>
 
-                <%-- Paso 4 --%>
+                <%-- Paso 4: Entregado --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Entregado'
@@ -146,11 +144,20 @@
         </div>
 
         <!-- BOTONES -->
-        <div class="flex gap-3">
+        <div class="flex gap-3 flex-wrap">
+            <!-- Volver al inicio -->
             <a href="${pageContext.request.contextPath}/home"
                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition text-center">
                 <i class="fa-solid fa-home mr-2"></i>Volver al inicio
             </a>
+
+            <!-- Descargar boleta (de danna) -->
+            <a href="${pageContext.request.contextPath}/boleta?pedidoId=${pedido.id}"
+               class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-pdf"></i> Descargar Boleta
+            </a>
+
+            <!-- Mis pedidos (tu ruta /historial) -->
             <a href="${pageContext.request.contextPath}/historial"
                class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-3 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
                 <i class="fa-solid fa-list"></i> Mis pedidos

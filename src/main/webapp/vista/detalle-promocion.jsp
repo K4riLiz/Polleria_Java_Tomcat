@@ -70,7 +70,7 @@
             </div>
 
             <!-- INFO -->
-            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5 overflow-y-auto max-h-[90vh]">
+            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5">
 
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 mb-1">${promocion.nombre}</h1>
@@ -83,6 +83,7 @@
                 <p class="text-xs text-gray-400 italic">
                     Por favor, elige tus opciones para continuar con tu pedido.
                 </p>
+
                 <!-- OPCIONES -->
                 <div class="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-100">
 
@@ -173,7 +174,6 @@
                     </c:if>
 
                 </div>
-                
 
                 <!-- COMENTARIO -->
                 <div>
@@ -206,74 +206,75 @@
     <jsp:include page="/components/footer.jsp"/>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-<!-- FORM OCULTO -->
-<form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
-    <input type="hidden" name="action" value="agregar">
-    <input type="hidden" name="productoId" value="${promocion.id}">
-    <input type="hidden" name="nombre" value="${promocion.nombre}">
-    <input type="hidden" name="precio" value="${promocion.precio}">
-    <input type="hidden" name="imagen" value="${promocion.imagen}">
-    <input type="hidden" name="tipo" value="promocion">
-    <input type="hidden" name="cantidad" id="cantidadInput" value="1">
-    <input type="hidden" name="opciones" id="opcionesInput" value="">
-</form>
-<script>
-    const precioBase = ${promocion.precio};
+    <!-- FORM OCULTO -->
+    <form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
+        <input type="hidden" name="action" value="agregar">
+        <input type="hidden" name="productoId" value="${promocion.id}">
+        <input type="hidden" name="nombre" value="${promocion.nombre}">
+        <input type="hidden" name="precio" value="${promocion.precio}">
+        <input type="hidden" name="imagen" value="${promocion.imagen}">
+        <input type="hidden" name="tipo" value="promocion">
+        <input type="hidden" name="cantidad" id="cantidadInput" value="1">
+        <input type="hidden" name="opciones" id="opcionesInput" value="">
+    </form>
 
-    function agregarAlPedido() {
-        let precioExtra = 0;
+    <script>
+        const precioBase = ${promocion.precio};
 
-        const pollo = document.querySelector('input[name="pollo"]:checked');
-        if (!pollo) { alert('Por favor selecciona el tipo de pollo.'); return; }
+        function agregarAlPedido() {
+            let precioExtra = 0;
 
-        const bebida = document.querySelector('input[name="bebida"]:checked');
-        if (!bebida) { alert('Por favor selecciona una bebida.'); return; }
+            const pollo = document.querySelector('input[name="pollo"]:checked');
+            if (!pollo) { alert('Por favor selecciona el tipo de pollo.'); return; }
 
-        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
-        if (guarnicion) precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+            const bebida = document.querySelector('input[name="bebida"]:checked');
+            if (!bebida) { alert('Por favor selecciona una bebida.'); return; }
 
-        const opciones = [
-            pollo.value,
-            guarnicion ? guarnicion.value : null,
-            bebida.value
-        ].filter(Boolean).join(', ');
+            const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
+            if (guarnicion) precioExtra += parseFloat(guarnicion.dataset.precio || 0);
 
-        const cantidad = parseInt(document.getElementById('cantidad').textContent);
-        const precioFinal = (precioBase + precioExtra) * cantidad;
-        document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
-        document.getElementById('opcionesInput').value = opciones;
-        document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
-        document.getElementById('formCarrito').submit();
-    }
+            const opciones = [
+                pollo.value,
+                guarnicion ? guarnicion.value : null,
+                bebida.value
+            ].filter(Boolean).join(', ');
 
-    function cambiarCantidad(delta) {
-        const el = document.getElementById('cantidad');
-        let v = parseInt(el.textContent) + delta;
-        if (v < 1) v = 1;
-        if (v > 20) v = 20;
-        el.textContent = v;
-
-        let precioExtra = 0;
-        const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
-        if (guarnicion) precioExtra += parseFloat(guarnicion.dataset.precio || 0);
-
-        document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
-        document.getElementById('cantidadInput').value = v;
-    }
-
-    function toggle(header) {
-        const content = header.nextElementSibling;
-        const chevron = header.querySelector('.chevron');
-        if (chevron.classList.contains('abierto')) {
-            content.style.maxHeight = '0px';
-            chevron.classList.remove('abierto');
-        } else {
-            content.style.maxHeight = '200px';
-            chevron.classList.add('abierto');
+            const cantidad = parseInt(document.getElementById('cantidad').textContent);
+            const precioFinal = (precioBase + precioExtra) * cantidad;
+            document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
+            document.getElementById('opcionesInput').value = opciones;
+            document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
+            document.getElementById('formCarrito').submit();
         }
-    }
-</script>
+
+        function cambiarCantidad(delta) {
+            const el = document.getElementById('cantidad');
+            let v = parseInt(el.textContent) + delta;
+            if (v < 1) v = 1;
+            if (v > 20) v = 20;
+            el.textContent = v;
+
+            let precioExtra = 0;
+            const guarnicion = document.querySelector('input[name="guarnicion"]:checked');
+            if (guarnicion) precioExtra += parseFloat(guarnicion.dataset.precio || 0);
+
+            document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
+            document.getElementById('cantidadInput').value = v;
+        }
+
+        function toggle(header) {
+            const content = header.nextElementSibling;
+            const chevron = header.querySelector('.chevron');
+            if (chevron.classList.contains('abierto')) {
+                content.style.maxHeight = '0px';
+                chevron.classList.remove('abierto');
+            } else {
+                content.style.maxHeight = '200px';
+                chevron.classList.add('abierto');
+            }
+        }
+    </script>
 </body>
 </html>
