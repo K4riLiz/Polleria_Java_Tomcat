@@ -91,24 +91,57 @@
             <h2 class="text-lg font-semibold mb-6">
                 <i class="fa-solid fa-timeline text-red-600 mr-2"></i>Seguimiento del pedido
             </h2>
-            <div class="flex items-center justify-between relative">
-                <div class="absolute top-4 left-0 right-0 h-1 bg-gray-200 z-0">
-                    <div class="h-full bg-red-500 w-1/4"></div>
+            <div class="relative flex items-center justify-between">
+                <!-- Línea base -->
+                <div class="absolute top-4 left-0 right-0 h-1 bg-gray-200 z-0"></div>
+                <!-- Línea progreso -->
+                <div class="absolute top-4 left-0 h-1 bg-red-500 z-0 transition-all"
+                     style="width:
+                     ${pedido.estado == 'Pendiente'     ? '0%'   :
+                        pedido.estado == 'En cocina'     ? '33%'  :
+                        pedido.estado == 'Por despachar' ? '66%'  :
+                        pedido.estado == 'Entregado'     ? '100%' : '0%'}">
                 </div>
-                <c:forEach var="estado" items="${['Pendiente','En cocina','Por despachar','Entregado']}">
-                    <div class="flex flex-col items-center gap-2 z-10">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                            ${estado == pedido.estado ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-400'}">
-                            <c:choose>
-                                <c:when test="${estado == 'Pendiente'}"><i class="fa-solid fa-clock text-xs"></i></c:when>
-                                <c:when test="${estado == 'En cocina'}"><i class="fa-solid fa-fire text-xs"></i></c:when>
-                                <c:when test="${estado == 'Por despachar'}"><i class="fa-solid fa-box text-xs"></i></c:when>
-                                <c:when test="${estado == 'Entregado'}"><i class="fa-solid fa-check text-xs"></i></c:when>
-                            </c:choose>
-                        </div>
-                        <p class="text-xs text-gray-500 text-center w-16">${estado}</p>
+
+                <%-- Paso 1 --%>
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'Pendiente' || pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
+                          ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-clock text-sm"></i>
                     </div>
-                </c:forEach>
+                    <p class="text-xs text-gray-500 text-center w-16">Pendiente</p>
+                </div>
+
+                <%-- Paso 2 --%>
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
+                         ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-fire text-sm"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center w-16">En cocina</p>
+                </div>
+
+                <%-- Paso 3 --%>
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
+                         ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-motorcycle text-sm"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center w-16">Despachando</p>
+                </div>
+
+                <%-- Paso 4 --%>
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'Entregado'
+                        ? 'bg-green-500 text-white shadow-lg shadow-green-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-check text-sm"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center w-16">Entregado</p>
+                </div>
             </div>
         </div>
 
@@ -118,7 +151,7 @@
                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition text-center">
                 <i class="fa-solid fa-home mr-2"></i>Volver al inicio
             </a>
-            <a href="${pageContext.request.contextPath}/mis-pedidos"
+            <a href="${pageContext.request.contextPath}/historial"
                class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-3 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
                 <i class="fa-solid fa-list"></i> Mis pedidos
             </a>
