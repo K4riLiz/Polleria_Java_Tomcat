@@ -1,6 +1,9 @@
 package com.polleria.servlet;
 
+import com.polleria.dao.DetallePedidoOpcionDAO;
 import com.polleria.dao.PedidoDAO;
+import com.polleria.model.DetallePedido;
+import com.polleria.model.Pedido;
 import com.polleria.model.Usuario;
 
 import javax.servlet.ServletException;
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 public class ClientePedidoServlet extends HttpServlet {
 
@@ -24,21 +28,19 @@ public class ClientePedidoServlet extends HttpServlet {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         try {
             PedidoDAO dao = new PedidoDAO();
-            String action = req.getParameter("action");
-            if ("detalle".equals(action)) {
-                int id = Integer.parseInt(req.getParameter("id"));
-                // Verificar que el pedido pertenece al cliente
-                com.polleria.model.Pedido pedido = dao.obtenerPorId(id);
-                if (pedido == null || pedido.getUsuarioId() != usuario.getId()) {
-                    resp.sendRedirect(req.getContextPath() + "/historial");
-                    return;
+            DetallePedidoOpcionDAO opcionDAO = new DetallePedidoOpcionDAO();
+
+            List<Pedido> pedidos = dao.listarPorUsuario(usuario.getId());
+
+            for (Pedido p : pedidos) {
+                List<DetallePedido> detalles = dao.listarDetalles(p.getId());
+                for (DetallePedido d : detalles) {
+                    d.setOpciones(opcionDAO.listarPorDetalle(d.getId()));
                 }
-                req.setAttribute("pedido", pedido);
-                req.setAttribute("detalles", dao.listarDetalles(id));
-                req.getRequestDispatcher("/vista/historial-detalle.jsp").forward(req, resp);
-                return;
+                p.setDetalles(detalles);
             }
-            req.setAttribute("pedidos", dao.listarEntregadosPorUsuario(usuario.getId()));
+
+            req.setAttribute("pedidos", pedidos);
             req.getRequestDispatcher("/vista/historial.jsp").forward(req, resp);
         } catch (SQLException e) {
             req.setAttribute("error", "Error: " + e.getMessage());
