@@ -34,7 +34,8 @@ public class PromocionDetalleServlet extends HttpServlet {
 
             // Cargar opciones y agrupar
             PromocionOpcionDAO opcionDAO = new PromocionOpcionDAO();
-            List<PromocionOpcion> opciones = opcionDAO.listarPorPromocion(id);
+            List<PromocionOpcion> opciones = opcionDAO.listarActivasPorPromocion(id);
+            req.setAttribute("opciones", opciones);
 
             Map<String, List<PromocionOpcion>> opcionesPorGrupo = new LinkedHashMap<>();
             for (PromocionOpcion op : opciones) {

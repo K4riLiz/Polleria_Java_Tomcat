@@ -35,7 +35,8 @@ public class ProductoServlet extends HttpServlet {
 
             // Cargar opciones y agrupar
             ProductoOpcionDAO opcionDAO = new ProductoOpcionDAO();
-            List<ProductoOpcion> opciones = opcionDAO.listarPorProducto(id);
+            List<ProductoOpcion> opciones = opcionDAO.listarActivasPorProducto(id);
+            req.setAttribute("opciones", opciones);
 
             Map<String, List<ProductoOpcion>> opcionesPorGrupo = new LinkedHashMap<>();
             for (ProductoOpcion op : opciones) {

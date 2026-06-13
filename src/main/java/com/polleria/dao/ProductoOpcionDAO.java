@@ -22,6 +22,21 @@ public class ProductoOpcionDAO {
         return lista;
     }
 
+    // Para el cliente — solo activas
+    public List<ProductoOpcion> listarActivasPorProducto(int productoId) throws SQLException {
+        List<ProductoOpcion> lista = new ArrayList<>();
+        String sql = "SELECT * FROM producto_opciones WHERE producto_id = ? AND activo = 1 ORDER BY grupo, precio_adicional";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, productoId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
+    
     public ProductoOpcion obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM producto_opciones WHERE id = ?";
         try (Connection con = DBConnection.getConnection();

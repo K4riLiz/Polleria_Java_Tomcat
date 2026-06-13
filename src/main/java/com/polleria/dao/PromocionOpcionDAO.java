@@ -21,6 +21,21 @@ public class PromocionOpcionDAO {
         }
         return lista;
     }
+    
+    // Para el cliente — solo activas
+    public List<PromocionOpcion> listarActivasPorPromocion(int promocionId) throws SQLException {
+        List<PromocionOpcion> lista = new ArrayList<>();
+        String sql = "SELECT * FROM promocion_opciones WHERE promocion_id = ? AND activo = 1 ORDER BY grupo, precio_adicional";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, promocionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
 
     public PromocionOpcion obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM promocion_opciones WHERE id = ?";
