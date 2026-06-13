@@ -23,7 +23,7 @@
             </div>
             <nav class="flex flex-col p-4 gap-2 flex-1">
                 <a href="${pageContext.request.contextPath}/admin/usuarios"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                   class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
                     <i class="fa-solid fa-users"></i> Usuarios
                 </a>
                 <!-- Roles: fa-shield-halved puede no cargar, usar fa-shield -->
@@ -41,7 +41,7 @@
                     <i class="fa-solid fa-receipt"></i> Pedidos
                 </a>
                 <a href="${pageContext.request.contextPath}/admin/opciones"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
+                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
                     <i class="fa-solid fa-sliders"></i> Opciones
                 </a>
                 <a href="${pageContext.request.contextPath}/admin/reclamaciones"

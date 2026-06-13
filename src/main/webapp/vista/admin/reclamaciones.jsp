@@ -40,11 +40,11 @@
                 <i class="fa-solid fa-receipt"></i> Pedidos
             </a>
             <a href="${pageContext.request.contextPath}/admin/opciones"
-               class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
                 <i class="fa-solid fa-sliders"></i> Opciones
             </a>
             <a href="${pageContext.request.contextPath}/admin/reclamaciones"
-               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+               class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
                 <i class="fa-solid fa-book-open"></i> Reclamaciones
             </a>
             <a href="${pageContext.request.contextPath}/logout"
