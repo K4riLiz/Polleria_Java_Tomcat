@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.*;
 
 public class ProductoServlet extends HttpServlet {
 
@@ -33,13 +33,32 @@ public class ProductoServlet extends HttpServlet {
                 return;
             }
 
-            // Cargar opciones del producto desde la BD
+            // Cargar opciones y agrupar
             ProductoOpcionDAO opcionDAO = new ProductoOpcionDAO();
             List<ProductoOpcion> opciones = opcionDAO.listarPorProducto(id);
-            req.setAttribute("producto", producto);
-            req.setAttribute("opciones", opciones);
 
-            // Verificar si el producto ya está en el carrito (de Danna)
+            Map<String, List<ProductoOpcion>> opcionesPorGrupo = new LinkedHashMap<>();
+            for (ProductoOpcion op : opciones) {
+                opcionesPorGrupo
+                    .computeIfAbsent(op.getGrupo(), k -> new ArrayList<>())
+                    .add(op);
+            }
+
+            // Colores por grupo
+            Map<String, String> coloresPorGrupo = new LinkedHashMap<>();
+            coloresPorGrupo.put("Pollo",            "bg-red-600");
+            coloresPorGrupo.put("Complemento",      "bg-orange-500");
+            coloresPorGrupo.put("Guarnición",       "bg-yellow-500");
+            coloresPorGrupo.put("Tipo de Ensalada", "bg-green-500");
+            coloresPorGrupo.put("Bebida",           "bg-blue-500");
+            coloresPorGrupo.put("Tipo de Bebida",   "bg-blue-500");
+            coloresPorGrupo.put("Tipo de Jugo",     "bg-blue-400");
+
+            req.setAttribute("producto", producto);
+            req.setAttribute("opcionesPorGrupo", opcionesPorGrupo);
+            req.setAttribute("coloresPorGrupo", coloresPorGrupo);
+
+            // Cantidad en carrito
             List<ItemCarrito> carrito = (List<ItemCarrito>) req.getSession().getAttribute("carrito");
             if (carrito != null) {
                 for (ItemCarrito item : carrito) {
