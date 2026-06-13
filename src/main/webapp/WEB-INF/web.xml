@@ -76,6 +76,15 @@
         <url-pattern>/categoria</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>AdminOpcionServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.AdminOpcionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminOpcionServlet</servlet-name>
+        <url-pattern>/admin/opciones</url-pattern>
+    </servlet-mapping>
+
     <!-- Servlet: Producto -->
     <servlet>
         <servlet-name>ProductoServlet</servlet-name>

@@ -11,28 +11,39 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import com.polleria.dao.DetallePedidoOpcionDAO;
+import com.polleria.model.DetallePedido;
+import com.polleria.model.Pedido;
+import java.util.List;
+
 public class AdminPedidoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (!esAdmin(req, resp)) return;
-        String action = req.getParameter("action");
+        if (!esAdmin(req, resp)) {
+            return;
+        }
         try {
             PedidoDAO dao = new PedidoDAO();
-            if ("detalle".equals(action)) {
-                int id = Integer.parseInt(req.getParameter("id"));
-                req.setAttribute("pedido", dao.obtenerPorId(id));
-                req.setAttribute("detalles", dao.listarDetalles(id));
-                req.getRequestDispatcher("/vista/admin/pedido-detalle.jsp").forward(req, resp);
-                return;
-            }
+            DetallePedidoOpcionDAO opcionDAO = new DetallePedidoOpcionDAO();
+
+            // Ya no necesitamos el action=detalle porque el detalle es modal
             String filtro = req.getParameter("estado");
-            if (filtro != null && !filtro.isEmpty()) {
-                req.setAttribute("pedidos", dao.listarPorEstado(filtro));
-            } else {
-                req.setAttribute("pedidos", dao.listarTodos());
+            List<Pedido> pedidos = (filtro != null && !filtro.isEmpty())
+                    ? dao.listarPorEstado(filtro)
+                    : dao.listarTodos();
+
+            // Cargar detalles y opciones de cada pedido para el modal
+            for (Pedido p : pedidos) {
+                List<DetallePedido> detalles = dao.listarDetalles(p.getId());
+                for (DetallePedido d : detalles) {
+                    d.setOpciones(opcionDAO.listarPorDetalle(d.getId()));
+                }
+                p.setDetalles(detalles);
             }
+
+            req.setAttribute("pedidos", pedidos);
             req.setAttribute("filtro", filtro);
             req.getRequestDispatcher("/vista/admin/pedidos.jsp").forward(req, resp);
         } catch (SQLException e) {
