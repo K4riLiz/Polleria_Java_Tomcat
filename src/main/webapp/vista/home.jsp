@@ -18,9 +18,9 @@
     <%-- CARRUSEL --%>
     <div class="relative w-full overflow-hidden">
         <div id="carousel" class="flex transition-transform duration-500 ease-in-out">
-            <img src="${pageContext.request.contextPath}/img/carrusel1.png" class="w-full flex-shrink-0 object-cover h-[200px] sm:h-[300px] md:h-[450px] lg:h-[500px]">
-            <img src="${pageContext.request.contextPath}/img/carrusel2.png" class="w-full flex-shrink-0 object-cover h-[200px] sm:h-[300px] md:h-[450px] lg:h-[500px]">
-            <img src="${pageContext.request.contextPath}/img/carrusel3.png" class="w-full flex-shrink-0 object-cover h-[200px] sm:h-[300px] md:h-[450px] lg:h-[500px]">
+            <img src="${pageContext.request.contextPath}/img/carrusel1.webp" class="w-full flex-shrink-0 object-cover h-[200px] sm:h-[300px] md:h-[450px] lg:h-[500px]">
+            <img src="${pageContext.request.contextPath}/img/carrusel2.webp" class="w-full flex-shrink-0 object-cover h-[200px] sm:h-[300px] md:h-[450px] lg:h-[500px]">
+            <img src="${pageContext.request.contextPath}/img/carrusel3.webp" class="w-full flex-shrink-0 object-cover h-[200px] sm:h-[300px] md:h-[450px] lg:h-[500px]">
         </div>
         <button id="prev" class="absolute top-1/2 left-2 md:left-4 -translate-y-1/2 bg-black/50 text-white px-2 py-1 md:px-3 md:py-2 rounded-full hover:bg-black">❮</button>
         <button id="next" class="absolute top-1/2 right-2 md:right-4 -translate-y-1/2 bg-black/50 text-white px-2 py-1 md:px-3 md:py-2 rounded-full hover:bg-black">❯</button>

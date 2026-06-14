@@ -13,7 +13,7 @@
 
         <!-- LOGO -->
         <a href="${pageContext.request.contextPath}/home" class="flex-shrink-0">
-            <img src="${pageContext.request.contextPath}/img/logoheader.png" class="h-14 md:h-20 w-auto object-contain">
+            <img src="${pageContext.request.contextPath}/img/logoheader.webp" class="h-14 md:h-20 w-auto object-contain">
         </a>
 
         <!-- NAV DESKTOP -->
