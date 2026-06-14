@@ -8,10 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
     <title>Delivery - Pedidos</title>
     <style>
         .slide-panel { transform: translateX(-100%); transition: transform 0.3s ease; }
         .slide-panel.abierto { transform: translateX(0); }
+        .mapa-delivery { height: 200px; width: 100%; border-radius: 12px; z-index: 1; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -19,7 +22,7 @@
 <!-- OVERLAY MÓVIL -->
 <div id="overlay" class="fixed inset-0 bg-black/40 z-30 hidden md:hidden" onclick="cerrarMenu()"></div>
 
-<!-- SIDEBAR MÓVIL (slide) -->
+<!-- SIDEBAR MÓVIL -->
 <div id="sidebarMovil"
      class="slide-panel fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-40 flex flex-col md:hidden">
     <div class="p-6 border-b border-gray-700 flex items-center justify-between">
@@ -123,10 +126,12 @@
                         </div>
                     </div>
 
-                    <!-- MODAL DETALLE -->
+                    <!-- MODAL DETALLE CON MAPA -->
                     <div id="detalle-${p.id}"
                          class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-                        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto">
+                        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
+                            <!-- Header -->
                             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                                 <h3 class="text-lg font-bold text-gray-800">Pedido #${p.id}</h3>
                                 <button onclick="cerrarDetalle('detalle-${p.id}')"
@@ -134,6 +139,8 @@
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
+
+                            <!-- Info básica -->
                             <div class="px-6 py-4 border-b border-gray-100 grid grid-cols-2 gap-3 text-sm">
                                 <div>
                                     <p class="text-xs text-gray-400 font-semibold uppercase mb-1">Fecha</p>
@@ -150,6 +157,26 @@
                                     <p class="text-gray-700">${p.direccion}</p>
                                 </div>
                             </div>
+
+                            <!-- MAPA -->
+                            <div class="px-6 py-4 border-b border-gray-100">
+                                <p class="text-xs text-gray-400 font-semibold uppercase mb-2">
+                                    <i class="fa-solid fa-map-location-dot mr-1 text-blue-500"></i>Ubicación del cliente
+                                </p>
+                                <c:choose>
+                                    <c:when test="${not empty p.latitud && not empty p.longitud}">
+                                        <div id="mapa-${p.id}" class="mapa-delivery"></div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="bg-gray-50 rounded-xl p-4 text-center text-gray-400 text-sm">
+                                            <i class="fa-solid fa-map-location-dot text-2xl mb-1 text-gray-300"></i>
+                                            <p>Ubicación no disponible</p>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+
+                            <!-- Productos -->
                             <div class="px-6 py-4">
                                 <p class="text-sm font-semibold text-gray-700 mb-3">Productos:</p>
                                 <div class="flex flex-col gap-3">
@@ -175,6 +202,8 @@
                                     </c:forEach>
                                 </div>
                             </div>
+
+                            <!-- Footer -->
                             <div class="px-6 py-4 border-t border-gray-100 flex justify-between items-center">
                                 <form action="${pageContext.request.contextPath}/delivery/pedidos" method="post">
                                     <input type="hidden" name="id" value="${p.id}">
@@ -206,6 +235,7 @@
 </div>
 
 <script>
+    // ── MENÚ MÓVIL ────────────────────────────────────────
     function abrirMenu() {
         document.getElementById('sidebarMovil').classList.add('abierto');
         document.getElementById('overlay').classList.remove('hidden');
@@ -216,15 +246,61 @@
         document.getElementById('overlay').classList.add('hidden');
         document.body.style.overflow = '';
     }
+
+    // ── MAPAS: datos desde servidor ───────────────────────
+    var mapasCargados = {};
+
+    // Coordenadas de cada pedido inyectadas desde JSP
+    var coordenadasPedidos = {
+        <c:forEach items="${pedidos}" var="p" varStatus="vs">
+            <c:if test="${not empty p.latitud && not empty p.longitud}">
+                '${p.id}': { lat: ${p.latitud}, lng: ${p.longitud} }<c:if test="${!vs.last}">,</c:if>
+            </c:if>
+        </c:forEach>
+    };
+
+    // ── MODAL ─────────────────────────────────────────────
     function abrirDetalle(id) {
         document.getElementById(id).classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+
+        // Extraer ID del pedido del string "detalle-123"
+        var pedidoId = id.replace('detalle-', '');
+
+        // Inicializar mapa solo si tiene coordenadas y no fue cargado antes
+        if (coordenadasPedidos[pedidoId] && !mapasCargados[pedidoId]) {
+            setTimeout(function() {
+                var coords = coordenadasPedidos[pedidoId];
+                var mapaDiv = document.getElementById('mapa-' + pedidoId);
+                if (!mapaDiv) return;
+
+                var mapa = L.map('mapa-' + pedidoId).setView([coords.lat, coords.lng], 16);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(mapa);
+
+                // Fijar íconos
+                delete L.Icon.Default.prototype._getIconUrl;
+                L.Icon.Default.mergeOptions({
+                    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+                    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                });
+
+                L.marker([coords.lat, coords.lng]).addTo(mapa);
+
+                mapasCargados[pedidoId] = true;
+            }, 100);
+        }
     }
+
     function cerrarDetalle(id) {
         document.getElementById(id).classList.add('hidden');
         document.body.style.overflow = '';
     }
-    document.querySelectorAll('[id^="detalle-"]').forEach(modal => {
+
+    document.querySelectorAll('[id^="detalle-"]').forEach(function(modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === this) cerrarDetalle(this.id);
         });

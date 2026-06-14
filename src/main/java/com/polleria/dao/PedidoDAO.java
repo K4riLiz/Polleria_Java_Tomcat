@@ -150,8 +150,15 @@ public class PedidoDAO {
         p.setTotal(rs.getDouble("total"));
         p.setEstado(rs.getString("estado"));
         p.setDireccion(rs.getString("direccion"));
-        p.setLatitud((Double) rs.getObject("latitud"));
-        p.setLongitud((Double) rs.getObject("longitud"));
+        
+        if (rs.getObject("latitud") != null) {
+            p.setLatitud(rs.getDouble("latitud"));
+        }
+
+        if (rs.getObject("longitud") != null) {
+            p.setLongitud(rs.getDouble("longitud"));
+        }
+        
         p.setFecha(rs.getString("fecha"));
         // usuarioNombre solo viene cuando hay JOIN con usuarios
         try {
