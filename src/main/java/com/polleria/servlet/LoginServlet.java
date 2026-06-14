@@ -54,7 +54,7 @@ public class LoginServlet extends HttpServlet {
                 // Redirigir según rol
                 switch (usuario.getRolNombre()){
                     case "ADMIN":
-                        resp.sendRedirect(req.getContextPath()+"/admin/usuarios");
+                        resp.sendRedirect(req.getContextPath()+"/admin/dashboard");
                         break;
                     case "CHEF":
                         resp.sendRedirect(req.getContextPath() + "/chef/pedidos");

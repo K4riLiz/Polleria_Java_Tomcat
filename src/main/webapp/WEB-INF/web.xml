@@ -95,6 +95,16 @@
         <url-pattern>/producto</url-pattern>
     </servlet-mapping>
 
+    <!-- Servlet: Admin Dahboard -->
+    <servlet>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.AdminDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <url-pattern>/admin/dashboard</url-pattern>
+    </servlet-mapping>
+
     <!-- Servlet: Admin Usuarios -->
     <servlet>
         <servlet-name>AdminUsuarioServlet</servlet-name>

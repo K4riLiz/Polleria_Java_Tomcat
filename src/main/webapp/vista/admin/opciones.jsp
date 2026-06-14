@@ -25,6 +25,10 @@
             <p class="text-xs text-gray-400 mt-1">${sessionScope.usuario.nombre}</p>
         </div>
         <nav class="flex flex-col p-4 gap-2 flex-1">
+            <a href="${pageContext.request.contextPath}/admin/dashboard"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
             <a href="${pageContext.request.contextPath}/admin/usuarios"
                class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
                 <i class="fa-solid fa-users"></i> Usuarios
