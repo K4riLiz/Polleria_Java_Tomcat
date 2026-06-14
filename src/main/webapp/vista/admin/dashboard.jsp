@@ -12,6 +12,75 @@
     <title>Admin - Dashboard</title>
     <style>
         body { background: #f8fafc; }
+
+        /* ─── ESTILOS DE IMPRESIÓN ──────────────────────────────────── */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm 12mm; }
+
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+
+            #print-area {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%;
+                background: #fff;
+            }
+
+            /* Título solo en impresión */
+            #print-title { display: block !important; }
+
+            /* Cards en fila */
+            #print-cards {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            #print-cards > div {
+                flex: 1;
+                border: 1px solid #e5e7eb;
+                border-radius: 10px;
+                padding: 8px 10px;
+                background: #fff;
+            }
+            /* Ocultar iconos en tarjetas para ahorrar espacio */
+            #print-cards .card-icon { display: none !important; }
+
+            /* Fila 1: productos y promociones lado a lado */
+            #print-row-bars {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            #print-row-bars > div {
+                flex: 1;
+                border: 1px solid #e5e7eb;
+                border-radius: 10px;
+                padding: 8px 10px;
+                background: #fff;
+            }
+
+            /* Fila 2: ventas (más ancho) + dona */
+            #print-row-charts {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 8px;
+            }
+            #print-row-charts > div {
+                border: 1px solid #e5e7eb;
+                border-radius: 10px;
+                padding: 8px 10px;
+                background: #fff;
+            }
+            /* Ventas ocupa ~60%, dona ~40% */
+            #print-ventas { flex: 3; }
+            #print-dona   { flex: 2; }
+
+            /* Forzar que los canvas se rendericen */
+            canvas { max-width: 100% !important; }
+            #print-area { page-break-inside: avoid; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -25,39 +94,37 @@
         </div>
         <nav class="flex flex-col p-4 gap-2 flex-1">
             <a href="${pageContext.request.contextPath}/admin/dashboard"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
-                    <i class="fa-solid fa-chart-line"></i> Dashboard
-                </a>
-                <a href="${pageContext.request.contextPath}/admin/usuarios"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-users"></i> Usuarios
-                </a>
-                <!-- Roles: fa-shield-halved puede no cargar, usar fa-shield -->
-                <a href="${pageContext.request.contextPath}/admin/roles"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-shield"></i> Roles
-                </a>
-                <!-- Productos: fa-bowl-food puede no cargar, usar fa-utensils -->
-                <a href="${pageContext.request.contextPath}/admin/productos"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-utensils"></i> Productos
-                </a>
-                <a href="${pageContext.request.contextPath}/admin/pedidos"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-receipt"></i> Pedidos
-                </a>
-                <a href="${pageContext.request.contextPath}/admin/opciones"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-sliders"></i> Opciones
-                </a>
-                <a href="${pageContext.request.contextPath}/admin/reclamaciones"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-book-open"></i> Reclamaciones
-                </a>
-                <a href="${pageContext.request.contextPath}/logout"
-                   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-700 transition text-red-400">
-                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-                </a>
+               class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/usuarios"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-users"></i> Usuarios
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/roles"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-shield"></i> Roles
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/productos"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-utensils"></i> Productos
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/pedidos"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-receipt"></i> Pedidos
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/opciones"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-sliders"></i> Opciones
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/reclamaciones"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-book-open"></i> Reclamaciones
+            </a>
+            <a href="${pageContext.request.contextPath}/logout"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-700 transition text-red-400">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+            </a>
         </nav>
     </aside>
 
@@ -90,136 +157,154 @@
             </div>
         </c:if>
 
-        <!-- CARDS -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">Pedidos hoy</span>
-                    <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-receipt text-red-500"></i>
-                    </div>
-                </div>
-                <p class="text-3xl font-bold text-gray-800">${pedidosHoy}</p>
-                <p class="text-xs mt-1 ${varPedidos.startsWith('↑') ? 'text-green-600' : 'text-red-500'}">${varPedidos}</p>
-            </div>
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">Ingresos hoy</span>
-                    <div class="w-9 h-9 bg-green-50 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-wallet text-green-500"></i>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-gray-800">S/<fmt:formatNumber value="${ingresosHoy}" pattern="#,##0.00"/></p>
-                <p class="text-xs mt-1 ${varIngresos.startsWith('↑') ? 'text-green-600' : 'text-red-500'}">${varIngresos}</p>
-            </div>
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">En proceso</span>
-                    <div class="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-fire text-amber-500"></i>
-                    </div>
-                </div>
-                <p class="text-3xl font-bold text-gray-800">${enProceso}</p>
-                <p class="text-xs text-amber-600 mt-1">pedidos activos</p>
-            </div>
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">Reclamaciones</span>
-                    <div class="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-book-open text-purple-500"></i>
-                    </div>
-                </div>
-                <p class="text-3xl font-bold text-gray-800">${reclamaciones}</p>
-                <p class="text-xs text-purple-600 mt-1">sin resolver</p>
-            </div>
-        </div>
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!--  BLOQUE IMPRIMIBLE                                        -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div id="print-area">
 
-        <!-- GRÁFICOS BARRAS -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <!-- Título solo visible al imprimir -->
+            <div id="print-title" style="display:none; margin-bottom:10px;">
+                <h1 style="font-size:16px; font-weight:700; color:#b91c1c; margin:0;">Pollería El Dorado</h1>
+                <p style="font-size:10px; color:#6b7280; margin:2px 0 0;">Reporte de Dashboard</p>
+            </div>
 
-            <!-- Productos más vendidos -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 class="text-sm font-semibold text-gray-700 mb-4">Productos más vendidos</h3>
-                <c:set var="maxProd" value="1"/>
-                <c:forEach var="e" items="${productosMasVendidos}">
-                    <c:if test="${e.value > maxProd}"><c:set var="maxProd" value="${e.value}"/></c:if>
-                </c:forEach>
-                <c:forEach var="e" items="${productosMasVendidos}">
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="text-xs text-gray-500 w-32 truncate">${e.key}</span>
-                        <div class="flex-1 bg-gray-100 rounded-full h-2">
-                            <div class="bg-red-500 h-2 rounded-full"
-                                 style="width: ${(e.value * 100) / maxProd}%"></div>
+            <!-- ── TARJETAS ─────────────────────────────────────────── -->
+            <div id="print-cards" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">Pedidos hoy</span>
+                        <div class="card-icon w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-receipt text-red-500"></i>
                         </div>
-                        <span class="text-xs font-semibold text-gray-700 w-6 text-right">${e.value}</span>
                     </div>
-                </c:forEach>
-                <c:if test="${empty productosMasVendidos}">
-                    <p class="text-sm text-gray-400 text-center py-4">Sin datos aún</p>
-                </c:if>
-            </div>
+                    <p class="text-3xl font-bold text-gray-800">${pedidosHoy}</p>
+                    <p class="text-xs mt-1 ${varPedidos.startsWith('↑') ? 'text-green-600' : 'text-red-500'}">${varPedidos}</p>
+                </div>
 
-            <!-- Promociones más vendidas -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 class="text-sm font-semibold text-gray-700 mb-4">Promociones más vendidas</h3>
-                <c:set var="maxProm" value="1"/>
-                <c:forEach var="e" items="${promocionesMasVendidas}">
-                    <c:if test="${e.value > maxProm}"><c:set var="maxProm" value="${e.value}"/></c:if>
-                </c:forEach>
-                <c:forEach var="e" items="${promocionesMasVendidas}">
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="text-xs text-gray-500 w-32 truncate">${e.key}</span>
-                        <div class="flex-1 bg-gray-100 rounded-full h-2">
-                            <div class="bg-purple-500 h-2 rounded-full"
-                                 style="width: ${(e.value * 100) / maxProm}%"></div>
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">Ingresos hoy</span>
+                        <div class="card-icon w-9 h-9 bg-green-50 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-wallet text-green-500"></i>
                         </div>
-                        <span class="text-xs font-semibold text-gray-700 w-6 text-right">${e.value}</span>
                     </div>
-                </c:forEach>
-                <c:if test="${empty promocionesMasVendidas}">
-                    <p class="text-sm text-gray-400 text-center py-4">Sin datos aún</p>
-                </c:if>
+                    <p class="text-2xl font-bold text-gray-800">S/<fmt:formatNumber value="${ingresosHoy}" pattern="#,##0.00"/></p>
+                    <p class="text-xs mt-1 ${varIngresos.startsWith('↑') ? 'text-green-600' : 'text-red-500'}">${varIngresos}</p>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">En proceso</span>
+                        <div class="card-icon w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-fire text-amber-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-800">${enProceso}</p>
+                    <p class="text-xs text-amber-600 mt-1">pedidos activos</p>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs text-gray-400 uppercase tracking-wide font-medium">Reclamaciones</span>
+                        <div class="card-icon w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-book-open text-purple-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-800">${reclamaciones}</p>
+                    <p class="text-xs text-purple-600 mt-1">sin resolver</p>
+                </div>
             </div>
+
+            <!-- ── FILA 1: BARRAS (orden original: productos | promociones) ── -->
+            <div id="print-row-bars" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+
+                <!-- Productos más vendidos -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Productos más vendidos</h3>
+                    <div style="position:relative; height:240px;">
+                        <canvas id="prodBarChart" role="img" aria-label="Productos más vendidos"></canvas>
+                    </div>
+                </div>
+
+                <!-- Promociones más vendidas -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Promociones más vendidas</h3>
+                    <div style="position:relative; height:240px;">
+                        <canvas id="promBarChart" role="img" aria-label="Promociones más vendidas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── FILA 2: VENTAS 7 DÍAS (col-span-2) + PEDIDOS POR ESTADO ── -->
+            <div id="print-row-charts" class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+
+                <!-- Ventas 7 días -->
+                <div id="print-ventas" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 lg:col-span-2">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Ventas últimos 7 días (S/)</h3>
+                    <div style="position:relative; height:200px;">
+                        <canvas id="lineChart" role="img" aria-label="Ventas de los últimos 7 días"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pedidos por estado -->
+                <div id="print-dona" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Pedidos por estado</h3>
+
+                    <!-- Dos columnas: círculo | leyenda -->
+                    <div class="flex items-center gap-4">
+
+                        <!-- Círculo — ocupa mitad del espacio -->
+                        <div style="position:relative; flex:1; min-width:0; height:200px;">
+                            <canvas id="pieChart" role="img" aria-label="Pedidos por estado"></canvas>
+                        </div>
+
+                        <!-- Leyenda derecha (pantalla + PDF, misma estructura) -->
+                        <div class="flex flex-col gap-2" style="flex:1; min-width:0;">
+                            <div class="flex items-center justify-between gap-2 text-xs text-gray-600">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-sm inline-block flex-shrink-0" style="background:#facc15;"></span>
+                                    Pendiente
+                                </span>
+                                <strong class="text-gray-800">${pedidosPorEstado['Pendiente']}</strong>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 text-xs text-gray-600">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-sm inline-block flex-shrink-0" style="background:#f97316;"></span>
+                                    En cocina
+                                </span>
+                                <strong class="text-gray-800">${pedidosPorEstado['En cocina']}</strong>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 text-xs text-gray-600">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-sm inline-block flex-shrink-0" style="background:#60a5fa;"></span>
+                                    Por despachar
+                                </span>
+                                <strong class="text-gray-800">${pedidosPorEstado['Por despachar']}</strong>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 text-xs text-gray-600">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-sm inline-block flex-shrink-0" style="background:#4ade80;"></span>
+                                    Entregado
+                                </span>
+                                <strong class="text-gray-800">${pedidosPorEstado['Entregado']}</strong>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 text-xs text-gray-600">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-sm inline-block flex-shrink-0" style="background:#f87171;"></span>
+                                    Cancelado
+                                </span>
+                                <strong class="text-gray-800">${pedidosPorEstado['Cancelado']}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+        <!-- FIN BLOQUE IMPRIMIBLE -->
 
-        <!-- VENTAS + ESTADOS -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-
-            <!-- Ventas 7 días -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 lg:col-span-2">
-                <h3 class="text-sm font-semibold text-gray-700 mb-4">Ventas últimos 7 días (S/)</h3>
-                <div style="position:relative;height:200px;">
-                    <canvas id="lineChart" role="img" aria-label="Ventas de los últimos 7 días"></canvas>
-                </div>
-            </div>
-
-            <!-- Pedidos por estado -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 class="text-sm font-semibold text-gray-700 mb-4">Pedidos por estado</h3>
-                <div style="position:relative;height:160px;">
-                    <canvas id="pieChart" role="img" aria-label="Pedidos por estado"></canvas>
-                </div>
-                <div class="flex flex-col gap-1 mt-3">
-                    <div class="flex items-center gap-2 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-yellow-400"></span> Pendiente: ${pedidosPorEstado['Pendiente']}
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-orange-400"></span> En cocina: ${pedidosPorEstado['En cocina']}
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-blue-400"></span> Por despachar: ${pedidosPorEstado['Por despachar']}
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-green-500"></span> Entregado: ${pedidosPorEstado['Entregado']}
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-red-400"></span> Cancelado: ${pedidosPorEstado['Cancelado']}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TABLA ÚLTIMOS PEDIDOS -->
+        <!-- TABLA ÚLTIMOS PEDIDOS (no va al PDF) -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 <h3 class="text-sm font-semibold text-gray-700">Últimos pedidos</h3>
@@ -303,11 +388,13 @@
     </main>
 </div>
 
-<!-- DATOS PARA CHARTS inyectados desde servidor -->
+<!-- ─── DATOS INYECTADOS DESDE SERVIDOR ─────────────────────────────────── -->
 <script>
+    // Ventas 7 días
     var ventasLabels = [<c:forEach var="e" items="${ventasSemana}" varStatus="vs">'${e.key}'<c:if test="${!vs.last}">,</c:if></c:forEach>];
     var ventasData   = [<c:forEach var="e" items="${ventasSemana}" varStatus="vs">${e.value}<c:if test="${!vs.last}">,</c:if></c:forEach>];
 
+    // Estados
     var estadoLabels = ['Pendiente','En cocina','Por despachar','Entregado','Cancelado'];
     var estadoData   = [
         ${pedidosPorEstado['Pendiente']},
@@ -316,10 +403,104 @@
         ${pedidosPorEstado['Entregado']},
         ${pedidosPorEstado['Cancelado']}
     ];
+
+    // Productos más vendidos — rellena hasta 5 slots
+    var prodRaw = [
+        <c:forEach var="e" items="${productosMasVendidos}" varStatus="vs">
+            { label: '${e.key}', value: ${e.value} }<c:if test="${!vs.last}">,</c:if>
+        </c:forEach>
+    ];
+    // Completar hasta 5 entradas vacías
+    while (prodRaw.length < 5) prodRaw.push({ label: '', value: 0 });
+    var prodLabels = prodRaw.map(function(x){ return x.label; });
+    var prodData   = prodRaw.map(function(x){ return x.value; });
+
+    // Promociones más vendidas — rellena hasta 5 slots
+    var promRaw = [
+        <c:forEach var="e" items="${promocionesMasVendidas}" varStatus="vs">
+            { label: '${e.key}', value: ${e.value} }<c:if test="${!vs.last}">,</c:if>
+        </c:forEach>
+    ];
+    while (promRaw.length < 5) promRaw.push({ label: '', value: 0 });
+    var promLabels = promRaw.map(function(x){ return x.label; });
+    var promData   = promRaw.map(function(x){ return x.value; });
 </script>
 
 <script>
-    // Gráfico línea — ventas 7 días
+    // ── Plugin inline: cantidad al extremo derecho de cada barra ──────────
+    var valueAtEndPlugin = {
+        id: 'valueAtEnd',
+        afterDatasetsDraw: function(chart) {
+            var ctx = chart.ctx;
+            chart.data.datasets.forEach(function(dataset, i) {
+                var meta = chart.getDatasetMeta(i);
+                meta.data.forEach(function(bar, index) {
+                    var value = dataset.data[index];
+                    if (!value || value === 0) return;
+                    var x = bar.x + 6;          // 6px a la derecha del extremo de la barra
+                    var y = bar.y;
+                    ctx.save();
+                    ctx.fillStyle = '#374151';
+                    ctx.font = 'bold 11px sans-serif';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(value, x, y);
+                    ctx.restore();
+                });
+            });
+        }
+    };
+
+    // ── Opciones comunes para barras horizontales ──────────────────────────
+    var barOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        layout: { padding: { right: 30 } },   // espacio para el número
+        plugins: { legend: { display: false } },
+        scales: {
+            x: {
+                ticks: { font: { size: 11 }, color: '#9ca3af' },
+                grid: { color: 'rgba(0,0,0,0.04)' },
+                beginAtZero: true
+            },
+            y: {
+                ticks: { font: { size: 11 }, color: '#6b7280' },
+                grid: { display: false }
+            }
+        }
+    };
+
+    // ── Productos más vendidos ─────────────────────────────────────────────
+    new Chart(document.getElementById('prodBarChart'), {
+        type: 'bar',
+        plugins: [valueAtEndPlugin],
+        data: {
+            labels: prodLabels,
+            datasets: [{
+                data: prodData,
+                backgroundColor: prodData.map(function(v){ return v > 0 ? 'rgba(220,38,38,0.75)' : 'transparent'; }),
+                borderRadius: 4
+            }]
+        },
+        options: barOpts
+    });
+
+    // ── Promociones más vendidas ───────────────────────────────────────────
+    new Chart(document.getElementById('promBarChart'), {
+        type: 'bar',
+        plugins: [valueAtEndPlugin],
+        data: {
+            labels: promLabels,
+            datasets: [{
+                data: promData,
+                backgroundColor: promData.map(function(v){ return v > 0 ? 'rgba(139,92,246,0.75)' : 'transparent'; }),
+                borderRadius: 4
+            }]
+        },
+        options: barOpts
+    });
+
+    // ── Ventas 7 días (línea) ──────────────────────────────────────────────
     new Chart(document.getElementById('lineChart'), {
         type: 'line',
         data: {
@@ -342,12 +523,15 @@
             plugins: { legend: { display: false } },
             scales: {
                 x: { ticks: { font: { size: 10 }, color: '#9ca3af' }, grid: { display: false } },
-                y: { ticks: { font: { size: 10 }, color: '#9ca3af', callback: function(v) { return 'S/' + v; } }, grid: { color: 'rgba(0,0,0,0.04)' } }
+                y: {
+                    ticks: { font: { size: 10 }, color: '#9ca3af', callback: function(v){ return 'S/' + v; } },
+                    grid: { color: 'rgba(0,0,0,0.04)' }
+                }
             }
         }
     });
 
-    // Gráfico pastel — pedidos por estado
+    // ── Pedidos por estado (dona gruesa) ──────────────────────────────────
     new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: {
@@ -363,11 +547,11 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            cutout: '60%'
+            cutout: '35%'   // dona gruesa
         }
     });
 
-    // Exportar PDF
+    // ── Exportar PDF ───────────────────────────────────────────────────────
     function exportarPDF() {
         window.print();
     }
