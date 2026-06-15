@@ -64,33 +64,21 @@
                             <i class="fa-solid fa-location-dot text-red-600 mr-2"></i>Dirección de entrega
                         </h2>
 
-                        <%-- Opción de usar ubicación guardada --%>
-                        <c:if test="${not empty sessionScope.usuario}">
-                            <%
-                                com.polleria.dao.ClienteDAO cDao = new com.polleria.dao.ClienteDAO();
-                                com.polleria.model.Usuario uSes = (com.polleria.model.Usuario) session.getAttribute("usuario");
-                                com.polleria.model.Cliente cSes = null;
-                                try {
-                                    cSes = cDao.obtenerPorUsuarioId(uSes.getId());
-                                } catch (Exception ignored) {
-                                }
-                                request.setAttribute("clientePerfil", cSes);
-                            %>
-                            <c:if test="${not empty clientePerfil.direccion}">
-                                <div class="bg-red-50 border border-red-100 rounded-xl p-4 mb-3 flex items-start gap-3">
-                                    <i class="fa-solid fa-location-dot text-red-500 mt-0.5"></i>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-semibold text-gray-700 mb-0.5">¿Usar tu dirección guardada?</p>
-                                        <p class="text-xs text-gray-500 mb-2">${clientePerfil.direccion}</p>
-                                        <button type="button" onclick="usarDireccionGuardada()"
-                                                class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-semibold transition">
-                                            <i class="fa-solid fa-check mr-1"></i> Usar esta dirección
-                                        </button>
-                                    </div>
+                        <%-- Cliente CON dirección guardada: mostrar botón para usarla --%>
+                        <c:if test="${not empty clientePerfil.direccion}">
+                            <div class="bg-red-50 border border-red-100 rounded-xl p-4 mb-3 flex items-start gap-3">
+                                <i class="fa-solid fa-location-dot text-red-500 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-gray-700 mb-0.5">¿Usar tu dirección guardada?</p>
+                                    <p class="text-xs text-gray-500 mb-2">${clientePerfil.direccion}</p>
+                                    <button type="button" onclick="usarDireccionGuardada()"
+                                            class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-semibold transition">
+                                        <i class="fa-solid fa-check mr-1"></i> Usar esta dirección
+                                    </button>
                                 </div>
-                            </c:if>
+                            </div>
                         </c:if>
-                        
+
                         <!-- Buscador -->
                         <div class="relative mb-3">
                             <input type="text" id="mapaBuscador"
@@ -112,7 +100,19 @@
                             <span id="mapaDirSpan" class="leading-relaxed"></span>
                         </div>
 
-                        <p class="text-xs text-gray-400 text-center">
+                        <%-- Cliente SIN dirección guardada: mostrar opción de guardar --%>
+                        <c:if test="${sinDireccion}">
+                            <div id="seccionGuardarDir" class="hidden mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3">
+                                <input type="checkbox" id="chkGuardarDir" name="guardarDireccion" value="true"
+                                       class="w-4 h-4 accent-red-600 cursor-pointer">
+                                <label for="chkGuardarDir" class="text-sm text-gray-700 cursor-pointer">
+                                    <span class="font-semibold">Guardar esta dirección en mi perfil</span>
+                                    <span class="text-gray-500 text-xs block">Para no tener que ingresarla la próxima vez</span>
+                                </label>
+                            </div>
+                        </c:if>
+
+                        <p class="text-xs text-gray-400 text-center mt-2">
                             <i class="fa-solid fa-hand-pointer mr-1"></i>
                             Haz clic en el mapa o arrastra el pin para ajustar tu ubicación
                         </p>
@@ -278,16 +278,17 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
     <script>
-    // ── Variables globales del mapa ──────────────────────────
     var mapa, marker;
 
     var latPerfil = '${clientePerfil.latitud}';
     var lngPerfil = '${clientePerfil.longitud}';
     var dirPerfil = '${clientePerfil.direccion}';
 
+    // sinDireccion viene del servlet: true si el cliente no tiene dirección guardada
+    var sinDireccion = ${sinDireccion};
+
     document.addEventListener('DOMContentLoaded', function () {
 
-        // ── MAPA ──────────────────────────────────────────────
         mapa = L.map('mapaLeaflet').setView([-12.0464, -77.0428], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -323,7 +324,6 @@
             }
         });
 
-        // Si hay dirección de perfil, pre-cargar el mapa al inicio
         if (latPerfil && lngPerfil) {
             var la = parseFloat(latPerfil);
             var ln = parseFloat(lngPerfil);
@@ -331,8 +331,6 @@
             marker.setLatLng([la, ln]);
         }
     });
-
-    // ── Funciones globales (accesibles desde onclick) ─────────
 
     function buscarDireccion(texto) {
         var url = 'https://nominatim.openstreetmap.org/search?format=json&q='
@@ -388,6 +386,13 @@
         document.getElementById('mapaDir').value = dir;
         document.getElementById('mapaDirSpan').textContent = dir;
         document.getElementById('mapaDirTexto').classList.remove('hidden');
+
+        // Mostrar el checkbox de guardar solo si el cliente no tiene dirección
+        // y recién acaba de seleccionar una en el mapa
+        if (sinDireccion) {
+            var seccion = document.getElementById('seccionGuardarDir');
+            if (seccion) seccion.classList.remove('hidden');
+        }
     }
 
     function usarDireccionGuardada() {
@@ -432,6 +437,6 @@
         input.value = parts.length ? parts.join(' ') : val;
     }
     </script>
-    
+
 </body>
 </html>
