@@ -39,7 +39,12 @@ public class ClienteDAO {
             ps.setString(3, c.getDireccion());
             ps.setObject(4, c.getLatitud());
             ps.setObject(5, c.getLongitud());
-            ps.setInt(6, c.getDistritoId());
+            // DESPUÉS
+            if (c.getDistritoId() > 0) {
+                ps.setInt(6, c.getDistritoId());
+            } else {
+                ps.setNull(6, Types.INTEGER);
+            }
             ps.setInt(7, c.getUsuarioId());
             return ps.executeUpdate() > 0;
         }
@@ -52,8 +57,10 @@ public class ClienteDAO {
         c.setApellido(rs.getString("apellido"));
         c.setTelefono(rs.getString("telefono"));
         c.setDireccion(rs.getString("direccion"));
-        c.setLatitud((Double) rs.getObject("latitud"));
-        c.setLongitud((Double) rs.getObject("longitud"));
+      
+        c.setLatitud(rs.getObject("latitud") != null ? rs.getDouble("latitud") : null);
+        c.setLongitud(rs.getObject("longitud") != null ? rs.getDouble("longitud") : null);
+        
         c.setFidelidad(rs.getInt("fidelidad"));
         c.setDistritoId(rs.getInt("distrito_id"));
         c.setDistritoNombre(rs.getString("distrito_nombre"));

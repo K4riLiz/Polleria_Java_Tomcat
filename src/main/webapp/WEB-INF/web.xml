@@ -55,6 +55,16 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
+    
+    <!-- Servlet: Perfil Cliente -->
+    <servlet>
+        <servlet-name>PerfilServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.PerfilServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PerfilServlet</servlet-name>
+        <url-pattern>/perfil</url-pattern>
+    </servlet-mapping>
 
     <!-- Servlet: Verificación de código -->
     <servlet>

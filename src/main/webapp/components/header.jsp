@@ -97,6 +97,12 @@
                                    class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
                                     <i class="fa-solid fa-house w-4"></i> Inicio
                                 </a>
+                                
+                                <a href="${pageContext.request.contextPath}/perfil"
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-user"></i> Mi perfil
+                                </a>
+                                   
                                 <a href="${pageContext.request.contextPath}/historial"
                                    class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
                                     <i class="fa-solid fa-clock-rotate-left w-4"></i> Mis pedidos

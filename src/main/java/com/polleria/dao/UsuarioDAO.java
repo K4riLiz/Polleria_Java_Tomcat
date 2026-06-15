@@ -114,4 +114,13 @@ public class UsuarioDAO {
         u.setActivo(rs.getBoolean("activo"));
         return u;
     }
+    
+    public boolean actualizarNombre(int id, String nombre) throws SQLException {
+        String sql = "UPDATE usuarios SET nombre = ? WHERE id = ?";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        }
+    }
 }

@@ -212,7 +212,7 @@
                         </div>
                     </div>
                     <p class="text-3xl font-bold text-gray-800">${reclamaciones}</p>
-                    <p class="text-xs text-purple-600 mt-1">sin resolver</p>
+                    <p class="text-xs text-purple-600 mt-1">recibidas</p>
                 </div>
             </div>
 
