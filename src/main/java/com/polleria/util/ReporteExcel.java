@@ -14,12 +14,10 @@ import java.util.Map;
 public class ReporteExcel {
 
     // ── Colores corporativos ────────────────────────────────────────────────
-    private static final byte[] COLOR_ROJO    = hexToRgb("B91C1C"); // rojo oscuro
-    private static final byte[] COLOR_ROJO_L  = hexToRgb("FEE2E2"); // rojo claro (filas pares)
-    private static final byte[] COLOR_BLANCO  = hexToRgb("FFFFFF");
-    private static final byte[] COLOR_GRIS    = hexToRgb("F9FAFB"); // filas impares
-    private static final byte[] COLOR_TEXTO   = hexToRgb("111827");
-    private static final byte[] COLOR_HEADER  = hexToRgb("FFFFFF"); // texto de cabecera
+    private static final byte[] COLOR_ROJO   = hexToRgb("B91C1C");
+    private static final byte[] COLOR_BLANCO = hexToRgb("FFFFFF");
+    private static final byte[] COLOR_GRIS   = hexToRgb("F9FAFB");
+    private static final byte[] COLOR_TEXTO  = hexToRgb("111827");
 
     // ── Columnas del reporte ────────────────────────────────────────────────
     private static final String[] COLUMNAS = {
@@ -27,19 +25,11 @@ public class ReporteExcel {
         "Producto / Pedido", "Opciones", "Total (S/)", "Fecha", "Estado"
     };
 
-    // Anchos de columna en unidades POI (256 = 1 carácter)
     private static final int[] ANCHOS = {
         12 * 256, 12 * 256, 28 * 256,
         35 * 256, 38 * 256, 14 * 256, 22 * 256, 15 * 256
     };
 
-    /**
-     * Genera y escribe el archivo Excel directamente en el HttpServletResponse.
-     *
-     * @param response  respuesta HTTP donde se descarga el archivo
-     * @param pedidos   lista de mapas con claves:
-     *                  id, idCliente, cliente, pedido, opciones, total, fecha, estado
-     */
     public static void exportar(HttpServletResponse response,
                                 List<Map<String, Object>> pedidos) throws IOException {
 
@@ -56,7 +46,7 @@ public class ReporteExcel {
 
             XSSFSheet sheet = wb.createSheet("Ventas");
 
-            // ── 1. Fila de título ───────────────────────────────────────────
+            // ── 1. Título ───────────────────────────────────────────────────
             Row rowTitulo = sheet.createRow(0);
             rowTitulo.setHeightInPoints(28);
             Cell cTitulo = rowTitulo.createCell(0);
@@ -64,7 +54,7 @@ public class ReporteExcel {
             cTitulo.setCellStyle(estiloTitulo(wb));
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, COLUMNAS.length - 1));
 
-            // ── 2. Fila de subtítulo (fecha generación) ─────────────────────
+            // ── 2. Subtítulo ────────────────────────────────────────────────
             Row rowSub = sheet.createRow(1);
             rowSub.setHeightInPoints(18);
             Cell cSub = rowSub.createCell(0);
@@ -73,10 +63,10 @@ public class ReporteExcel {
             cSub.setCellStyle(estiloSubtitulo(wb));
             sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, COLUMNAS.length - 1));
 
-            // ── 3. Fila vacía de separación ─────────────────────────────────
+            // ── 3. Fila vacía ───────────────────────────────────────────────
             sheet.createRow(2).setHeightInPoints(6);
 
-            // ── 4. Cabecera de columnas ─────────────────────────────────────
+            // ── 4. Cabecera ─────────────────────────────────────────────────
             Row rowHeader = sheet.createRow(3);
             rowHeader.setHeightInPoints(20);
             CellStyle stHeader = estiloHeader(wb);
@@ -87,54 +77,75 @@ public class ReporteExcel {
                 sheet.setColumnWidth(c, ANCHOS[c]);
             }
 
-            // ── 5. Filas de datos ────────────────────────────────────────────
+            // ── 5. Estilos creados UNA sola vez fuera del bucle ─────────────
+            CellStyle stIdPar      = estiloId(wb, true);
+            CellStyle stIdImpar    = estiloId(wb, false);
+            CellStyle stDatoPar    = estiloDato(wb, true);
+            CellStyle stDatoImpar  = estiloDato(wb, false);
+            CellStyle stTotalPar   = estiloTotalNumerico(wb, true);
+            CellStyle stTotalImpar = estiloTotalNumerico(wb, false);
+            CellStyle stEstadoEnt  = estiloEstado(wb, true);
+            CellStyle stEstadoCan  = estiloEstado(wb, false);
+
+            // ── 6. Filas de datos ───────────────────────────────────────────
             int rowNum = 4;
             for (Map<String, Object> p : pedidos) {
                 Row row = sheet.createRow(rowNum);
                 row.setHeightInPoints(16);
 
                 boolean esEntregado = "Entregado".equals(str(p, "estado"));
-                CellStyle stDato    = estiloDato(wb, rowNum % 2 == 0, esEntregado);
-                CellStyle stTotal   = estiloTotal(wb, rowNum % 2 == 0, esEntregado);
-                CellStyle stEstado  = estiloEstado(wb, esEntregado);
+                boolean par         = rowNum % 2 == 0;
 
-                setCell(row, 0, str(p, "id"),         stDato);
-                setCell(row, 1, str(p, "idCliente"),  stDato);
-                setCell(row, 2, str(p, "cliente"),    stDato);
-                setCell(row, 3, str(p, "pedido"),     stDato);
-                setCell(row, 4, str(p, "opciones"),   stDato);
-                setCell(row, 5, str(p, "total"),      stTotal);
-                setCell(row, 6, str(p, "fecha"),      stDato);
-                setCell(row, 7, str(p, "estado"),     stEstado);
+                CellStyle stId     = par ? stIdPar    : stIdImpar;
+                CellStyle stDato   = par ? stDatoPar  : stDatoImpar;
+                CellStyle stTotal  = par ? stTotalPar : stTotalImpar;
+                CellStyle stEstado = esEntregado ? stEstadoEnt : stEstadoCan;
+
+                // IDs como números enteros
+                setCellNumeric(row, 0, toDouble(p, "id"),        stId);
+                setCellNumeric(row, 1, toDouble(p, "idCliente"), stId);
+
+                // Texto normal
+                setCell(row, 2, str(p, "cliente"),  stDato);
+                setCell(row, 3, str(p, "pedido"),   stDato);
+                setCell(row, 4, str(p, "opciones"), stDato);
+
+                // Total como número decimal
+                setCellNumeric(row, 5, toDouble(p, "total"), stTotal);
+
+                setCell(row, 6, str(p, "fecha"),  stDato);
+                setCell(row, 7, str(p, "estado"), stEstado);
 
                 rowNum++;
             }
 
-            // ── 6. Fila de total general ─────────────────────────────────────
+            // ── 7. Fila de total general ────────────────────────────────────
             Row rowTotalGen = sheet.createRow(rowNum + 1);
             rowTotalGen.setHeightInPoints(18);
-            CellStyle stTotGen = estiloTotalGeneral(wb);
+
+            CellStyle stTotLabel = estiloTotalGeneral(wb);
+            // Clonar el estilo del label y agregarle formato numérico
+            XSSFCellStyle stTotValor = wb.createCellStyle();
+            stTotValor.cloneStyleFrom(stTotLabel);
+            stTotValor.setDataFormat(wb.createDataFormat().getFormat("#,##0.00"));
 
             Cell cLabelTot = rowTotalGen.createCell(4);
             cLabelTot.setCellValue("TOTAL GENERAL:");
-            cLabelTot.setCellStyle(stTotGen);
+            cLabelTot.setCellStyle(stTotLabel);
 
-            // Suma solo pedidos Entregados
-            double totalGeneral = pedidos.stream()
-                    .filter(p -> "Entregado".equals(str(p, "estado")))
-                    .mapToDouble(p -> {
-                        try { return Double.parseDouble(str(p, "total").replace(",", ".")); }
-                        catch (Exception e) { return 0; }
-                    }).sum();
-
+            // SUMIF sobre columna H (Estado) y F (Total) — base 1 en Excel
+            int primeraDato = 5;       // fila Excel donde empiezan los datos (rowNum 4 → fila 5)
+            int ultimaDato  = rowNum;  // rowNum apunta justo después de la última fila
             Cell cValTot = rowTotalGen.createCell(5);
-            cValTot.setCellValue(String.format("S/ %.2f", totalGeneral));
-            cValTot.setCellStyle(stTotGen);
+            cValTot.setCellFormula(
+                "SUMIF(H" + primeraDato + ":H" + ultimaDato
+                + ",\"Entregado\""
+                + ",F" + primeraDato + ":F" + ultimaDato + ")"
+            );
+            cValTot.setCellStyle(stTotValor);
 
-            // ── 7. Autofilter en cabecera ────────────────────────────────────
+            // ── 8. Autofilter y freeze ──────────────────────────────────────
             sheet.setAutoFilter(new CellRangeAddress(3, rowNum - 1, 0, COLUMNAS.length - 1));
-
-            // ── 8. Congelar primera fila de datos ────────────────────────────
             sheet.createFreezePane(0, 4);
 
             wb.write(response.getOutputStream());
@@ -160,7 +171,7 @@ public class ReporteExcel {
 
     private static CellStyle estiloSubtitulo(XSSFWorkbook wb) {
         XSSFCellStyle st = wb.createCellStyle();
-        setFill(st, hexToRgb("7F1D1D")); // rojo muy oscuro
+        setFill(st, hexToRgb("7F1D1D"));
         XSSFFont f = wb.createFont();
         f.setFontHeightInPoints((short) 10);
         f.setColor(new XSSFColor(hexToRgb("FCA5A5"), null));
@@ -172,7 +183,7 @@ public class ReporteExcel {
 
     private static CellStyle estiloHeader(XSSFWorkbook wb) {
         XSSFCellStyle st = wb.createCellStyle();
-        setFill(st, hexToRgb("991B1B")); // rojo header
+        setFill(st, hexToRgb("991B1B"));
         XSSFFont f = wb.createFont();
         f.setBold(true);
         f.setFontHeightInPoints((short) 10);
@@ -184,10 +195,9 @@ public class ReporteExcel {
         return st;
     }
 
-    private static CellStyle estiloDato(XSSFWorkbook wb, boolean parImpar, boolean esEntregado) {
+    private static CellStyle estiloDato(XSSFWorkbook wb, boolean par) {
         XSSFCellStyle st = wb.createCellStyle();
-        byte[] bg = parImpar ? COLOR_GRIS : COLOR_BLANCO;
-        setFill(st, bg);
+        setFill(st, par ? COLOR_GRIS : COLOR_BLANCO);
         XSSFFont f = wb.createFont();
         f.setFontHeightInPoints((short) 10);
         f.setColor(new XSSFColor(COLOR_TEXTO, null));
@@ -198,28 +208,47 @@ public class ReporteExcel {
         return st;
     }
 
-    private static CellStyle estiloTotal(XSSFWorkbook wb, boolean parImpar, boolean esEntregado) {
-        XSSFCellStyle st = (XSSFCellStyle) estiloDato(wb, parImpar, esEntregado);
+    private static CellStyle estiloId(XSSFWorkbook wb, boolean par) {
+        XSSFCellStyle st = wb.createCellStyle();
+        setFill(st, par ? COLOR_GRIS : COLOR_BLANCO);
+        XSSFFont f = wb.createFont();
+        f.setFontHeightInPoints((short) 10);
+        f.setColor(new XSSFColor(COLOR_TEXTO, null));
+        st.setFont(f);
+        st.setVerticalAlignment(VerticalAlignment.CENTER);
+        setBorderLight(st);
+        // Entero sin decimales ni separador de miles
+        st.setDataFormat(wb.createDataFormat().getFormat("0"));
+        return st;
+    }
+
+    private static CellStyle estiloTotalNumerico(XSSFWorkbook wb, boolean par) {
+        XSSFCellStyle st = wb.createCellStyle();
+        setFill(st, par ? COLOR_GRIS : COLOR_BLANCO);
         XSSFFont f = wb.createFont();
         f.setBold(true);
         f.setFontHeightInPoints((short) 10);
-        f.setColor(new XSSFColor(hexToRgb("166534"), null)); // verde oscuro
+        f.setColor(new XSSFColor(hexToRgb("166534"), null));
         st.setFont(f);
         st.setAlignment(HorizontalAlignment.RIGHT);
+        st.setVerticalAlignment(VerticalAlignment.CENTER);
+        setBorderLight(st);
+        // Decimal con 2 cifras y separador de miles
+        st.setDataFormat(wb.createDataFormat().getFormat("#,##0.00"));
         return st;
     }
 
     private static CellStyle estiloEstado(XSSFWorkbook wb, boolean esEntregado) {
         XSSFCellStyle st = wb.createCellStyle();
         if (esEntregado) {
-            setFill(st, hexToRgb("DCFCE7")); // verde claro
+            setFill(st, hexToRgb("DCFCE7"));
             XSSFFont f = wb.createFont();
             f.setBold(true);
             f.setFontHeightInPoints((short) 10);
             f.setColor(new XSSFColor(hexToRgb("166534"), null));
             st.setFont(f);
         } else {
-            setFill(st, hexToRgb("FEE2E2")); // rojo claro
+            setFill(st, hexToRgb("FEE2E2"));
             XSSFFont f = wb.createFont();
             f.setBold(true);
             f.setFontHeightInPoints((short) 10);
@@ -282,9 +311,30 @@ public class ReporteExcel {
         cell.setCellStyle(style);
     }
 
+    private static void setCellNumeric(Row row, int col, double value, CellStyle style) {
+        Cell cell = row.createCell(col);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
+
     private static String str(Map<String, Object> map, String key) {
         Object v = map.get(key);
         return v != null ? v.toString() : "";
+    }
+
+    /**
+     * Convierte el valor del mapa a double de forma segura.
+     * Maneja tanto Number directamente como String con coma o punto decimal.
+     */
+    private static double toDouble(Map<String, Object> map, String key) {
+        Object v = map.get(key);
+        if (v == null) return 0.0;
+        if (v instanceof Number) return ((Number) v).doubleValue();
+        try {
+            return Double.parseDouble(v.toString().replace(",", "."));
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
     private static byte[] hexToRgb(String hex) {
