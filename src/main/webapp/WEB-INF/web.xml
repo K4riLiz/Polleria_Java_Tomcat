@@ -275,5 +275,15 @@
         <error-code>404</error-code>
         <location>/vista/error.jsp</location>
     </error-page>
+    
+    <!-- Botón de exportar pedidos a PDF o Excel -->
+    <servlet>
+        <servlet-name>ExportarPedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.ExportarPedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ExportarPedidoServlet</servlet-name>
+        <url-pattern>/admin/exportarPedidos</url-pattern>
+    </servlet-mapping>
 
 </web-app>
