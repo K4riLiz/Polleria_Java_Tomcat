@@ -114,4 +114,26 @@ public class UsuarioDAO {
         u.setActivo(rs.getBoolean("activo"));
         return u;
     }
+
+    public Usuario obtenerPorEmail(String email) throws SQLException {
+    String sql = "SELECT u.*, r.nombre as rol_nombre FROM usuarios u " +
+                 "JOIN roles r ON u.rol_id = r.id WHERE u.email = ?";
+    try (Connection con = DBConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) return mapear(rs);
+    }
+    return null;
+    }
+
+    public boolean actualizarPassword(String email, String hashPassword) throws SQLException {
+        String sql = "UPDATE usuarios SET password = ? WHERE email = ?";
+        try (Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, hashPassword);
+            ps.setString(2, email);
+            return ps.executeUpdate() > 0;
+        }
+    }
 }

@@ -66,6 +66,14 @@
 
     <!-- CONTENIDO -->
     <div class="max-w-5xl mx-auto px-4 pb-20">
+
+        <c:if test="${not empty sessionScope.carritoError}">
+            <div class="bg-red-100 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm">
+                ${sessionScope.carritoError}
+                <c:remove var="carritoError" scope="session"/>
+            </div>
+        </c:if>
+
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
 
             <!-- IMAGEN -->
@@ -86,6 +94,10 @@
                     <p class="text-gray-500 text-sm leading-relaxed mb-3">${producto.descripcion}</p>
                     <p class="text-3xl font-bold text-red-600">
                         S/ <fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/>
+                    </p>
+                    <p class="text-sm mt-2 ${producto.stock <= 5 ? 'text-orange-600' : 'text-green-600'} font-medium">
+                        <i class="fa-solid fa-box-open mr-1"></i>
+                        ${producto.stock} plato(s) disponible(s) hoy
                     </p>
                 </div>
 
@@ -159,11 +171,11 @@
                 <!-- CANTIDAD + BOTÓN -->
                 <div class="flex items-center gap-4 mt-auto">
                     <div class="flex items-center gap-3">
-                        <button class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
+                        <button type="button" class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
                         <span id="cantidad" class="text-xl font-bold w-8 text-center">1</span>
-                        <button class="btn-cantidad" onclick="cambiarCantidad(1)">+</button>
+                        <button type="button" class="btn-cantidad" id="btnMas" onclick="cambiarCantidad(1)">+</button>
                     </div>
-                    <button onclick="agregarAlPedido()"
+                    <button type="button" id="btnAgregar" onclick="agregarAlPedido()"
                             class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-cart-plus"></i>
                         Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/></span>
@@ -192,8 +204,15 @@
 
     <script>
         const precioBase = ${producto.precio};
+        const stockMax = ${producto.stock};
+        const enCarrito = ${not empty cantidadEnCarrito ? cantidadEnCarrito : 0};
+        const stockDisponible = Math.max(0, stockMax - enCarrito);
 
         function agregarAlPedido() {
+            if (stockDisponible <= 0) {
+                alert('Este producto está agotado.');
+                return;
+            }
             let precioExtra = 0;
             const opcionesSeleccionadas = [];
 
@@ -214,6 +233,10 @@
             }
 
             const cantidad = parseInt(document.getElementById('cantidad').textContent);
+            if (cantidad > stockDisponible) {
+                alert('Solo puedes pedir ' + stockDisponible + ' unidad(es).');
+                return;
+            }
             const precioFinal = (precioBase + precioExtra) * cantidad;
             document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
             document.getElementById('opcionesInput').value = opcionesSeleccionadas.join(', ');
@@ -225,7 +248,7 @@
             const el = document.getElementById('cantidad');
             let v = parseInt(el.textContent) + delta;
             if (v < 1) v = 1;
-            if (v > 20) v = 20;
+            if (v > stockDisponible) v = stockDisponible;
             el.textContent = v;
 
             let precioExtra = 0;
@@ -235,6 +258,15 @@
 
             document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
             document.getElementById('cantidadInput').value = v;
+            document.getElementById('btnMas').disabled = (v >= stockDisponible);
+        }
+
+        if (stockDisponible <= 0) {
+            document.getElementById('btnAgregar').disabled = true;
+            document.getElementById('btnAgregar').classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('btnMas').disabled = true;
+        } else if (stockDisponible < 20) {
+            document.getElementById('btnMas').disabled = (parseInt(document.getElementById('cantidad').textContent) >= stockDisponible);
         }
 
         function toggle(header) {

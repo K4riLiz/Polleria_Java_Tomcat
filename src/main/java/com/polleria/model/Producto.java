@@ -7,6 +7,7 @@ public class Producto {
     private double precio;
     private String imagen;
     private boolean activo;
+    private int stock;
     private int categoriaId;
     private String categoriaNombre;
 
@@ -29,6 +30,12 @@ public class Producto {
 
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
+
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
+
+    /** true si hay platos disponibles para venta al cliente */
+    public boolean tieneStock() { return stock > 0; }
 
     public int getCategoriaId() { return categoriaId; }
     public void setCategoriaId(int categoriaId) { this.categoriaId = categoriaId; }

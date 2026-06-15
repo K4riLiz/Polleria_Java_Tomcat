@@ -3,6 +3,7 @@ package com.polleria.servlet;
 import com.polleria.dao.PagoDAO;
 import com.polleria.dao.PedidoDAO;
 import com.polleria.model.*;
+import com.polleria.util.StockService;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +70,15 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp)
     } catch (NumberFormatException ignored) {}
 
     try {
+        // Validar stock antes de confirmar el pedido
+        String errorStock = StockService.validarCarrito(carrito);
+        if (errorStock != null) {
+            req.setAttribute("error", errorStock);
+            req.setAttribute("total", total);
+            req.getRequestDispatcher("/vista/checkout.jsp").forward(req, resp);
+            return;
+        }
+
         Pedido pedido = new Pedido();
         pedido.setUsuarioId(usuario.getId());
         pedido.setTotal(total);

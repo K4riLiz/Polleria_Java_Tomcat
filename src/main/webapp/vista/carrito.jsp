@@ -20,6 +20,13 @@
             <i class="fa-solid fa-cart-shopping text-red-600"></i> Mi Carrito
         </h1>
 
+        <c:if test="${not empty sessionScope.carritoError}">
+            <div class="bg-red-100 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm">
+                ${sessionScope.carritoError}
+                <c:remove var="carritoError" scope="session"/>
+            </div>
+        </c:if>
+
         <c:choose>
             <c:when test="${empty sessionScope.carrito}">
                 <!-- CARRITO VACÍO -->
@@ -70,10 +77,18 @@
                                         −
                                     </button>
                                     <span class="w-8 text-center font-bold text-gray-800">${item.cantidad}</span>
-                                    <button type="submit" name="cantidad" value="${item.cantidad + 1}"
-                                            class="w-8 h-8 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-bold transition flex items-center justify-center">
-                                        +
-                                    </button>
+                                    <c:set var="stockItem" value="${item.tipo == 'producto' ? stocks[item.productoId] : 999}"/>
+                                    <c:choose>
+                                        <c:when test="${item.tipo == 'producto' && item.cantidad >= stockItem}">
+                                            <span class="w-8 h-8 rounded-full border-2 border-gray-200 text-gray-300 flex items-center justify-center cursor-not-allowed" title="Stock máximo">+</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button type="submit" name="cantidad" value="${item.cantidad + 1}"
+                                                    class="w-8 h-8 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-bold transition flex items-center justify-center">
+                                                +
+                                            </button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </form>
 
                                 <!-- Subtotal -->

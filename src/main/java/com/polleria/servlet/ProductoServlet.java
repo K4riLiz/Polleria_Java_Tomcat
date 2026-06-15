@@ -32,6 +32,10 @@ public class ProductoServlet extends HttpServlet {
                 resp.sendRedirect(req.getContextPath() + "/home");
                 return;
             }
+            if (!producto.isActivo() || producto.getStock() <= 0) {
+                resp.sendRedirect(req.getContextPath() + "/categoria?id=" + producto.getCategoriaId());
+                return;
+            }
 
             // Cargar opciones y agrupar
             ProductoOpcionDAO opcionDAO = new ProductoOpcionDAO();

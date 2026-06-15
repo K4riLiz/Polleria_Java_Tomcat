@@ -4,8 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        #btn-olvide-pass {
+            display: inline-block;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 5px 0 20px !important;
+            color: #000 !important;
+            font-size: 14px !important;
+            font-family: inherit !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        #btn-olvide-pass:hover {
+            color: #a0594b !important;
+            font-weight: 900;
+        }
+    </style>
     <title>Login - Pollería</title>
 </head>
 <body>
@@ -46,9 +68,17 @@
                     <input type="password" name="password" placeholder="Contraseña" required>
                 </div>
 
-                <a href="#">¿Olvidaste tu contraseña?</a>
+                <a href="javascript:void(0)" id="btn-olvide-pass" class="link-olvide-pass"
+                   onclick="abrirModalRecuperar(); return false;">¿Olvidaste tu contraseña?</a>
                 <button type="submit" class="button">Iniciar sesión</button>
                 <br>
+
+                <!-- Solo para móvil -->
+                <p class="mobile-switch">
+                    ¿No tienes cuenta?
+                    <a href="?modo=registro">Regístrate</a>
+                </p>
+
 
                 <p>Síguenos en nuestras redes sociales</p>
                 <div class="social-networks">
@@ -124,6 +154,14 @@
                 </div>
 
                 <button type="submit" class="button">Registrarse</button>
+
+                    <!-- Solo para móvil -->
+                    <p class="mobile-switch">
+                        ¿Ya tienes cuenta?
+                        <a href="?">Inicia sesión</a>
+                    </p>
+
+
             </form>
         </section>
 
@@ -144,7 +182,105 @@
     </section>
 </div>
 
-<script src="${pageContext.request.contextPath}/js/login.js"></script>
+<!-- Modal recuperar contraseña -->
+<div id="modal-recuperar" class="modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="modal-recuperar">
+
+        <!-- Paso 1 y 2: correo + código -->
+        <div id="paso-email" class="modal-paso">
+            <div class="modal-header">
+                <button type="button" class="modal-volver" id="modal-cerrar-volver" onclick="cerrarModalRecuperar()">
+                    <i class="fas fa-chevron-left"></i> Volver
+                </button>
+                <button type="button" class="modal-cerrar" id="modal-cerrar-x" onclick="cerrarModalRecuperar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <h2>Recuperar contraseña</h2>
+            <p class="modal-desc">Ingresa el <span class="text-highlight">correo electrónico</span> con el que te registraste para recibir un enlace.</p>
+
+            <div class="modal-input-row">
+                <input type="email" id="rec-email" placeholder="Correo electrónico">
+                <button type="button" id="btn-enviar-codigo" class="btn-modal-enviar" disabled>
+                    <i class="fas fa-envelope"></i> Enviar
+                </button>
+            </div>
+
+            <div id="exito-correo" class="modal-exito" style="display:none;"></div>
+
+            <div id="seccion-codigo" style="display:none;">
+                <p class="modal-desc" style="margin-top:18px;">Ingresa el <span class="text-highlight">código de 6 dígitos</span> que recibiste en tu correo.</p>
+                <div class="modal-input-row">
+                    <input type="text" id="rec-codigo" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric">
+                    <button type="button" id="btn-verificar-codigo" class="btn-modal-enviar" disabled>
+                        <i class="fas fa-check"></i> Verificar
+                    </button>
+                </div>
+                <p id="timer-codigo" class="modal-timer"></p>
+                <button type="button" id="btn-reenviar-codigo" class="btn-reenviar-codigo" style="display:none;">
+                    <i class="fas fa-redo"></i> Reenviar código
+                </button>
+            </div>
+
+            <p id="error-recuperar" class="modal-error" style="display:none;"></p>
+        </div>
+
+        <!-- Paso 3: nueva contraseña -->
+        <div id="paso-password" class="modal-paso" style="display:none;">
+            <div class="modal-header-cambiar">
+                <h2>Cambiar contraseña</h2>
+            </div>
+            <p class="modal-desc-cambiar">Ahora puedes ingresar tu nueva contraseña, recuerda que debe ser <span class="text-highlight">mayor a 8 caracteres</span> con mayúscula, minúscula, número y carácter especial.</p>
+
+            <div class="modal-campo-pass">
+                <label for="rec-pass1">Contraseña</label>
+                <div class="pass-input-wrap">
+                    <input type="password" id="rec-pass1" placeholder="Nueva contraseña">
+                    <button type="button" class="toggle-pass" data-target="rec-pass1">
+                        <i class="fas fa-eye-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-campo-pass">
+                <label for="rec-pass2">Repetir contraseña</label>
+                <div class="pass-input-wrap">
+                    <input type="password" id="rec-pass2" placeholder="Repetir contraseña">
+                    <button type="button" class="toggle-pass" data-target="rec-pass2">
+                        <i class="fas fa-eye-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <p id="error-password" class="modal-error" style="display:none;"></p>
+
+            <button type="button" id="btn-cambiar-pass" class="btn-cambiar-pass" disabled>
+                <i class="fas fa-lock"></i> Cambiar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    /* Abre el modal aunque falle la carga de login.js */
+    function abrirModalRecuperar() {
+        var modal = document.getElementById('modal-recuperar');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalRecuperar() {
+        var modal = document.getElementById('modal-recuperar');
+        if (!modal) return;
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+</script>
+<script src="${pageContext.request.contextPath}/js/login.js?v=4"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script>
@@ -201,20 +337,27 @@
 
     
     document.addEventListener('DOMContentLoaded', function() {
-        // Solo letras en nombre
-        document.querySelector('input[name="nombre"]').addEventListener('input', function() {
-            this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '');
-        });
+        const nombreInput = document.querySelector('.sign-up input[name="nombre"]');
+        const dniInput = document.querySelector('.sign-up input[name="dni"]');
+        const telInput = document.querySelector('.sign-up input[name="telefono"]');
 
-        // Solo números en DNI
-        document.querySelector('input[name="dni"]').addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
-        });
+        if (nombreInput) {
+            nombreInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '');
+            });
+        }
 
-        // Solo números en teléfono
-        document.querySelector('input[name="telefono"]').addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);
-        });
+        if (dniInput) {
+            dniInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
+            });
+        }
+
+        if (telInput) {
+            telInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);
+            });
+        }
     });
 </script>
 

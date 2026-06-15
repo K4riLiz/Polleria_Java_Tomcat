@@ -255,6 +255,16 @@
         <url-pattern>/boleta</url-pattern>
     </servlet-mapping>
 
+    <!-- Servlet: Recuperar contraseña -->
+    <servlet>
+        <servlet-name>RecuperarPasswordServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.RecuperarPasswordServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RecuperarPasswordServlet</servlet-name>
+        <url-pattern>/recuperar-password</url-pattern>
+    </servlet-mapping>
+
     <!-- Página de inicio por defecto -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>

@@ -4,6 +4,7 @@ import com.polleria.model.DetallePedido;
 import com.polleria.model.DetallePedidoOpcion;
 import com.polleria.model.ItemCarrito;
 import com.polleria.model.Pedido;
+import com.polleria.model.Producto;
 import com.polleria.util.DBConnection;
 
 import java.sql.*;
@@ -16,6 +17,23 @@ public class PedidoDAO {
         Connection con = DBConnection.getConnection();
         con.setAutoCommit(false);
         try {
+            // 0. Agrupar cantidades por producto y descontar stock
+            java.util.Map<Integer, Integer> cantidades = new java.util.HashMap<>();
+            for (ItemCarrito item : items) {
+                if ("producto".equals(item.getTipo())) {
+                    cantidades.merge(item.getProductoId(), item.getCantidad(), Integer::sum);
+                }
+            }
+
+            ProductoDAO productoDAO = new ProductoDAO();
+            for (java.util.Map.Entry<Integer, Integer> entry : cantidades.entrySet()) {
+                if (!productoDAO.descontarStock(con, entry.getKey(), entry.getValue())) {
+                    Producto p = productoDAO.obtenerPorId(entry.getKey());
+                    String nombre = p != null ? p.getNombre() : "ID " + entry.getKey();
+                    throw new SQLException("Stock insuficiente para: " + nombre);
+                }
+            }
+
             // 1. Insertar pedido
             String sqlPedido = "INSERT INTO pedidos (usuario_id, total, estado, direccion, latitud, longitud) VALUES (?, ?, 'Pendiente', ?, ?, ?)";
             int pedidoId;
