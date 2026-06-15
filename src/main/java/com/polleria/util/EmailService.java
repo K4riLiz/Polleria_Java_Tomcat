@@ -1,180 +1,130 @@
 package com.polleria.util;
 
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.util.Properties;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Base64;
 import java.util.List;
 
 public class EmailService {
 
-    private static final String REMITENTE = "992485707kari@gmail.com";
-    private static final String CLAVE     = "lopkwinxnvvbcnzg";
+    private static final String API_KEY  = "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";
+    private static final String REMITENTE_EMAIL = "992485707kari@gmail.com";
+    private static final String REMITENTE_NOMBRE = "Pollería El Dorado";
+    private static final HttpClient client = HttpClient.newHttpClient();
 
-    public static void enviarCodigo(String destinatario, String codigo) throws MessagingException {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+    // ── Método base ───────────────────────────────────────────────────────────
+    private static void enviar(String destinatario, String asunto,
+                                String html, byte[] pdfBytes, String pdfNombre) {
+        try {
+            StringBuilder json = new StringBuilder();
+            json.append("{");
+            json.append("\"sender\":{\"name\":\"").append(REMITENTE_NOMBRE)
+                .append("\",\"email\":\"").append(REMITENTE_EMAIL).append("\"},");
+            json.append("\"to\":[{\"email\":\"").append(destinatario).append("\"}],");
+            json.append("\"subject\":\"").append(escaparJson(asunto)).append("\",");
+            json.append("\"htmlContent\":\"").append(escaparJson(html)).append("\"");
 
-        Session session = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(REMITENTE, CLAVE);
+            // Adjunto PDF si viene
+            if (pdfBytes != null && pdfNombre != null) {
+                String b64 = Base64.getEncoder().encodeToString(pdfBytes);
+                json.append(",\"attachment\":[{");
+                json.append("\"name\":\"").append(pdfNombre).append("\",");
+                json.append("\"content\":\"").append(b64).append("\"");
+                json.append("}]");
             }
-        });
 
-        String htmlContent
-                = "<div style='font-family:Arial,sans-serif;max-width:480px;margin:0 auto;'>"
-                + "<div style='background:#c0392b;padding:28px 32px;text-align:center;border-radius:8px 8px 0 0;'>"
-                + "<span style='color:white;font-size:24px;font-weight:bold;'>Pollería El Dorado</span>"
-                + "</div>"
-                + "<div style='background:white;padding:32px;border:1px solid #eee;'>"
-                + "<h2 style='color:#1a1a1a;font-size:18px;'>Verifica tu cuenta</h2>"
-                + "<p style='color:#666;font-size:14px;line-height:1.6;'>Hola! Gracias por registrarte en <strong>Pollería El Dorado</strong>. "
-                + "Para completar tu registro, ingresa el siguiente código:</p>"
-                + "<div style='background:#fdecea;border:2px dashed #c0392b;border-radius:10px;padding:20px;text-align:center;margin:24px 0;'>"
-                + "<p style='color:#a93226;font-size:12px;margin:0 0 8px;'>TU CÓDIGO DE VERIFICACIÓN</p>"
-                + "<span style='font-size:36px;font-weight:bold;color:#c0392b;letter-spacing:10px;'>" + codigo + "</span>"
-                + "<p style='color:#999;font-size:12px;margin:10px 0 0;'>Expira en 5 minutos</p>"
-                + "</div>"
-                + "<p style='color:#888;font-size:13px;'>Si no solicitaste este registro, ignora este correo.</p>"
-                + "<p style='color:#888;font-size:13px;'>Por seguridad, nunca compartas este código con nadie.</p>"
-                + "</div>"
-                + "<div style='background:#f9f9f9;border:1px solid #eee;border-top:none;padding:16px;text-align:center;border-radius:0 0 8px 8px;'>"
-                + "<p style='color:#aaa;font-size:12px;margin:0;'>© 2026 Pollería El Dorado · Lima, Perú</p>"
-                + "</div>"
-                + "</div>";
+            json.append("}");
 
-        Message mensaje = new MimeMessage(session);
-        mensaje.setFrom(new InternetAddress(REMITENTE));
-        mensaje.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-        mensaje.setSubject("Código de verificación - Pollería El Dorado");
-        mensaje.setContent(htmlContent, "text/html; charset=UTF-8");
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
+                .header("api-key", API_KEY)
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
+                .build();
 
-        Transport.send(mensaje);
+            HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200 && response.statusCode() != 201) {
+                System.err.println("Brevo error " + response.statusCode() + ": " + response.body());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error enviando email: " + e.getMessage());
+        }
     }
 
-    public static void enviarBoleta(String destinatario, String nombre, int pedidoId,
-        List<com.polleria.model.DetallePedido> detalles,
-        com.polleria.model.Pedido pedido,
-        com.polleria.model.Pago pago) {
-    try {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+    // ── Código de verificación ────────────────────────────────────────────────
+    public static void enviarCodigo(String destinatario, String codigo) throws Exception {
+        String html = "<div style='font-family:Arial,sans-serif;max-width:480px;margin:0 auto;'>"
+            + "<div style='background:#c0392b;padding:28px 32px;text-align:center;border-radius:8px 8px 0 0;'>"
+            + "<span style='color:white;font-size:24px;font-weight:bold;'>Pollería El Dorado</span>"
+            + "</div>"
+            + "<div style='background:white;padding:32px;border:1px solid #eee;'>"
+            + "<h2 style='color:#1a1a1a;font-size:18px;'>Verifica tu cuenta</h2>"
+            + "<p style='color:#666;font-size:14px;line-height:1.6;'>Hola! Gracias por registrarte en "
+            + "<strong>Pollería El Dorado</strong>. Para completar tu registro, ingresa el siguiente código:</p>"
+            + "<div style='background:#fdecea;border:2px dashed #c0392b;border-radius:10px;"
+            + "padding:20px;text-align:center;margin:24px 0;'>"
+            + "<p style='color:#a93226;font-size:12px;margin:0 0 8px;'>TU CÓDIGO DE VERIFICACIÓN</p>"
+            + "<span style='font-size:36px;font-weight:bold;color:#c0392b;letter-spacing:10px;'>"
+            + codigo + "</span>"
+            + "<p style='color:#999;font-size:12px;margin:10px 0 0;'>Expira en 5 minutos</p>"
+            + "</div>"
+            + "<p style='color:#888;font-size:13px;'>Si no solicitaste este registro, ignora este correo.</p>"
+            + "<p style='color:#888;font-size:13px;'>Por seguridad, nunca compartas este código con nadie.</p>"
+            + "</div>"
+            + "<div style='background:#f9f9f9;border:1px solid #eee;border-top:none;padding:16px;"
+            + "text-align:center;border-radius:0 0 8px 8px;'>"
+            + "<p style='color:#aaa;font-size:12px;margin:0;'>© 2026 Pollería El Dorado · Lima, Perú</p>"
+            + "</div></div>";
 
-        Session session = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(REMITENTE, CLAVE);
-            }
-        });
+        enviar(destinatario, "Código de verificación - Pollería El Dorado", html, null, null);
+    }
 
-        StringBuilder items = new StringBuilder();
-        for (com.polleria.model.DetallePedido d : detalles) {
-            items.append("<tr>")
-                .append("<td style='padding:6px;border-bottom:1px solid #eee;'>")
-                .append(d.getProductoNombre()).append(" x").append(d.getCantidad())
-                .append("</td>")
-                .append("<td style='padding:6px;border-bottom:1px solid #eee;text-align:right;'>S/ ")
-                .append(String.format("%.2f", d.getSubtotal())).append("</td>")
-                .append("</tr>");
-        }
-
+    // ── Boleta con PDF adjunto ────────────────────────────────────────────────
+    public static void enviarBoletaPDF(String destinatario, String nombre,
+                                        int pedidoId, byte[] pdfBytes) {
         String html = "<div style='font-family:Arial;max-width:600px;margin:auto;'>"
             + "<div style='background:#c0392b;padding:20px;text-align:center;'>"
             + "<h1 style='color:white;margin:0;'>Pollería El Dorado</h1>"
-            + "<p style='color:#ffcccc;margin:5px 0 0;'>Gracias por tu pedido!</p></div>"
+            + "<p style='color:#ffcccc;margin:5px 0 0;'>¡Tu pedido fue entregado!</p></div>"
             + "<div style='padding:30px;'>"
             + "<h2 style='color:#333;'>Hola, " + nombre + "</h2>"
-            + "<p>Tu pedido <strong>#" + pedidoId + "</strong> ha sido confirmado.</p>"
-            + "<table style='width:100%;border-collapse:collapse;margin:20px 0;'>"
-            + "<thead><tr style='background:#c0392b;color:white;'>"
-            + "<th style='padding:8px;text-align:left;'>Producto</th>"
-            + "<th style='padding:8px;text-align:right;'>Subtotal</th>"
-            + "</tr></thead><tbody>"
-            + items.toString()
-            + "</tbody><tfoot>"
-            + "<tr><td style='padding:8px;font-weight:bold;'>TOTAL</td>"
-            + "<td style='padding:8px;font-weight:bold;text-align:right;color:#c0392b;'>S/ "
-            + String.format("%.2f", pedido.getTotal()) + "</td></tr>"
-            + "</tfoot></table>"
-            + "<div style='background:#f9f9f9;padding:15px;border-radius:8px;margin:10px 0;'>"
-            + "<p style='margin:0;'><strong>Metodo de pago:</strong> "
-            + (pago != null ? pago.getMetodo() : "-") + "</p>"
-            + "<p style='margin:5px 0 0;'><strong>Referencia:</strong> "
-            + (pago != null ? pago.getReferencia() : "-") + "</p>"
-            + "</div>"
-            + "<p style='color:#999;font-size:12px;'>Puedes descargar tu boleta desde la pagina de confirmacion.</p>"
+            + "<p>Tu pedido <strong>#" + pedidoId + "</strong> ha sido entregado exitosamente.</p>"
+            + "<p>Adjuntamos tu boleta en PDF. ¡Gracias por elegirnos!</p>"
+            + "<div style='background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;"
+            + "padding:16px;margin:20px 0;'>"
+            + "<p style='color:#166534;margin:0;font-size:14px;'>"
+            + "&#10003; Pedido #" + pedidoId + " entregado correctamente</p>"
+            + "</div></div>"
+            + "<div style='background:#f9f9f9;padding:15px;text-align:center;'>"
+            + "<p style='color:#aaa;font-size:12px;margin:0;'>"
+            + "© 2026 Pollería El Dorado · Lima, Perú</p>"
             + "</div></div>";
 
-        Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(REMITENTE, "Polleria El Dorado"));
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-        msg.setSubject("Tu boleta de compra - Pedido #" + pedidoId);
-        msg.setContent(html, "text/html; charset=utf-8");
-        Transport.send(msg);
-
-    } catch (Exception e) {
-        System.err.println("Error enviando boleta: " + e.getMessage());
+        enviar(destinatario, "Tu boleta - Pedido #" + pedidoId + " - Pollería El Dorado",
+               html, pdfBytes, "Boleta_Pedido_" + pedidoId + ".pdf");
     }
+
+    // ── Compatibilidad con código existente ───────────────────────────────────
+    public static void enviarBoleta(String destinatario, String nombre, int pedidoId,
+            List<com.polleria.model.DetallePedido> detalles,
+            com.polleria.model.Pedido pedido,
+            com.polleria.model.Pago pago) {
+        enviarBoletaPDF(destinatario, nombre, pedidoId, null);
     }
-    
-    public static void enviarBoletaPDF(String destinatario, String nombre,
-            int pedidoId, byte[] pdfBytes) {
-        try {
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
 
-            Session session = Session.getInstance(props, new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(REMITENTE, CLAVE);
-                }
-            });
-
-            String html = "<div style='font-family:Arial;max-width:600px;margin:auto;'>"
-                    + "<div style='background:#c0392b;padding:20px;text-align:center;'>"
-                    + "<h1 style='color:white;margin:0;'>Pollería El Dorado</h1>"
-                    + "<p style='color:#ffcccc;margin:5px 0 0;'>¡Tu pedido fue entregado!</p></div>"
-                    + "<div style='padding:30px;'>"
-                    + "<h2 style='color:#333;'>Hola, " + nombre + "</h2>"
-                    + "<p>Tu pedido <strong>#" + pedidoId + "</strong> ha sido entregado exitosamente.</p>"
-                    + "<p>Adjuntamos tu boleta en PDF. ¡Gracias por elegirnos!</p>"
-                    + "</div>"
-                    + "<div style='background:#f9f9f9;padding:15px;text-align:center;'>"
-                    + "<p style='color:#aaa;font-size:12px;margin:0;'>© 2026 Pollería El Dorado · Lima, Perú</p>"
-                    + "</div></div>";
-
-            Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(REMITENTE, "Pollería El Dorado"));
-            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-            msg.setSubject("Tu boleta - Pedido #" + pedidoId + " - Pollería El Dorado");
-
-            // Parte HTML
-            MimeBodyPart htmlPart = new MimeBodyPart();
-            htmlPart.setContent(html, "text/html; charset=UTF-8");
-
-            // Parte PDF adjunto
-            MimeBodyPart pdfPart = new MimeBodyPart();
-            pdfPart.setDataHandler(new javax.activation.DataHandler(
-                    new javax.mail.util.ByteArrayDataSource(pdfBytes, "application/pdf")
-            ));
-            pdfPart.setFileName("Boleta_Pedido_" + pedidoId + ".pdf");
-
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(htmlPart);
-            multipart.addBodyPart(pdfPart);
-
-            msg.setContent(multipart);
-            Transport.send(msg);
-
-        } catch (Exception e) {
-            System.err.println("Error enviando boleta PDF: " + e.getMessage());
-        }
+    // ── Escapa caracteres especiales para JSON ────────────────────────────────
+    private static String escaparJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
-    
 }

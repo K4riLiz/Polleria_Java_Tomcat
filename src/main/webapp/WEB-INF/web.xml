@@ -205,6 +205,16 @@
         <url-pattern>/checkout</url-pattern>
     </servlet-mapping>
 
+<!-- Servlet: Estado de Pedido -->
+    <servlet>
+        <servlet-name>EstadoPedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.EstadoPedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EstadoPedidoServlet</servlet-name>
+        <url-pattern>/api/estadoPedido</url-pattern>
+    </servlet-mapping>
+
     <!-- Servlet: Confirmacion -->
     <servlet>
         <servlet-name>ConfirmacionServlet</servlet-name>

@@ -77,7 +77,12 @@
                 </div>
                 <div>
                     <p class="text-gray-400">Estado del pedido</p>
-                    <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-1 rounded-full">
+                    <span id="badgeEstado" class="text-xs font-bold px-2 py-1 rounded-full
+                        ${pedido.estado == 'Pendiente'     ? 'bg-yellow-100 text-yellow-600' :
+                          pedido.estado == 'En cocina'     ? 'bg-orange-100 text-orange-600' :
+                          pedido.estado == 'Por despachar' ? 'bg-blue-100 text-blue-600'     :
+                          pedido.estado == 'Entregado'     ? 'bg-green-100 text-green-600'   :
+                                                             'bg-red-100 text-red-600'}">
                         ${pedido.estado}
                     </span>
                 </div>
@@ -91,25 +96,24 @@
             </h2>
             <div class="relative flex items-center justify-between">
                 <div class="absolute top-4 left-0 right-0 h-1 bg-gray-200 z-0"></div>
-                <div class="absolute top-4 left-0 h-1 bg-red-500 z-0 transition-all"
-                     style="width:
-                     ${pedido.estado == 'Pendiente'     ? '0%'   :
-                        pedido.estado == 'En cocina'     ? '33%'  :
-                        pedido.estado == 'Por despachar' ? '66%'  :
-                        pedido.estado == 'Entregado'     ? '100%' : '0%'}">
+
+                <div id="barraProgreso" class="absolute top-4 left-0 h-1 bg-red-500 z-0 transition-all duration-500"
+                     style="width: ${pedido.estado == 'Pendiente' ? '0%' :
+                                     pedido.estado == 'En cocina' ? '33%' :
+                                     pedido.estado == 'Por despachar' ? '66%' :
+                                     pedido.estado == 'Entregado' ? '100%' : '0%'}">
                 </div>
 
                 <div class="flex flex-col items-center gap-2 z-10">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center
-                         ${pedido.estado == 'Pendiente' || pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
-                          ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
+                    <div id="paso1" class="w-10 h-10 rounded-full flex items-center justify-center
+                         bg-red-600 text-white shadow-lg shadow-red-200">
                         <i class="fa-solid fa-clock text-sm"></i>
                     </div>
                     <p class="text-xs text-gray-500 text-center w-16">Pendiente</p>
                 </div>
 
                 <div class="flex flex-col items-center gap-2 z-10">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                    <div id="paso2" class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
                          ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
                         <i class="fa-solid fa-fire text-sm"></i>
@@ -118,7 +122,7 @@
                 </div>
 
                 <div class="flex flex-col items-center gap-2 z-10">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                    <div id="paso3" class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
                          ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
                         <i class="fa-solid fa-motorcycle text-sm"></i>
@@ -127,7 +131,7 @@
                 </div>
 
                 <div class="flex flex-col items-center gap-2 z-10">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                    <div id="paso4" class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Entregado'
                         ? 'bg-green-500 text-white shadow-lg shadow-green-200' : 'bg-gray-200 text-gray-400'}">
                         <i class="fa-solid fa-check text-sm"></i>
@@ -137,7 +141,7 @@
             </div>
         </div>
 
-        <!-- BOTONES — sin botón de boleta -->
+        <!-- BOTONES -->
         <div class="flex gap-3 flex-wrap">
             <a href="${pageContext.request.contextPath}/home"
                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition text-center">
@@ -151,13 +155,11 @@
 
     </div>
 
-    <%-- ── MODAL PEDIDO ENTREGADO (aparece automáticamente si el estado es Entregado) ── --%>
-    <c:if test="${pedido.estado == 'Entregado'}">
+    <!-- MODAL PEDIDO ENTREGADO (oculto, controlado por JS) -->
     <div id="modalEntregado"
-         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-bounce-in">
+         class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
 
-            <!-- Encabezado verde -->
             <div class="bg-green-500 px-6 py-5 text-center">
                 <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fa-solid fa-circle-check text-4xl text-green-500"></i>
@@ -166,7 +168,6 @@
                 <p class="text-green-100 text-sm mt-1">Pedido <strong>#${pedido.id}</strong></p>
             </div>
 
-            <!-- Cuerpo -->
             <div class="px-6 py-5 text-center">
                 <p class="text-gray-700 text-sm mb-2">
                     Tu pedido ha sido entregado exitosamente. ¡Que lo disfrutes!
@@ -178,8 +179,6 @@
                         También puedes descargarla directamente aquí.
                     </p>
                 </div>
-
-                <!-- Botones del modal -->
                 <div class="flex flex-col gap-2">
                     <a href="${pageContext.request.contextPath}/boleta?pedidoId=${pedido.id}"
                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
@@ -189,7 +188,7 @@
                        class="w-full border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-list"></i> Ver mis pedidos
                     </a>
-                    <button onclick="document.getElementById('modalEntregado').classList.add('hidden')"
+                    <button onclick="cerrarModal()"
                             class="w-full text-gray-400 hover:text-gray-600 text-xs py-1 transition">
                         Cerrar
                     </button>
@@ -197,11 +196,106 @@
             </div>
         </div>
     </div>
-    </c:if>
 
     <jsp:include page="/components/footer.jsp"/>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        var pedidoId    = ${pedido.id};
+        var contextPath = '${pageContext.request.contextPath}';
+        var estadoActual = '${pedido.estado}';
+        var modalMostrado = false;
+        var intervalo;
+        var storageKey = 'modal_pedido_' + pedidoId;
+
+        // Al cargar: si ya fue entregado Y nunca se mostró el modal → mostrar
+        if (estadoActual === 'Entregado' && !localStorage.getItem(storageKey)) {
+            mostrarModal();
+        } else if (estadoActual !== 'Entregado') {
+            // Iniciar polling cada 5 segundos
+            intervalo = setInterval(consultarEstado, 5000);
+        }
+
+        function consultarEstado() {
+            fetch(contextPath + '/api/estadoPedido?pedidoId=' + pedidoId)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.estado) return;
+
+                    actualizarBadge(data.estado);
+                    actualizarSeguimiento(data.estado);
+
+                    if (data.estado === 'Entregado'
+                            && !modalMostrado
+                            && !localStorage.getItem(storageKey)) {
+                        clearInterval(intervalo);
+                        mostrarModal();
+                    }
+                })
+                .catch(function() { /* silencioso */ });
+        }
+
+        function actualizarBadge(estado) {
+            var badge = document.getElementById('badgeEstado');
+            badge.textContent = estado;
+            badge.className = 'text-xs font-bold px-2 py-1 rounded-full ';
+            if      (estado === 'Pendiente')     badge.className += 'bg-yellow-100 text-yellow-600';
+            else if (estado === 'En cocina')     badge.className += 'bg-orange-100 text-orange-600';
+            else if (estado === 'Por despachar') badge.className += 'bg-blue-100 text-blue-600';
+            else if (estado === 'Entregado')     badge.className += 'bg-green-100 text-green-600';
+            else                                 badge.className += 'bg-red-100 text-red-600';
+        }
+
+        function actualizarSeguimiento(estado) {
+            var activo   = 'bg-red-600 text-white shadow-lg shadow-red-200';
+            var inactivo = 'bg-gray-200 text-gray-400';
+            var verde    = 'bg-green-500 text-white shadow-lg shadow-green-200';
+            var base     = 'w-10 h-10 rounded-full flex items-center justify-center ';
+
+            document.getElementById('paso1').className = base + activo;
+
+            if (estado === 'Pendiente') {
+                document.getElementById('paso2').className = base + inactivo;
+                document.getElementById('paso3').className = base + inactivo;
+                document.getElementById('paso4').className = base + inactivo;
+                document.getElementById('barraProgreso').style.width = '0%';
+            } else if (estado === 'En cocina') {
+                document.getElementById('paso2').className = base + activo;
+                document.getElementById('paso3').className = base + inactivo;
+                document.getElementById('paso4').className = base + inactivo;
+                document.getElementById('barraProgreso').style.width = '33%';
+            } else if (estado === 'Por despachar') {
+                document.getElementById('paso2').className = base + activo;
+                document.getElementById('paso3').className = base + activo;
+                document.getElementById('paso4').className = base + inactivo;
+                document.getElementById('barraProgreso').style.width = '66%';
+            } else if (estado === 'Entregado') {
+                document.getElementById('paso2').className = base + activo;
+                document.getElementById('paso3').className = base + activo;
+                document.getElementById('paso4').className = base + verde;
+                document.getElementById('barraProgreso').style.width = '100%';
+            }
+        }
+
+        function mostrarModal() {
+            modalMostrado = true;
+            localStorage.setItem(storageKey, 'visto'); // nunca más se muestra
+            var modal = document.getElementById('modalEntregado');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function cerrarModal() {
+            var modal = document.getElementById('modalEntregado');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        window.addEventListener('beforeunload', function() {
+            clearInterval(intervalo);
+        });
+    </script>
 </body>
 </html>
