@@ -85,6 +85,7 @@ public class LoginServlet extends HttpServlet {
     private void handleRegistro(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String nombre   = req.getParameter("nombre");
+        String apellido = req.getParameter("apellido");
         String email    = req.getParameter("email");
         String password = req.getParameter("password");
         String telefono = req.getParameter("telefono");
@@ -93,6 +94,13 @@ public class LoginServlet extends HttpServlet {
             // Validación: solo letras y espacios en el nombre
             if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$")) {
                 req.setAttribute("errorRegistro", "El nombre solo debe contener letras");
+                req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+                return;
+            }
+            
+            // Validar apellido igual que nombre
+            if (!apellido.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$") || apellido.length() < 2 || apellido.length() > 50) {
+                req.setAttribute("errorRegistro", "El apellido solo debe contener letras (2-50 caracteres)");
                 req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
                 return;
             }
@@ -149,6 +157,7 @@ public class LoginServlet extends HttpServlet {
             // Guardar en sesión para verificar después
             HttpSession session = req.getSession();
             session.setAttribute("usuarioPendiente", u);
+            session.setAttribute("apellidoPendiente", apellido);
             session.setAttribute("codigoVerificacion", codigo);
             
             // Guardar tiempo de expiración (5 minutos)

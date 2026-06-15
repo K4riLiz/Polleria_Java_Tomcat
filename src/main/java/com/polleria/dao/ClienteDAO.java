@@ -66,4 +66,14 @@ public class ClienteDAO {
         c.setDistritoNombre(rs.getString("distrito_nombre"));
         return c;
     }
+    
+    public boolean actualizarApellidoYTelefono(int usuarioId, String apellido, String telefono) throws SQLException {
+        String sql = "UPDATE clientes SET apellido = ?, telefono = ? WHERE usuario_id = ?";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, apellido);
+            ps.setString(2, telefono);
+            ps.setInt(3, usuarioId);
+            return ps.executeUpdate() > 0;
+        }
+    }
 }

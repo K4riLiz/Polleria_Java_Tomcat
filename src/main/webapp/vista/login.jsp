@@ -97,6 +97,11 @@
                     <ion-icon name="person-outline"></ion-icon>
                     <input type="text" name="nombre" placeholder="Nombre completo" required>
                 </div>
+                
+                <div class="container-input">
+                    <ion-icon name="person-outline"></ion-icon>
+                    <input type="text" name="apellido" placeholder="Apellido" required>
+                </div>
 
                 <div class="container-input">
                     <ion-icon name="card-outline"></ion-icon>
@@ -150,6 +155,13 @@
 <script>
     function validarRegistro() {
         const nombre   = document.querySelector('input[name="nombre"]').value;
+        // En validarRegistro(), después de la validación del nombre:
+        const apellido = document.querySelector('input[name="apellido"]').value;
+        if (!regexNombre.test(apellido)) {
+            document.getElementById('errorNombre').style.display = 'block';
+            document.getElementById('errorNombre').textContent = 'El apellido solo debe contener letras y espacios.';
+            return false;
+        }
         const dni      = document.querySelector('input[name="dni"]').value;
         const telefono = document.querySelector('input[name="telefono"]').value;
         const email    = document.querySelector('input[name="email"]').value;
@@ -203,6 +215,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Solo letras en nombre
         document.querySelector('input[name="nombre"]').addEventListener('input', function() {
+            this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '');
+        });
+        
+        // Solo letras en apellido
+        document.querySelector('input[name="apellido"]').addEventListener('input', function() {
             this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '');
         });
 

@@ -123,4 +123,18 @@ public class UsuarioDAO {
             return ps.executeUpdate() > 0;
         }
     }
+    
+    public Usuario obtenerPorEmail(String email) throws SQLException {
+        String sql = "SELECT u.*, r.nombre as rol_nombre FROM usuarios u "
+                + "JOIN roles r ON u.rol_id = r.id WHERE u.email = ?";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapear(rs);
+                }
+            }
+        }
+        return null;
+    }
 }
