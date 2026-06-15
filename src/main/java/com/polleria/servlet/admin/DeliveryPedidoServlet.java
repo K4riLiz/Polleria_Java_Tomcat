@@ -1,11 +1,11 @@
 package com.polleria.servlet.admin;
 
 import com.polleria.dao.PedidoDAO;
-import com.polleria.model.Usuario;
-
 import com.polleria.dao.DetallePedidoOpcionDAO;
 import com.polleria.model.DetallePedido;
 import com.polleria.model.Pedido;
+import com.polleria.model.Usuario;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,14 +20,13 @@ public class DeliveryPedidoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (!esDelivery(req, resp)) {
-            return;
-        }
+        if (!esDelivery(req, resp)) return;
+
         try {
             PedidoDAO dao = new PedidoDAO();
             DetallePedidoOpcionDAO opcionDAO = new DetallePedidoOpcionDAO();
-
             List<Pedido> pedidos = dao.listarPorEstado("Por despachar");
+
             for (Pedido p : pedidos) {
                 List<DetallePedido> detalles = dao.listarDetalles(p.getId());
                 for (DetallePedido d : detalles) {
@@ -38,6 +37,7 @@ public class DeliveryPedidoServlet extends HttpServlet {
 
             req.setAttribute("pedidos", pedidos);
             req.getRequestDispatcher("/vista/admin/delivery-pedidos.jsp").forward(req, resp);
+
         } catch (SQLException e) {
             req.setAttribute("error", "Error: " + e.getMessage());
             req.getRequestDispatcher("/vista/admin/delivery-pedidos.jsp").forward(req, resp);
@@ -48,18 +48,26 @@ public class DeliveryPedidoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         if (!esDelivery(req, resp)) return;
+
         try {
             PedidoDAO dao = new PedidoDAO();
             int id = Integer.parseInt(req.getParameter("id"));
             String estado = req.getParameter("estado");
-            // Delivery solo puede cambiar a Entregado
+
+            // Delivery solo puede marcar como Entregado
             if ("Entregado".equals(estado)) {
                 dao.actualizarEstado(id, estado);
+
+                // ── Generar PDF y enviar boleta al cliente ──────────────────
+                AdminPedidoServlet.enviarBoletaAlCliente(id, dao);
+
                 req.getSession().setAttribute("exito", "Pedido marcado como entregado.");
             }
+
         } catch (SQLException e) {
             req.getSession().setAttribute("error", "Error: " + e.getMessage());
         }
+
         resp.sendRedirect(req.getContextPath() + "/delivery/pedidos");
     }
 

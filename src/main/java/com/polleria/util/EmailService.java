@@ -120,4 +120,61 @@ public class EmailService {
         System.err.println("Error enviando boleta: " + e.getMessage());
     }
     }
+    
+    public static void enviarBoletaPDF(String destinatario, String nombre,
+            int pedidoId, byte[] pdfBytes) {
+        try {
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.port", "587");
+
+            Session session = Session.getInstance(props, new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(REMITENTE, CLAVE);
+                }
+            });
+
+            String html = "<div style='font-family:Arial;max-width:600px;margin:auto;'>"
+                    + "<div style='background:#c0392b;padding:20px;text-align:center;'>"
+                    + "<h1 style='color:white;margin:0;'>Pollería El Dorado</h1>"
+                    + "<p style='color:#ffcccc;margin:5px 0 0;'>¡Tu pedido fue entregado!</p></div>"
+                    + "<div style='padding:30px;'>"
+                    + "<h2 style='color:#333;'>Hola, " + nombre + "</h2>"
+                    + "<p>Tu pedido <strong>#" + pedidoId + "</strong> ha sido entregado exitosamente.</p>"
+                    + "<p>Adjuntamos tu boleta en PDF. ¡Gracias por elegirnos!</p>"
+                    + "</div>"
+                    + "<div style='background:#f9f9f9;padding:15px;text-align:center;'>"
+                    + "<p style='color:#aaa;font-size:12px;margin:0;'>© 2026 Pollería El Dorado · Lima, Perú</p>"
+                    + "</div></div>";
+
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress(REMITENTE, "Pollería El Dorado"));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
+            msg.setSubject("Tu boleta - Pedido #" + pedidoId + " - Pollería El Dorado");
+
+            // Parte HTML
+            MimeBodyPart htmlPart = new MimeBodyPart();
+            htmlPart.setContent(html, "text/html; charset=UTF-8");
+
+            // Parte PDF adjunto
+            MimeBodyPart pdfPart = new MimeBodyPart();
+            pdfPart.setDataHandler(new javax.activation.DataHandler(
+                    new javax.mail.util.ByteArrayDataSource(pdfBytes, "application/pdf")
+            ));
+            pdfPart.setFileName("Boleta_Pedido_" + pedidoId + ".pdf");
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(htmlPart);
+            multipart.addBodyPart(pdfPart);
+
+            msg.setContent(multipart);
+            Transport.send(msg);
+
+        } catch (Exception e) {
+            System.err.println("Error enviando boleta PDF: " + e.getMessage());
+        }
+    }
+    
 }

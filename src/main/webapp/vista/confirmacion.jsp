@@ -90,9 +90,7 @@
                 <i class="fa-solid fa-timeline text-red-600 mr-2"></i>Seguimiento del pedido
             </h2>
             <div class="relative flex items-center justify-between">
-                <!-- Línea base -->
                 <div class="absolute top-4 left-0 right-0 h-1 bg-gray-200 z-0"></div>
-                <!-- Línea progreso -->
                 <div class="absolute top-4 left-0 h-1 bg-red-500 z-0 transition-all"
                      style="width:
                      ${pedido.estado == 'Pendiente'     ? '0%'   :
@@ -101,7 +99,6 @@
                         pedido.estado == 'Entregado'     ? '100%' : '0%'}">
                 </div>
 
-                <%-- Paso 1: Pendiente --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Pendiente' || pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
@@ -111,7 +108,6 @@
                     <p class="text-xs text-gray-500 text-center w-16">Pendiente</p>
                 </div>
 
-                <%-- Paso 2: En cocina --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
@@ -121,7 +117,6 @@
                     <p class="text-xs text-gray-500 text-center w-16">En cocina</p>
                 </div>
 
-                <%-- Paso 3: Despachando --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
@@ -131,7 +126,6 @@
                     <p class="text-xs text-gray-500 text-center w-16">Despachando</p>
                 </div>
 
-                <%-- Paso 4: Entregado --%>
                 <div class="flex flex-col items-center gap-2 z-10">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center
                          ${pedido.estado == 'Entregado'
@@ -143,21 +137,12 @@
             </div>
         </div>
 
-        <!-- BOTONES -->
+        <!-- BOTONES — sin botón de boleta -->
         <div class="flex gap-3 flex-wrap">
-            <!-- Volver al inicio -->
             <a href="${pageContext.request.contextPath}/home"
                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition text-center">
                 <i class="fa-solid fa-home mr-2"></i>Volver al inicio
             </a>
-
-            <!-- Descargar boleta (de danna) -->
-            <a href="${pageContext.request.contextPath}/boleta?pedidoId=${pedido.id}"
-               class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition text-center flex items-center justify-center gap-2">
-                <i class="fa-solid fa-file-pdf"></i> Descargar Boleta
-            </a>
-
-            <!-- Mis pedidos (tu ruta /historial) -->
             <a href="${pageContext.request.contextPath}/historial"
                class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-3 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
                 <i class="fa-solid fa-list"></i> Mis pedidos
@@ -165,6 +150,54 @@
         </div>
 
     </div>
+
+    <%-- ── MODAL PEDIDO ENTREGADO (aparece automáticamente si el estado es Entregado) ── --%>
+    <c:if test="${pedido.estado == 'Entregado'}">
+    <div id="modalEntregado"
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-bounce-in">
+
+            <!-- Encabezado verde -->
+            <div class="bg-green-500 px-6 py-5 text-center">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-circle-check text-4xl text-green-500"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">¡Pedido entregado!</h2>
+                <p class="text-green-100 text-sm mt-1">Pedido <strong>#${pedido.id}</strong></p>
+            </div>
+
+            <!-- Cuerpo -->
+            <div class="px-6 py-5 text-center">
+                <p class="text-gray-700 text-sm mb-2">
+                    Tu pedido ha sido entregado exitosamente. ¡Que lo disfrutes!
+                </p>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-5 flex items-start gap-3 text-left">
+                    <i class="fa-solid fa-envelope text-blue-500 mt-0.5"></i>
+                    <p class="text-xs text-blue-700">
+                        Tu boleta en PDF ha sido enviada a tu correo electrónico.
+                        También puedes descargarla directamente aquí.
+                    </p>
+                </div>
+
+                <!-- Botones del modal -->
+                <div class="flex flex-col gap-2">
+                    <a href="${pageContext.request.contextPath}/boleta?pedidoId=${pedido.id}"
+                       class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-file-pdf"></i> Descargar boleta PDF
+                    </a>
+                    <a href="${pageContext.request.contextPath}/historial"
+                       class="w-full border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-list"></i> Ver mis pedidos
+                    </a>
+                    <button onclick="document.getElementById('modalEntregado').classList.add('hidden')"
+                            class="w-full text-gray-400 hover:text-gray-600 text-xs py-1 transition">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </c:if>
 
     <jsp:include page="/components/footer.jsp"/>
 
