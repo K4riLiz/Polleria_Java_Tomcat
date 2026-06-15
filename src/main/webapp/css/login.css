@@ -132,6 +132,19 @@ body{
     margin-bottom: 20px;
     margin-top: 5px;
 }
+.link-olvide-pass{
+    background: none;
+    border: none;
+    padding: 0;
+    color: black;
+    font-size: 14px;
+    margin-bottom: 20px;
+    margin-top: 5px;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+}
+.link-olvide-pass:hover,
 .container-form a:hover{
     color: #a0594b;
     font-weight: 900;
@@ -297,3 +310,359 @@ button{
     display: block;
     
 } */
+
+/* =========================
+   RESPONSIVE TABLET Y MÓVIL
+========================= */
+@media screen and (max-width:768px){
+
+    .login-wrapper{
+        padding: 20px 10px;
+    }
+
+    .container{
+        width: 100%;
+        max-width: 420px;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+
+        overflow: visible !important;
+    }
+
+    .container-welcome{
+        display: none;
+    }
+
+    .container-form{
+        width: 100%;
+    }
+
+    .container-form form{
+        height: auto !important;
+
+    justify-content: flex-start !important;
+        padding: 30px 20px;
+    }
+
+    .container-input{
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .button{
+        width: 100%;
+        max-width: 320px;
+    }
+
+    /* LOGIN visible */
+    .container .container-form:nth-child(2){
+        display: none;
+    }
+
+    /* REGISTRO visible cuando hay toggle */
+    .container.toggle .container-form:first-child{
+        display: none;
+    }
+
+    .container.toggle .container-form:nth-child(2){
+        display: block;
+    }
+
+    .container-form,
+    .container-form form{
+        overflow: visible !important;
+    }
+
+    .container{
+    overflow: visible !important;
+}
+
+.sign-in,
+.sign-up{
+    transform: translateX(0) !important;
+}
+
+}
+
+.mobile-switch{
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+    display: none;
+}
+
+@media screen and (max-width:768px){
+
+    .mobile-switch{
+        display: block !important;
+    }
+
+    .mobile-switch a{
+        color: #ff2a00;
+        font-weight: bold;
+        text-decoration: none;
+    }
+}
+
+/* =========================
+   MODAL RECUPERAR CONTRASEÑA
+========================= */
+.modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.modal-recuperar{
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    padding: 28px 32px 32px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    position: relative;
+}
+
+.modal-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.modal-volver{
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+}
+
+.modal-volver:hover{
+    color: #ff2a00;
+}
+
+.modal-cerrar{
+    background: none;
+    border: none;
+    color: #ff2a00;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.modal-recuperar h2{
+    font-size: 26px;
+    margin: 0 0 12px;
+    color: #1a1a1a;
+}
+
+.modal-desc{
+    font-size: 14px;
+    color: #444;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.text-highlight{
+    color: #ff2a00;
+    font-weight: 600;
+}
+
+.modal-input-row{
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.modal-input-row input{
+    flex: 1;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+}
+
+.modal-input-row input:focus{
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+}
+
+.btn-modal-enviar{
+    background: #d1d5db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.btn-modal-enviar.activo{
+    background: #ff2a00;
+    cursor: pointer;
+}
+
+.btn-modal-enviar.activo:hover{
+    background: #d92400;
+}
+
+.modal-exito{
+    margin-top: 18px;
+    background: #c6f6d5;
+    color: #22543d;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.modal-error{
+    color: #c0392b;
+    font-size: 13px;
+    margin-top: 12px;
+}
+
+.modal-timer{
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.btn-reenviar-codigo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: #ff2a00;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-reenviar-codigo:hover{
+    background: #d92400;
+}
+
+.btn-reenviar-codigo:disabled{
+    background: #d1d5db;
+    cursor: not-allowed;
+}
+
+.modal-header-cambiar{
+    background: #fde8e4;
+    margin: -28px -32px 20px;
+    padding: 18px 32px;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+}
+
+.modal-header-cambiar h2{
+    margin: 0;
+    font-size: 22px;
+}
+
+.modal-desc-cambiar{
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modal-campo-pass{
+    margin-bottom: 16px;
+}
+
+.modal-campo-pass label{
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.pass-input-wrap{
+    display: flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pass-input-wrap.invalido{
+    border-color: #f87171;
+}
+
+.pass-input-wrap input{
+    flex: 1;
+    border: none;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+}
+
+.toggle-pass{
+    background: none;
+    border: none;
+    padding: 10px 14px;
+    color: #888;
+    cursor: pointer;
+}
+
+.btn-cambiar-pass{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 160px;
+    margin: 20px auto 0;
+    padding: 12px 24px;
+    background: #d1d5db;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    font-size: 15px;
+    cursor: not-allowed;
+    transition: background 0.2s;
+}
+
+.btn-cambiar-pass.activo{
+    background: #ff2a00;
+    cursor: pointer;
+}
+
+.btn-cambiar-pass.activo:hover{
+    background: #d92400;
+}
+
+@media screen and (max-width: 480px){
+    .modal-input-row{
+        flex-direction: column;
+    }
+
+    .btn-modal-enviar{
+        justify-content: center;
+    }
+}

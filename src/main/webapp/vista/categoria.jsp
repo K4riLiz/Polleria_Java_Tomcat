@@ -40,6 +40,7 @@
                 <div class="text-center py-20 text-gray-400">
                     <i class="fa-solid fa-bowl-food text-6xl mb-4"></i>
                     <p class="text-xl">No hay productos disponibles en esta categoría.</p>
+                    <p class="text-sm mt-2">Es posible que el stock del día se haya agotado.</p>
                 </div>
             </c:when>
             <c:otherwise>
@@ -62,6 +63,7 @@
                                         Ver detalle
                                     </span>
                                 </div>
+                                <p class="text-xs text-green-600 mt-2 font-medium">${prod.stock} disponible(s)</p>
                             </div>
                         </a>
                     </c:forEach>

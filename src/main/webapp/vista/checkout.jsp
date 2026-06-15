@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
     <title>Checkout - El Dorado</title>
     <style>
         .metodo-card input[type="radio"] { display: none; }
@@ -27,6 +29,14 @@
         }
         .metodo-card label:hover { border-color: #f87171; }
         #seccion-tarjeta, #seccion-yape, #seccion-plin { display: none; }
+        #mapaLeaflet {
+            height: 280px;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            z-index: 1;
+        }
+        #mapaSugerencias { z-index: 999; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -42,20 +52,48 @@
             <div class="bg-red-100 text-red-700 px-4 py-3 rounded-xl mb-6">${error}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/checkout" method="post">
+        <form action="${pageContext.request.contextPath}/checkout" method="post" id="formCheckout">
             <div class="flex flex-col lg:flex-row gap-6">
 
                 <!-- IZQUIERDA -->
                 <div class="flex-1 flex flex-col gap-6">
 
-                    <!-- DIRECCIÓN -->
+                    <!-- DIRECCIÓN CON MAPA -->
                     <div class="bg-white rounded-2xl shadow-sm p-6">
                         <h2 class="text-lg font-semibold mb-4">
                             <i class="fa-solid fa-location-dot text-red-600 mr-2"></i>Dirección de entrega
                         </h2>
-                        <input type="text" name="direccion" required
-                               placeholder="Ej: Av. La Marina 4534, San Miguel, Lima"
-                               class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+
+                        <!-- Buscador -->
+                        <div class="relative mb-3">
+                            <input type="text" id="mapaBuscador"
+                                   placeholder="Busca tu dirección en Lima..."
+                                   autocomplete="off"
+                                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 pr-10">
+                            <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-gray-400 text-sm"></i>
+                            <div id="mapaSugerencias"
+                                 class="hidden absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto mt-1">
+                            </div>
+                        </div>
+
+                        <!-- Mapa -->
+                        <div id="mapaLeaflet" class="mb-3"></div>
+
+                        <!-- Dirección seleccionada -->
+                        <div id="mapaDirTexto" class="hidden text-xs text-gray-500 flex items-start gap-2 px-1 mb-2">
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5"></i>
+                            <span id="mapaDirSpan" class="leading-relaxed"></span>
+                        </div>
+
+                        <p class="text-xs text-gray-400 text-center">
+                            <i class="fa-solid fa-hand-pointer mr-1"></i>
+                            Haz clic en el mapa o arrastra el pin para ajustar tu ubicación
+                        </p>
+
+                        <!-- Inputs hidden -->
+                        <input type="hidden" name="direccion" id="mapaDir">
+                        <input type="hidden" name="latitud"   id="mapaLat">
+                        <input type="hidden" name="longitud"  id="mapaLng">
                     </div>
 
                     <!-- MÉTODO DE PAGO -->
@@ -80,7 +118,6 @@
                                 </label>
                             </div>
 
-                            <!-- Datos tarjeta -->
                             <div id="seccion-tarjeta" class="bg-gray-50 rounded-xl p-4 flex flex-col gap-3">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Número de tarjeta</label>
@@ -121,7 +158,6 @@
                                 </label>
                             </div>
 
-                            <!-- Datos Yape -->
                             <div id="seccion-yape" class="bg-purple-50 rounded-xl p-4 flex flex-col items-center gap-3">
                                 <p class="text-sm font-semibold text-purple-700">Escanea el código QR con Yape</p>
                                 <div class="w-40 h-40 bg-white rounded-xl flex items-center justify-center border-2 border-purple-200">
@@ -147,7 +183,6 @@
                                 </label>
                             </div>
 
-                            <!-- Datos Plin -->
                             <div id="seccion-plin" class="bg-green-50 rounded-xl p-4 flex flex-col items-center gap-3">
                                 <p class="text-sm font-semibold text-green-700">Escanea el código QR con Plin</p>
                                 <div class="w-40 h-40 bg-white rounded-xl flex items-center justify-center border-2 border-green-200">
@@ -194,7 +229,7 @@
                             </div>
                         </div>
 
-                        <button type="submit"
+                        <button type="submit" onclick="return validarFormulario()"
                                 class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
                             <i class="fa-solid fa-lock"></i> Confirmar y pagar
                         </button>
@@ -214,7 +249,116 @@
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ── MAPA ──────────────────────────────────────────
+            const mapa = L.map('mapaLeaflet').setView([-12.0464, -77.0428], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(mapa);
+
+            const marker = L.marker([-12.0464, -77.0428], { draggable: true }).addTo(mapa);
+
+            marker.on('dragend', function () {
+                const pos = marker.getLatLng();
+                geocodificarInverso(pos.lat, pos.lng);
+            });
+
+            mapa.on('click', function (e) {
+                marker.setLatLng(e.latlng);
+                geocodificarInverso(e.latlng.lat, e.latlng.lng);
+            });
+
+            let timeoutBusqueda;
+            document.getElementById('mapaBuscador').addEventListener('input', function () {
+                clearTimeout(timeoutBusqueda);
+                const texto = this.value.trim();
+                if (texto.length < 3) {
+                    document.getElementById('mapaSugerencias').classList.add('hidden');
+                    return;
+                }
+                timeoutBusqueda = setTimeout(function() { buscarDireccion(texto); }, 400);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('#mapaBuscador') && !e.target.closest('#mapaSugerencias')) {
+                    document.getElementById('mapaSugerencias').classList.add('hidden');
+                }
+            });
+
+            function buscarDireccion(texto) {
+                var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(texto) + '&countrycodes=pe&limit=5';
+                fetch(url, { headers: { 'Accept-Language': 'es' } })
+                    .then(function(r) { return r.json(); })
+                    .then(function(resultados) {
+                        var lista = document.getElementById('mapaSugerencias');
+                        lista.innerHTML = '';
+                        if (resultados.length === 0) {
+                            lista.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">Sin resultados</div>';
+                            lista.classList.remove('hidden');
+                            return;
+                        }
+                        resultados.forEach(function(r) {
+                            var div = document.createElement('div');
+                            div.className = 'px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 cursor-pointer border-b border-gray-50 last:border-0';
+                            div.innerHTML = '<i class="fa-solid fa-location-dot mr-2 text-red-400 text-xs"></i>' + r.display_name;
+                            div.addEventListener('click', function() {
+                                var la = parseFloat(r.lat);
+                                var ln = parseFloat(r.lon);
+                                mapa.setView([la, ln], 17);
+                                marker.setLatLng([la, ln]);
+                                guardarUbicacion(la, ln, r.display_name);
+                                document.getElementById('mapaBuscador').value = r.display_name;
+                                lista.classList.add('hidden');
+                            });
+                            lista.appendChild(div);
+                        });
+                        lista.classList.remove('hidden');
+                    })
+                    .catch(function() {});
+            }
+
+            function geocodificarInverso(la, ln) {
+                var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + la + '&lon=' + ln + '&accept-language=es';
+                fetch(url)
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        var dir = data.display_name || (la.toFixed(6) + ', ' + ln.toFixed(6));
+                        guardarUbicacion(la, ln, dir);
+                        document.getElementById('mapaBuscador').value = dir;
+                    })
+                    .catch(function() {
+                        guardarUbicacion(la, ln, la.toFixed(6) + ', ' + ln.toFixed(6));
+                    });
+            }
+
+            function guardarUbicacion(la, ln, dir) {
+                document.getElementById('mapaLat').value = la;
+                document.getElementById('mapaLng').value = ln;
+                document.getElementById('mapaDir').value = dir;
+                document.getElementById('mapaDirSpan').textContent = dir;
+                document.getElementById('mapaDirTexto').classList.remove('hidden');
+            }
+
+        });
+
+        function validarFormulario() {
+            var dir = document.getElementById('mapaDir').value;
+            if (!dir) {
+                alert('Por favor selecciona tu dirección de entrega en el mapa.');
+                return false;
+            }
+            var metodo = document.querySelector('input[name="metodo"]:checked');
+            if (!metodo) {
+                alert('Por favor selecciona un método de pago.');
+                return false;
+            }
+            return true;
+        }
+
         function mostrarSeccion(metodo) {
             document.getElementById('seccion-tarjeta').style.display = 'none';
             document.getElementById('seccion-yape').style.display = 'none';
@@ -224,11 +368,11 @@
         }
 
         function formatarTarjeta(input) {
-            let val = input.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-            let matches = val.match(/\d{4,16}/g);
-            let match = matches && matches[0] || '';
-            let parts = [];
-            for (let i = 0, len = match.length; i < len; i += 4) {
+            var val = input.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            var matches = val.match(/\d{4,16}/g);
+            var match = matches && matches[0] || '';
+            var parts = [];
+            for (var i = 0, len = match.length; i < len; i += 4) {
                 parts.push(match.substring(i, i + 4));
             }
             input.value = parts.length ? parts.join(' ') : val;

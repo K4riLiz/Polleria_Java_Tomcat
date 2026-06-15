@@ -1,14 +1,19 @@
 package com.polleria.servlet;
 
+import com.polleria.dao.ProductoDAO;
 import com.polleria.model.ItemCarrito;
+import com.polleria.util.StockService;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CarritoServlet extends HttpServlet {
 
@@ -30,7 +35,8 @@ public class CarritoServlet extends HttpServlet {
             return;
         }
 
-        // Mostrar carrito
+        // Cargar stock disponible para productos en el carrito
+        cargarStocksEnRequest(req);
         req.getRequestDispatcher("/vista/carrito.jsp").forward(req, resp);
     }
 
@@ -39,19 +45,49 @@ public class CarritoServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = req.getParameter("action");
+        String redirectUrl = req.getContextPath() + "/carrito";
 
-        if ("agregar".equals(action)) {
-            agregarItem(req);
-        } else if ("actualizar".equals(action)) {
-            actualizarCantidad(req);
+        try {
+            if ("agregar".equals(action)) {
+                String error = agregarItem(req);
+                if (error != null) {
+                    req.getSession().setAttribute("carritoError", error);
+                    String referer = req.getHeader("Referer");
+                    redirectUrl = (referer != null && !referer.isEmpty())
+                            ? referer : req.getContextPath() + "/carrito";
+                }
+            } else if ("actualizar".equals(action)) {
+                String error = actualizarCantidad(req);
+                if (error != null) {
+                    req.getSession().setAttribute("carritoError", error);
+                }
+            }
+        } catch (SQLException e) {
+            req.getSession().setAttribute("carritoError", "Error al validar stock: " + e.getMessage());
         }
 
-        resp.sendRedirect(req.getContextPath() + "/carrito");
+        resp.sendRedirect(redirectUrl);
     }
 
-    // ── AGREGAR ITEM ───────────────────────────────────────
     @SuppressWarnings("unchecked")
-    private void agregarItem(HttpServletRequest req) {
+    private void cargarStocksEnRequest(HttpServletRequest req) throws ServletException {
+        List<ItemCarrito> carrito = (List<ItemCarrito>) req.getSession().getAttribute("carrito");
+        if (carrito == null || carrito.isEmpty()) return;
+
+        try {
+            List<Integer> ids = carrito.stream()
+                    .filter(i -> "producto".equals(i.getTipo()))
+                    .map(ItemCarrito::getProductoId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            req.setAttribute("stocks", new ProductoDAO().obtenerStocks(ids));
+        } catch (SQLException e) {
+            throw new ServletException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String agregarItem(HttpServletRequest req) throws SQLException {
         HttpSession session = req.getSession();
         List<ItemCarrito> carrito = (List<ItemCarrito>) session.getAttribute("carrito");
         if (carrito == null) carrito = new ArrayList<>();
@@ -64,7 +100,12 @@ public class CarritoServlet extends HttpServlet {
         String tipo    = req.getParameter("tipo") != null ? req.getParameter("tipo") : "producto";
         String opciones = req.getParameter("opciones");
 
-        // Si ya existe en el carrito, aumentar cantidad
+        // Validar stock solo para productos (no promociones)
+        if ("producto".equals(tipo)) {
+            String error = StockService.validarAgregar(productoId, cantidad, carrito);
+            if (error != null) return error;
+        }
+
         boolean encontrado = false;
         for (ItemCarrito item : carrito) {
             if (item.getProductoId() == productoId && item.getTipo().equals(tipo)) {
@@ -79,18 +120,23 @@ public class CarritoServlet extends HttpServlet {
         }
 
         session.setAttribute("carrito", carrito);
+        return null;
     }
 
-    // ── ACTUALIZAR CANTIDAD ────────────────────────────────
     @SuppressWarnings("unchecked")
-    private void actualizarCantidad(HttpServletRequest req) {
+    private String actualizarCantidad(HttpServletRequest req) throws SQLException {
         HttpSession session = req.getSession();
         List<ItemCarrito> carrito = (List<ItemCarrito>) session.getAttribute("carrito");
-        if (carrito == null) return;
+        if (carrito == null) return null;
 
         int productoId = Integer.parseInt(req.getParameter("productoId"));
         int cantidad   = Integer.parseInt(req.getParameter("cantidad"));
         String tipo    = req.getParameter("tipo");
+
+        if ("producto".equals(tipo) && cantidad > 0) {
+            String error = StockService.validarCantidad(productoId, cantidad, carrito);
+            if (error != null) return error;
+        }
 
         for (ItemCarrito item : carrito) {
             if (item.getProductoId() == productoId && item.getTipo().equals(tipo)) {
@@ -104,9 +150,9 @@ public class CarritoServlet extends HttpServlet {
         }
 
         session.setAttribute("carrito", carrito);
+        return null;
     }
 
-    // ── ELIMINAR ITEM ──────────────────────────────────────
     @SuppressWarnings("unchecked")
     private void eliminarItem(HttpServletRequest req) {
         HttpSession session = req.getSession();
@@ -119,5 +165,4 @@ public class CarritoServlet extends HttpServlet {
         carrito.removeIf(item -> item.getProductoId() == productoId && item.getTipo().equals(tipo));
         session.setAttribute("carrito", carrito);
     }
-    
 }

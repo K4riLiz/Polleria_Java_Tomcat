@@ -1,8 +1,10 @@
 package com.polleria.dao;
 
 import com.polleria.model.DetallePedido;
+import com.polleria.model.DetallePedidoOpcion;
 import com.polleria.model.ItemCarrito;
 import com.polleria.model.Pedido;
+import com.polleria.model.Producto;
 import com.polleria.util.DBConnection;
 
 import java.sql.*;
@@ -11,37 +13,82 @@ import java.util.List;
 
 public class PedidoDAO {
 
-    // Crear pedido y sus detalles, retorna el ID generado
     public int crear(Pedido pedido, List<ItemCarrito> items) throws SQLException {
         Connection con = DBConnection.getConnection();
         con.setAutoCommit(false);
         try {
-            // Insertar pedido
-            String sqlPedido = "INSERT INTO pedidos (usuario_id, total, estado, direccion) VALUES (?, ?, 'Pendiente', ?)";
-            PreparedStatement psPedido = con.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS);
-            psPedido.setInt(1, pedido.getUsuarioId());
-            psPedido.setDouble(2, pedido.getTotal());
-            psPedido.setString(3, pedido.getDireccion());
-            psPedido.executeUpdate();
-
-            ResultSet rs = psPedido.getGeneratedKeys();
-            int pedidoId = 0;
-            if (rs.next()) pedidoId = rs.getInt(1);
-
-            // Insertar detalles
-            String sqlDetalle = "INSERT INTO detalle_pedido (pedido_id, producto_nombre, precio, cantidad, opciones, tipo, subtotal) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement psDetalle = con.prepareStatement(sqlDetalle);
+            // 0. Agrupar cantidades por producto y descontar stock
+            java.util.Map<Integer, Integer> cantidades = new java.util.HashMap<>();
             for (ItemCarrito item : items) {
-                psDetalle.setInt(1, pedidoId);
-                psDetalle.setString(2, item.getNombre());
-                psDetalle.setDouble(3, item.getPrecio());
-                psDetalle.setInt(4, item.getCantidad());
-                psDetalle.setString(5, item.getOpciones());
-                psDetalle.setString(6, item.getTipo());
-                psDetalle.setDouble(7, item.getSubtotal());
-                psDetalle.addBatch();
+                if ("producto".equals(item.getTipo())) {
+                    cantidades.merge(item.getProductoId(), item.getCantidad(), Integer::sum);
+                }
             }
-            psDetalle.executeBatch();
+
+            ProductoDAO productoDAO = new ProductoDAO();
+            for (java.util.Map.Entry<Integer, Integer> entry : cantidades.entrySet()) {
+                if (!productoDAO.descontarStock(con, entry.getKey(), entry.getValue())) {
+                    Producto p = productoDAO.obtenerPorId(entry.getKey());
+                    String nombre = p != null ? p.getNombre() : "ID " + entry.getKey();
+                    throw new SQLException("Stock insuficiente para: " + nombre);
+                }
+            }
+
+            // 1. Insertar pedido
+            String sqlPedido = "INSERT INTO pedidos (usuario_id, total, estado, direccion, latitud, longitud) VALUES (?, ?, 'Pendiente', ?, ?, ?)";
+            int pedidoId;
+            try (PreparedStatement ps = con.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, pedido.getUsuarioId());
+                ps.setDouble(2, pedido.getTotal());
+                ps.setString(3, pedido.getDireccion());
+                ps.setObject(4, pedido.getLatitud());
+                ps.setObject(5, pedido.getLongitud());
+                ps.executeUpdate();
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (!rs.next()) throw new SQLException("No se generó ID para el pedido");
+                    pedidoId = rs.getInt(1);
+                }
+            }
+
+            // 2. Insertar detalles
+            String sqlDetalle = "INSERT INTO detalle_pedido (pedido_id, producto_id, promocion_id, producto_nombre, precio, cantidad, subtotal, tipo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            for (ItemCarrito item : items) {
+                int detalleId;
+                try (PreparedStatement ps = con.prepareStatement(sqlDetalle, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setInt(1, pedidoId);
+                    if ("promocion".equals(item.getTipo())) {
+                        ps.setNull(2, Types.INTEGER);
+                        ps.setInt(3, item.getProductoId());
+                    } else {
+                        ps.setInt(2, item.getProductoId());
+                        ps.setNull(3, Types.INTEGER);
+                    }
+                    ps.setString(4, item.getNombre());
+                    ps.setDouble(5, item.getPrecio());
+                    ps.setInt(6, item.getCantidad());
+                    ps.setDouble(7, item.getSubtotal());
+                    ps.setString(8, item.getTipo());
+                    ps.executeUpdate();
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (!rs.next()) throw new SQLException("No se generó ID para el detalle");
+                        detalleId = rs.getInt(1);
+                    }
+                }
+
+                // 3. Insertar opciones del detalle
+                if (item.getOpciones() != null && !item.getOpciones().isEmpty()) {
+                    String sqlOpcion = "INSERT INTO detalle_pedido_opciones (detalle_pedido_id, nombre_opcion, precio_cobrado) VALUES (?, ?, 0)";
+                    String[] opciones = item.getOpciones().split(",");
+                    try (PreparedStatement ps = con.prepareStatement(sqlOpcion)) {
+                        for (String opcion : opciones) {
+                            ps.setInt(1, detalleId);
+                            ps.setString(2, opcion.trim());
+                            ps.addBatch();
+                        }
+                        ps.executeBatch();
+                    }
+                }
+            }
 
             con.commit();
             return pedidoId;
@@ -54,73 +101,44 @@ public class PedidoDAO {
         }
     }
 
-    // Obtener pedido por ID
     public Pedido obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM pedidos WHERE id = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Pedido p = new Pedido();
-                p.setId(rs.getInt("id"));
-                p.setUsuarioId(rs.getInt("usuario_id"));
-                p.setTotal(rs.getDouble("total"));
-                p.setEstado(rs.getString("estado"));
-                p.setDireccion(rs.getString("direccion"));
-                p.setFecha(rs.getString("fecha"));
-                return p;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapear(rs);
             }
         }
         return null;
     }
 
-    // Listar pedidos de un usuario
     public List<Pedido> listarPorUsuario(int usuarioId) throws SQLException {
         List<Pedido> lista = new ArrayList<>();
         String sql = "SELECT * FROM pedidos WHERE usuario_id = ? ORDER BY fecha DESC";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, usuarioId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Pedido p = new Pedido();
-                p.setId(rs.getInt("id"));
-                p.setUsuarioId(rs.getInt("usuario_id"));
-                p.setTotal(rs.getDouble("total"));
-                p.setEstado(rs.getString("estado"));
-                p.setFecha(rs.getString("fecha"));
-                lista.add(p);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(mapear(rs));
             }
         }
         return lista;
     }
 
-    // Listar detalles de un pedido
     public List<DetallePedido> listarDetalles(int pedidoId) throws SQLException {
         List<DetallePedido> lista = new ArrayList<>();
         String sql = "SELECT * FROM detalle_pedido WHERE pedido_id = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, pedidoId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                DetallePedido d = new DetallePedido();
-                d.setId(rs.getInt("id"));
-                d.setPedidoId(rs.getInt("pedido_id"));
-                d.setProductoNombre(rs.getString("producto_nombre"));
-                d.setPrecio(rs.getDouble("precio"));
-                d.setCantidad(rs.getInt("cantidad"));
-                d.setOpciones(rs.getString("opciones"));
-                d.setTipo(rs.getString("tipo"));
-                d.setSubtotal(rs.getDouble("subtotal"));
-                lista.add(d);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(mapearDetalle(rs));
             }
         }
         return lista;
     }
 
-    // Listar todos los pedidos (admin)
     public List<Pedido> listarTodos() throws SQLException {
         List<Pedido> lista = new ArrayList<>();
         String sql = "SELECT p.*, u.nombre as usuario_nombre FROM pedidos p " +
@@ -128,20 +146,11 @@ public class PedidoDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Pedido p = new Pedido();
-                p.setId(rs.getInt("id"));
-                p.setUsuarioId(rs.getInt("usuario_id"));
-                p.setTotal(rs.getDouble("total"));
-                p.setEstado(rs.getString("estado"));
-                p.setFecha(rs.getString("fecha"));
-                lista.add(p);
-            }
+            while (rs.next()) lista.add(mapear(rs));
         }
         return lista;
     }
 
-    // Actualizar estado del pedido (admin/cocinero)
     public boolean actualizarEstado(int pedidoId, String estado) throws SQLException {
         String sql = "UPDATE pedidos SET estado = ? WHERE id = ?";
         try (Connection con = DBConnection.getConnection();
@@ -150,5 +159,99 @@ public class PedidoDAO {
             ps.setInt(2, pedidoId);
             return ps.executeUpdate() > 0;
         }
+    }
+
+    private Pedido mapear(ResultSet rs) throws SQLException {
+        Pedido p = new Pedido();
+        p.setId(rs.getInt("id"));
+        p.setUsuarioId(rs.getInt("usuario_id"));
+        p.setTotal(rs.getDouble("total"));
+        p.setEstado(rs.getString("estado"));
+        p.setDireccion(rs.getString("direccion"));
+        
+        if (rs.getObject("latitud") != null) {
+            p.setLatitud(rs.getDouble("latitud"));
+        }
+
+        if (rs.getObject("longitud") != null) {
+            p.setLongitud(rs.getDouble("longitud"));
+        }
+        
+        p.setFecha(rs.getString("fecha"));
+        // usuarioNombre solo viene cuando hay JOIN con usuarios
+        try {
+            p.setUsuarioNombre(rs.getString("usuario_nombre"));
+        } catch (SQLException e) {
+        }
+        return p;
+    }
+
+    private DetallePedido mapearDetalle(ResultSet rs) throws SQLException {
+        DetallePedido d = new DetallePedido();
+        d.setId(rs.getInt("id"));
+        d.setPedidoId(rs.getInt("pedido_id"));
+        d.setProductoId((Integer) rs.getObject("producto_id"));
+        d.setPromocionId((Integer) rs.getObject("promocion_id"));
+        d.setProductoNombre(rs.getString("producto_nombre"));
+        d.setPrecio(rs.getDouble("precio"));
+        d.setCantidad(rs.getInt("cantidad"));
+        d.setSubtotal(rs.getDouble("subtotal"));
+        d.setTipo(rs.getString("tipo"));
+        return d;
+    }
+    
+    // ── NUEVO: historial solo entregados del cliente ───────
+    public List<Pedido> listarEntregadosPorUsuario(int usuarioId) throws SQLException {
+        List<Pedido> lista = new ArrayList<>();
+        String sql = "SELECT * FROM pedidos WHERE usuario_id = ? AND estado = 'Entregado' ORDER BY fecha DESC";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, usuarioId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+// ── NUEVO: listar por estado (chef / delivery) ─────────
+    public List<Pedido> listarPorEstado(String estado) throws SQLException {
+        List<Pedido> lista = new ArrayList<>();
+        String sql = "SELECT p.*, u.nombre as usuario_nombre FROM pedidos p "
+                + "JOIN usuarios u ON p.usuario_id = u.id "
+                + "WHERE p.estado = ? ORDER BY p.fecha ASC";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, estado);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+// ── NUEVO: listar por múltiples estados ───────────────
+    public List<Pedido> listarPorEstados(String... estados) throws SQLException {
+        List<Pedido> lista = new ArrayList<>();
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < estados.length; i++) {
+            placeholders.append(i == 0 ? "?" : ",?");
+        }
+        String sql = "SELECT p.*, u.nombre as usuario_nombre FROM pedidos p "
+                + "JOIN usuarios u ON p.usuario_id = u.id "
+                + "WHERE p.estado IN (" + placeholders + ") ORDER BY p.fecha ASC";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            for (int i = 0; i < estados.length; i++) {
+                ps.setString(i + 1, estados[i]);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
     }
 }

@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,19 +12,13 @@
     <style>
         .opcion-item input[type="radio"] { display: none; }
         .opcion-item input[type="radio"]:checked + label {
-            border-color: #c0392b;
-            background-color: #fff5f5;
-            color: #c0392b;
-            font-weight: 600;
+            border-color: #c0392b; background-color: #fff5f5;
+            color: #c0392b; font-weight: 600;
         }
         .opcion-item label {
-            cursor: pointer;
-            transition: all 0.2s;
-            display: block;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 10px 16px;
-            font-size: 14px;
+            cursor: pointer; transition: all 0.2s; display: block;
+            border: 2px solid #e5e7eb; border-radius: 10px;
+            padding: 10px 16px; font-size: 14px;
         }
         .opcion-item label:hover { border-color: #f87171; }
         .chevron { transition: transform 0.3s; }
@@ -39,6 +32,15 @@
             transition: all 0.2s;
         }
         .btn-cantidad:hover { background: #c0392b; color: white; }
+        .opciones-scroll {
+            max-height: 320px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #f87171 #f3f4f6;
+        }
+        .opciones-scroll::-webkit-scrollbar { width: 4px; }
+        .opciones-scroll::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 4px; }
+        .opciones-scroll::-webkit-scrollbar-thumb { background: #f87171; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -64,6 +66,14 @@
 
     <!-- CONTENIDO -->
     <div class="max-w-5xl mx-auto px-4 pb-20">
+
+        <c:if test="${not empty sessionScope.carritoError}">
+            <div class="bg-red-100 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm">
+                ${sessionScope.carritoError}
+                <c:remove var="carritoError" scope="session"/>
+            </div>
+        </c:if>
+
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
 
             <!-- IMAGEN -->
@@ -77,7 +87,7 @@
             </div>
 
             <!-- INFO -->
-            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-5 overflow-y-auto max-h-[90vh]">
+            <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-4">
 
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 mb-1">${producto.nombre}</h1>
@@ -85,130 +95,68 @@
                     <p class="text-3xl font-bold text-red-600">
                         S/ <fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/>
                     </p>
+                    <p class="text-sm mt-2 ${producto.stock <= 5 ? 'text-orange-600' : 'text-green-600'} font-medium">
+                        <i class="fa-solid fa-box-open mr-1"></i>
+                        ${producto.stock} plato(s) disponible(s) hoy
+                    </p>
                 </div>
 
                 <p class="text-xs text-gray-400 italic">
                     Por favor, elige tus opciones para continuar con tu pedido.
                 </p>
 
-                
-                <!-- OPCIONES SEGÚN CATEGORÍA uu -->
-                <div class="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-100">
+                <!-- OPCIONES con scroll interno -->
+                <div class="border border-gray-100 rounded-xl overflow-hidden">
+                    <c:choose>
+                        <c:when test="${not empty opcionesPorGrupo}">
+                            <div class="opciones-scroll divide-y divide-gray-100">
+                                <c:forEach var="entrada" items="${opcionesPorGrupo}">
+                                    <c:set var="grupo" value="${entrada.key}"/>
+                                    <c:set var="listaOpciones" value="${entrada.value}"/>
+                                    <c:set var="color" value="${coloresPorGrupo[grupo] != null ? coloresPorGrupo[grupo] : 'bg-gray-500'}"/>
+                                    <c:set var="inputName" value="${grupo}"/>
 
-                    <%-- CATEGORÍA 1: Pollo a la Brasa --%>
-                    <c:if test="${producto.categoriaId == 1}">
-
-                        <!-- Complemento -->
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-orange-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-bowl-food"></i> Complemento
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
+                                    <div>
+                                        <div class="flex items-center justify-between px-4 py-3 ${color} text-white cursor-pointer select-none" onclick="toggle(this)">
+                                            <div class="flex items-center gap-2 text-sm font-semibold">
+                                                <i class="fa-solid fa-circle-dot"></i> ${grupo}
+                                            </div>
+                                            <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
+                                        </div>
+                                        <div class="contenido-opcion" style="max-height:300px">
+                                            <div class="p-4 flex flex-col gap-2">
+                                                <c:forEach var="op" items="${listaOpciones}">
+                                                    <div class="opcion-item">
+                                                        <input type="radio"
+                                                               name="${inputName}"
+                                                               id="op${op.id}"
+                                                               value="${op.nombre}"
+                                                               data-precio="${op.precioAdicional}"
+                                                               data-grupo="${grupo}">
+                                                        <label for="op${op.id}">
+                                                            ${op.nombre}
+                                                            <c:if test="${op.precioAdicional > 0}">
+                                                                <span class="text-red-500 text-xs ml-1">
+                                                                    +S/ <fmt:formatNumber value="${op.precioAdicional}" pattern="#,##0.00"/>
+                                                                </span>
+                                                            </c:if>
+                                                        </label>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:forEach>
                             </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="complemento" id="papas" value="Papas Fritas"><label for="papas"> Papas Fritas</label></div>
-                                    <div class="opcion-item"><input type="radio" name="complemento" id="arroz" value="Arroz"><label for="arroz"> Arroz</label></div>
-                                </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="p-4 text-center text-gray-400 text-sm">
+                                <i class="fa-solid fa-circle-check text-green-500 text-2xl mb-2"></i>
+                                <p>Solo selecciona la cantidad y agrega al carrito</p>
                             </div>
-                        </div>
-
-                        <!-- Guarnición -->
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-yellow-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-leaf"></i> Guarnición
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ef" value="Ensalada Fresca"><label for="ef"> Ensalada Fresca</label></div>
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ec" value="Ensalada Cocida"><label for="ec"> Ensalada Cocida</label></div>
-                                    <div class="opcion-item"><input type="radio" name="guarnicion" id="ee" value="Ensalada Especial"><label for="ee"> Ensalada Especial</label></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bebida -->
-                        <%-- Bebida solo si la descripción la menciona --%>
-                    <c:if test="${fn:containsIgnoreCase(producto.descripcion, 'bebida') or
-                                fn:containsIgnoreCase(producto.descripcion, 'gaseosa') or
-                                fn:containsIgnoreCase(producto.descripcion, 'kola')}">
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-bottle-water"></i> Bebida
-                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Opcional</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="inca" value="Inca Kola 500ml"><label for="inca"> Inca Kola 500ml</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="gaseosa15" value="Gaseosa 1.5L"><label for="gaseosa15"> Gaseosa 1.5L</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebida" id="jugo" value="Jugo Natural"><label for="jugo"> Jugo Natural</label></div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    </c:if>
-
-                    <%-- CATEGORÍA 2: Ensaladas --%>
-                    <c:if test="${producto.categoriaId == 2}">
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-green-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-leaf"></i> Tipo de Ensalada
-                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="fresca" value="Fresca"><label for="fresca"> Fresca</label></div>
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="cocida" value="Cocida"><label for="cocida"> Cocida</label></div>
-                                    <div class="opcion-item"><input type="radio" name="ensalada" id="especial" value="Especial"><label for="especial"> Especial</label></div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <%-- CATEGORÍA 5: Bebidas --%>
-                    <c:if test="${producto.categoriaId == 5}">
-                        <div>
-                            <div class="flex items-center justify-between px-4 py-3 bg-blue-500 text-white cursor-pointer select-none" onclick="toggle(this)">
-                                <div class="flex items-center gap-2 text-sm font-semibold">
-                                    <i class="fa-solid fa-bottle-water"></i> Elige tu bebida
-                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Obligatorio</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down chevron abierto text-sm"></i>
-                            </div>
-                            <div class="contenido-opcion" style="max-height:200px">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="cocacola" value="Coca Cola"><label for="cocacola"> Coca Cola</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="inkakola" value="Inca Kola"><label for="inkakola"> Inca Kola</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="pepsi" value="Pepsi"><label for="pepsi"> Pepsi</label></div>
-                                    <div class="opcion-item"><input type="radio" name="bebidaTipo" id="sprite" value="Sprite"><label for="sprite"> Sprite</label></div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <%-- CATEGORÍAS 3,4,6: Adicionales, Arroces, Postres - sin opciones extra --%>
-                    <c:if test="${producto.categoriaId == 3 or producto.categoriaId == 4 or producto.categoriaId == 6}">
-                        <div class="p-4 text-center text-gray-400 text-sm">
-                            <i class="fa-solid fa-circle-check text-green-500 text-2xl mb-2"></i>
-                            <p>Solo selecciona la cantidad y agrega al carrito</p>
-                        </div>
-                    </c:if>
-
+                        </c:otherwise>
+                    </c:choose>
                 </div>
-
-
-        
 
                 <!-- COMENTARIO -->
                 <div>
@@ -223,15 +171,14 @@
                 <!-- CANTIDAD + BOTÓN -->
                 <div class="flex items-center gap-4 mt-auto">
                     <div class="flex items-center gap-3">
-                        <button class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
+                        <button type="button" class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
                         <span id="cantidad" class="text-xl font-bold w-8 text-center">1</span>
-                        <button class="btn-cantidad" onclick="cambiarCantidad(1)">+</button>
+                        <button type="button" class="btn-cantidad" id="btnMas" onclick="cambiarCantidad(1)">+</button>
                     </div>
-
-                    <button onclick="agregarAlPedido()"
+                    <button type="button" id="btnAgregar" onclick="agregarAlPedido()"
                             class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-cart-plus"></i>
-                            Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/></span>
+                        Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${producto.precio}" pattern="#,##0.00"/></span>
                     </button>
                 </div>
 
@@ -242,77 +189,97 @@
     <jsp:include page="/components/footer.jsp"/>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-<!-- FORM OCULTO -->
-<form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
-    <input type="hidden" name="action" value="agregar">
-    <input type="hidden" name="productoId" value="${producto.id}">
-    <input type="hidden" name="nombre" value="${producto.nombre}">
-    <input type="hidden" name="precio" value="${producto.precio}">
-    <input type="hidden" name="imagen" value="${producto.imagen}">
-    <input type="hidden" name="tipo" value="producto">
-    <input type="hidden" name="cantidad" id="cantidadInput" value="1">
-    <input type="hidden" name="opciones" id="opcionesInput" value=""> 
-</form>
+    <form id="formCarrito" action="${pageContext.request.contextPath}/carrito" method="post" style="display:none">
+        <input type="hidden" name="action" value="agregar">
+        <input type="hidden" name="productoId" value="${producto.id}">
+        <input type="hidden" name="nombre" value="${producto.nombre}">
+        <input type="hidden" name="precio" value="${producto.precio}">
+        <input type="hidden" name="imagen" value="${producto.imagen}">
+        <input type="hidden" name="tipo" value="producto">
+        <input type="hidden" name="cantidad" id="cantidadInput" value="1">
+        <input type="hidden" name="opciones" id="opcionesInput" value="">
+    </form>
 
-<script>
-    const precioBase = ${producto.precio};
-
-    function cambiarCantidad(delta) {
-        const el = document.getElementById('cantidad');
-        let v = parseInt(el.textContent) + delta;
-        if (v < 1) v = 1;
-        if (v > 20) v = 20;
-        el.textContent = v;
-        document.getElementById('precioTotal').textContent = (precioBase * v).toFixed(2);
-        document.getElementById('cantidadInput').value = v;
-    }
-
-    function toggle(header) {
-        const content = header.nextElementSibling;
-        const chevron = header.querySelector('.chevron');
-        if (chevron.classList.contains('abierto')) {
-            content.style.maxHeight = '0px';
-            chevron.classList.remove('abierto');
-        } else {
-            content.style.maxHeight = '200px';
-            chevron.classList.add('abierto');
-        }
-    }
+    <script>
+        const precioBase = ${producto.precio};
+        const stockMax = ${producto.stock};
+        const enCarrito = ${not empty cantidadEnCarrito ? cantidadEnCarrito : 0};
+        const stockDisponible = Math.max(0, stockMax - enCarrito);
 
         function agregarAlPedido() {
-        const categoriaId = ${producto.categoriaId};
+            if (stockDisponible <= 0) {
+                alert('Este producto está agotado.');
+                return;
+            }
+            let precioExtra = 0;
+            const opcionesSeleccionadas = [];
 
-        // Validaciones según categoría
-        if (categoriaId == 1) {
-            // Pollo: no hay obligatorio estricto, solo capturar lo seleccionado
-        } else if (categoriaId == 2) {
-            const ensalada = document.querySelector('input[name="ensalada"]:checked');
-            if (!ensalada) { alert('Por favor selecciona el tipo de ensalada.'); return; }
-        } else if (categoriaId == 5) {
-            const bebida = document.querySelector('input[name="bebidaTipo"]:checked');
-            if (!bebida) { alert('Por favor selecciona el tipo de bebida.'); return; }
+            const todosInputs = document.querySelectorAll('input[type="radio"][data-grupo]');
+            const gruposUnicos = [...new Set([...todosInputs].map(i => i.name))];
+
+            for (const nombre of gruposUnicos) {
+                const checked = document.querySelector(`input[name="${CSS.escape(nombre)}"]:checked`);
+                const hayInputs = document.querySelector(`input[name="${CSS.escape(nombre)}"]`);
+                if (hayInputs && !checked) {
+                    alert(`Por favor selecciona una opción de: ${nombre}`);
+                    return;
+                }
+                if (checked) {
+                    precioExtra += parseFloat(checked.dataset.precio || 0);
+                    opcionesSeleccionadas.push(checked.value);
+                }
+            }
+
+            const cantidad = parseInt(document.getElementById('cantidad').textContent);
+            if (cantidad > stockDisponible) {
+                alert('Solo puedes pedir ' + stockDisponible + ' unidad(es).');
+                return;
+            }
+            const precioFinal = (precioBase + precioExtra) * cantidad;
+            document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
+            document.getElementById('opcionesInput').value = opcionesSeleccionadas.join(', ');
+            document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
+            document.getElementById('formCarrito').submit();
         }
 
-        // Capturar opciones seleccionadas
-        const opciones = [];
-        const complemento = document.querySelector('input[name="complemento"]:checked');
-        const guarnicion  = document.querySelector('input[name="guarnicion"]:checked');
-        const bebida      = document.querySelector('input[name="bebida"]:checked');
-        const ensalada    = document.querySelector('input[name="ensalada"]:checked');
-        const bebidaTipo  = document.querySelector('input[name="bebidaTipo"]:checked');
+        function cambiarCantidad(delta) {
+            const el = document.getElementById('cantidad');
+            let v = parseInt(el.textContent) + delta;
+            if (v < 1) v = 1;
+            if (v > stockDisponible) v = stockDisponible;
+            el.textContent = v;
 
-        if (complemento) opciones.push(' ' + complemento.value);
-        if (guarnicion)  opciones.push(' ' + guarnicion.value);
-        if (bebida)      opciones.push(' ' + bebida.value);
-        if (ensalada)    opciones.push(' ' + ensalada.value);
-        if (bebidaTipo)  opciones.push(' ' + bebidaTipo.value);
+            let precioExtra = 0;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(i => {
+                precioExtra += parseFloat(i.dataset.precio || 0);
+            });
 
-        document.getElementById('opcionesInput').value = opciones.join(', ');
-        document.getElementById('formCarrito').submit();
-    }
-    
-</script>
+            document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
+            document.getElementById('cantidadInput').value = v;
+            document.getElementById('btnMas').disabled = (v >= stockDisponible);
+        }
+
+        if (stockDisponible <= 0) {
+            document.getElementById('btnAgregar').disabled = true;
+            document.getElementById('btnAgregar').classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('btnMas').disabled = true;
+        } else if (stockDisponible < 20) {
+            document.getElementById('btnMas').disabled = (parseInt(document.getElementById('cantidad').textContent) >= stockDisponible);
+        }
+
+        function toggle(header) {
+            const content = header.nextElementSibling;
+            const chevron = header.querySelector('.chevron');
+            if (chevron.classList.contains('abierto')) {
+                content.style.maxHeight = '0px';
+                chevron.classList.remove('abierto');
+            } else {
+                content.style.maxHeight = '300px';
+                chevron.classList.add('abierto');
+            }
+        }
+    </script>
 </body>
 </html>

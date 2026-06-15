@@ -33,24 +33,24 @@
                         </div>
                         <div class="flex gap-12">
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Pollo a la brasa</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=1" class="text-lg font-bold text-red-500 mb-2 hover:underline">Pollo a la brasa</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=1" class="hover:text-red-500 py-1">1/4 Pollo</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=1" class="hover:text-red-500 py-1">1/2 Pollo</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=1" class="hover:text-red-500 py-1">1 Pollo entero</a>
                             </div>
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Ensaladas</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=2" class="text-lg font-bold text-red-500 mb-2 hover:underline">Ensaladas</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=2" class="hover:text-red-500 py-1">Fresca</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=2" class="hover:text-red-500 py-1">Cocida</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=2" class="hover:text-red-500 py-1">Especial</a>
                             </div>
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Bebidas</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=5" class="text-lg font-bold text-red-500 mb-2 hover:underline">Bebidas</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=5" class="hover:text-red-500 py-1">Gaseosas</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=5" class="hover:text-red-500 py-1">Jugos</a>
                             </div>
                             <div class="flex flex-col">
-                                <h2 class="text-lg font-bold text-red-500 mb-2">Postres</h2>
+                                <a href="${pageContext.request.contextPath}/categoria?id=6" class="text-lg font-bold text-red-500 mb-2 hover:underline">Postres</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=6" class="hover:text-red-500 py-1">Helados</a>
                                 <a href="${pageContext.request.contextPath}/categoria?id=6" class="hover:text-red-500 py-1">Tortas</a>
                             </div>
@@ -78,9 +78,54 @@
 
             <c:choose>
                 <c:when test="${not empty sessionScope.usuario}">
-                    <span class="hidden md:block text-sm font-medium text-gray-700">Hola, ${sessionScope.usuario.nombre}</span>
-                    <a href="${pageContext.request.contextPath}/logout" class="text-sm text-red-500 hover:underline">Salir</a>
+                    <%-- Dropdown solo para CLIENTE --%>
+                    <c:if test="${sessionScope.rolNombre == 'CLIENTE'}">
+                        <div class="relative hidden md:block" id="clienteMenu">
+                            <button onclick="toggleClienteMenu()"
+                                    class="flex items-center gap-2 bg-white border border-gray-200 shadow-sm px-3 py-1.5 rounded-xl text-sm font-medium text-gray-700 hover:border-red-400 hover:text-red-600 transition">
+                                <i class="fa-solid fa-circle-user text-red-500 text-base"></i>
+                                ${sessionScope.usuario.nombre}
+                                <i class="fa-solid fa-chevron-down text-xs text-gray-400" id="iconClienteMenu"></i>
+                            </button>
+                            <div id="dropdownCliente"
+                                 class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+                                <div class="px-4 py-3 border-b border-gray-100 bg-red-50">
+                                    <p class="text-sm font-semibold text-gray-800">${sessionScope.usuario.nombre}</p>
+                                    <p class="text-xs text-gray-500">${sessionScope.usuario.email}</p>
+                                </div>
+                                <a href="${pageContext.request.contextPath}/home"
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-house w-4"></i> Inicio
+                                </a>
+                                <a href="${pageContext.request.contextPath}/historial"
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-clock-rotate-left w-4"></i> Mis pedidos
+                                </a>
+                                <a href="${pageContext.request.contextPath}/carrito"
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-bag-shopping w-4"></i> Mi carrito
+                                </a>
+                                <a href="${pageContext.request.contextPath}/libro-reclamaciones"
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-book-open w-4"></i> Reclamaciones
+                                </a>
+                                <div class="border-t border-gray-100"></div>
+                                <a href="${pageContext.request.contextPath}/logout"
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition">
+                                    <i class="fa-solid fa-right-from-bracket w-4"></i> Cerrar sesión
+                                </a>
+                            </div>
+                        </div>
+                    </c:if>
+
+                    <%-- Para otros roles mantenemos el saludo simple --%>
+                    <c:if test="${sessionScope.rolNombre != 'CLIENTE'}">
+                        <span class="hidden md:block text-sm font-medium text-gray-700">
+                            Hola, ${sessionScope.usuario.nombre}
+                        </span>
+                    </c:if>
                 </c:when>
+                
                 <c:otherwise>
                     <a href="${pageContext.request.contextPath}/login" class="hover:text-red-500 transition">
                         <ion-icon name="person-outline"></ion-icon>
@@ -191,7 +236,22 @@
         function toggleCatMovil() {
             document.getElementById('catMovil').classList.toggle('hidden');
         }
+        
+        //box
+        function toggleClienteMenu() {
+            const dd = document.getElementById('dropdownCliente');
+            const icon = document.getElementById('iconClienteMenu');
+            dd.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('clienteMenu');
+            if (menu && !menu.contains(e.target)) {
+                document.getElementById('dropdownCliente').classList.add('hidden');
+                document.getElementById('iconClienteMenu').classList.remove('rotate-180');
+            }
+        });
     </script>
+    
 
 </header>
-

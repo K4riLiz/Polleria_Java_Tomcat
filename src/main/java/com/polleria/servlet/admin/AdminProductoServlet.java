@@ -40,7 +40,7 @@ public class AdminProductoServlet extends HttpServlet {
                 req.setAttribute("productoEditar", prodDAO.obtenerPorId(id));
             }
 
-            req.setAttribute("productos", prodDAO.listarTodos());
+            req.setAttribute("productos", prodDAO.listarTodosAdmin());
             req.setAttribute("categorias", catDAO.listarTodas());
             req.getRequestDispatcher("/vista/admin/productos.jsp").forward(req, resp);
 
@@ -55,6 +55,21 @@ public class AdminProductoServlet extends HttpServlet {
             throws ServletException, IOException {
 
         if (!esAdmin(req, resp)) return;
+
+        // Actualización rápida de stock (formulario simple, sin multipart)
+        String actionParam = req.getParameter("action");
+        if ("actualizarStock".equals(actionParam)) {
+            try {
+                int id = Integer.parseInt(req.getParameter("id"));
+                int stock = parseStock(req.getParameter("stock"));
+                new ProductoDAO().actualizarStock(id, stock);
+                req.getSession().setAttribute("exito", "Stock actualizado correctamente.");
+            } catch (Exception e) {
+                req.getSession().setAttribute("error", "Error al actualizar stock: " + e.getMessage());
+            }
+            resp.sendRedirect(req.getContextPath() + "/admin/productos");
+            return;
+        }
 
         // Verificar si es multipart (subida de archivo)
         if (!ServletFileUpload.isMultipartContent(req)) {
@@ -76,7 +91,7 @@ public class AdminProductoServlet extends HttpServlet {
 
             // Variables del formulario
             String action = "", nombre = "", descripcion = "", imagen = "";
-            String id = "", precio = "", categoriaId = "", activo = "1";
+            String id = "", precio = "", categoriaId = "", activo = "1", stock = "0";
 
             for (FileItem item : items) {
                 if (item.isFormField()) {
@@ -88,6 +103,7 @@ public class AdminProductoServlet extends HttpServlet {
                         case "precio"      -> precio      = item.getString("UTF-8");
                         case "categoriaId" -> categoriaId = item.getString("UTF-8");
                         case "activo"      -> activo      = item.getString("UTF-8");
+                        case "stock"       -> stock       = item.getString("UTF-8");
                         case "imagenActual"-> imagen      = item.getString("UTF-8");
                     }
                 } else {
@@ -112,6 +128,7 @@ public class AdminProductoServlet extends HttpServlet {
                     p.setPrecio(Double.parseDouble(precio));
                     p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
                     p.setCategoriaId(Integer.parseInt(categoriaId));
+                    p.setStock(parseStock(stock));
                     p.setActivo(true);
                     dao.crear(p);
                     req.getSession().setAttribute("exito", "Producto creado correctamente.");
@@ -125,6 +142,7 @@ public class AdminProductoServlet extends HttpServlet {
                     p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
                     p.setCategoriaId(Integer.parseInt(categoriaId));
                     p.setActivo("1".equals(activo));
+                    p.setStock(parseStock(stock));
                     dao.actualizar(p);
                     req.getSession().setAttribute("exito", "Producto actualizado correctamente.");
                 }
@@ -154,5 +172,13 @@ public class AdminProductoServlet extends HttpServlet {
             return false;
         }
         return true;
+    }
+
+    private int parseStock(String stock) {
+        try {
+            return Math.max(0, Integer.parseInt(stock.trim()));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

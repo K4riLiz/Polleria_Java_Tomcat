@@ -28,9 +28,10 @@
 <div class="flex min-h-screen">
 
     <!-- SIDEBAR -->
+    <!-- SIDEBAR -->
     <aside class="w-64 bg-gray-900 text-white flex flex-col">
         <div class="p-6 border-b border-gray-700">
-            <h1 class="text-xl font-bold text-red-400"> Hola, admin</h1>
+            <h1 class="text-xl font-bold text-red-400">Hola, admin</h1>
             <p class="text-xs text-gray-400 mt-1">${sessionScope.usuario.nombre}</p>
         </div>
         <nav class="flex flex-col p-4 gap-2 flex-1">
@@ -38,16 +39,26 @@
                class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
                 <i class="fa-solid fa-users"></i> Usuarios
             </a>
+            <!-- Roles: fa-shield-halved puede no cargar, usar fa-shield -->
             <a href="${pageContext.request.contextPath}/admin/roles"
                class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                <i class="fa-solid fa-shield-halved"></i> Roles
+                <i class="fa-solid fa-shield"></i> Roles
             </a>
+            <!-- Productos: fa-bowl-food puede no cargar, usar fa-utensils -->
             <a href="${pageContext.request.contextPath}/admin/productos"
                class="flex items-center gap-3 px-4 py-2 rounded-lg bg-red-600 text-white font-medium">
-                <i class="fa-solid fa-bowl-food"></i> Productos
+                <i class="fa-solid fa-utensils"></i> Productos
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/pedidos"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-receipt"></i> Pedidos
+            </a>
+            <a href="${pageContext.request.contextPath}/admin/opciones"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-sliders"></i> Opciones
             </a>
             <a href="${pageContext.request.contextPath}/admin/reclamaciones"
-                class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
                 <i class="fa-solid fa-book-open"></i> Reclamaciones
             </a>
             <a href="${pageContext.request.contextPath}/logout"
@@ -60,6 +71,10 @@
     <!-- CONTENIDO -->
     <main class="flex-1 p-8 overflow-auto">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Productos</h2>
+        <p class="text-sm text-gray-500 mb-4">
+            <i class="fa-solid fa-boxes-stacked mr-1"></i>
+            Actualiza el <strong>stock del día</strong> de cada plato. Los productos con stock 0 no se muestran al cliente.
+        </p>
 
         <!-- ALERTAS -->
         <c:if test="${not empty sessionScope.exito}">
@@ -123,6 +138,17 @@
                             </option>
                         </c:forEach>
                     </select>
+                </div>
+
+                <!-- Stock diario -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">
+                        Stock del día (platos)
+                    </label>
+                    <input type="number" name="stock" min="0" required
+                           value="${empty productoEditar ? 0 : productoEditar.stock}"
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                           placeholder="Ej: 20">
                 </div>
 
                 <!-- Descripción -->
@@ -215,6 +241,7 @@
                         <th class="px-4 py-3 text-left">Nombre</th>
                         <th class="px-4 py-3 text-left">Categoría</th>
                         <th class="px-4 py-3 text-left">Precio</th>
+                        <th class="px-4 py-3 text-left">Stock</th>
                         <th class="px-4 py-3 text-left">Estado</th>
                         <th class="px-4 py-3 text-center">Acciones</th>
                     </tr>
@@ -238,10 +265,30 @@
                                 S/<fmt:formatNumber value="${p.precio}" pattern="#,##0.00"/>
                             </td>
                             <td class="px-4 py-3">
+                                <form action="${pageContext.request.contextPath}/admin/productos"
+                                      method="post" class="flex items-center gap-2">
+                                    <input type="hidden" name="action" value="actualizarStock">
+                                    <input type="hidden" name="id" value="${p.id}">
+                                    <input type="number" name="stock" min="0" value="${p.stock}"
+                                           class="w-16 border rounded px-2 py-1 text-sm text-center
+                                           ${p.stock == 0 ? 'border-red-400 bg-red-50' : 'border-gray-300'}">
+                                    <button type="submit" title="Guardar stock"
+                                            class="text-green-600 hover:text-green-800">
+                                        <i class="fa-solid fa-floppy-disk"></i>
+                                    </button>
+                                </form>
+                                <c:if test="${p.stock == 0}">
+                                    <span class="text-xs text-red-500 font-semibold">Agotado</span>
+                                </c:if>
+                            </td>
+                            <td class="px-4 py-3">
                                 <span class="px-2 py-1 rounded-full text-xs font-semibold
                                     ${p.activo ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}">
                                     ${p.activo ? 'Activo' : 'Inactivo'}
                                 </span>
+                                <c:if test="${!p.activo}">
+                                    <span class="block text-xs text-gray-400 mt-1">Oculto al cliente</span>
+                                </c:if>
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <a href="${pageContext.request.contextPath}/admin/productos?action=editar&id=${p.id}"

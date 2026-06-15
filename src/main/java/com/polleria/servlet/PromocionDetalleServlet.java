@@ -1,13 +1,17 @@
 package com.polleria.servlet;
 
 import com.polleria.dao.PromocionDAO;
+import com.polleria.dao.PromocionOpcionDAO;
 import com.polleria.model.Promocion;
+import com.polleria.model.PromocionOpcion;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.*;
 
 public class PromocionDetalleServlet extends HttpServlet {
 
@@ -27,7 +31,29 @@ public class PromocionDetalleServlet extends HttpServlet {
                 resp.sendRedirect(req.getContextPath() + "/promociones");
                 return;
             }
+
+            // Cargar opciones y agrupar
+            PromocionOpcionDAO opcionDAO = new PromocionOpcionDAO();
+            List<PromocionOpcion> opciones = opcionDAO.listarActivasPorPromocion(id);
+            req.setAttribute("opciones", opciones);
+
+            Map<String, List<PromocionOpcion>> opcionesPorGrupo = new LinkedHashMap<>();
+            for (PromocionOpcion op : opciones) {
+                opcionesPorGrupo
+                    .computeIfAbsent(op.getGrupo(), k -> new ArrayList<>())
+                    .add(op);
+            }
+
+            // Colores por grupo
+            Map<String, String> coloresPorGrupo = new LinkedHashMap<>();
+            coloresPorGrupo.put("Pollo",       "bg-red-600");
+            coloresPorGrupo.put("Complemento", "bg-orange-500");
+            coloresPorGrupo.put("Guarnición",  "bg-yellow-500");
+            coloresPorGrupo.put("Bebida",      "bg-blue-500");
+
             req.setAttribute("promocion", promocion);
+            req.setAttribute("opcionesPorGrupo", opcionesPorGrupo);
+            req.setAttribute("coloresPorGrupo", coloresPorGrupo);
             req.getRequestDispatcher("/vista/detalle-promocion.jsp").forward(req, resp);
         } catch (NumberFormatException | SQLException e) {
             resp.sendRedirect(req.getContextPath() + "/promociones");
