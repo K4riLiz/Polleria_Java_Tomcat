@@ -1,428 +1,207 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css?v=3">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<<<<<<< HEAD
-    <script src="https://www.google.com/recaptcha/api.js?render=6LcthQQtAAAAABq3-5JjXFFMfPJhGlbYcYVP139S"></script>
-=======
-    <style>
-        #btn-olvide-pass {
-            display: inline-block;
-            background: none !important;
-            border: none !important;
-            padding: 0 !important;
-            margin: 5px 0 20px !important;
-            color: #000 !important;
-            font-size: 14px !important;
-            font-family: inherit !important;
-            cursor: pointer !important;
-            text-decoration: none !important;
-            box-shadow: none !important;
-            outline: none !important;
-            width: auto !important;
-            height: auto !important;
-        }
-        #btn-olvide-pass:hover {
-            color: #a0594b !important;
-            font-weight: 900;
-        }
-    </style>
->>>>>>> Danna
-    <title>Login - Pollería</title>
+    <title>Pedido Confirmado - El Dorado</title>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
 
-<div class="login-wrapper">
-    <section class="container ${not empty param.modo and param.modo == 'registro' ? 'toggle' : ''}">
+    <jsp:include page="/components/header.jsp"/>
 
-        <!-- FORMULARIO LOGIN -->
-        <section class="container-form">
-            <div class="close">
-                <a href="${pageContext.request.contextPath}/home" style="color:inherit;display:flex;text-decoration:none;">
-                    <ion-icon name="close-outline"></ion-icon>
-                </a>
+    <div class="max-w-2xl mx-auto px-4 py-12">
+
+        <!-- ÉXITO -->
+        <div class="bg-white rounded-2xl shadow-sm p-8 text-center mb-6">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-circle-check text-5xl text-green-500"></i>
             </div>
-
-            <form class="sign-in" action="${pageContext.request.contextPath}/login" method="post">
-                <input type="hidden" name="action" value="login">
-                <input type="hidden" name="g-recaptcha-response" id="captchaLogin">
-                <h2>Iniciar sesión</h2>
-
-                
-
-                <span>Use su correo y contraseña</span>
-
-                <% if (request.getAttribute("error") != null) { %>
-                    <p style="color:red;font-size:13px;margin-bottom:8px;">${error}</p>
-                <% } %>
-                <% if (request.getAttribute("exito") != null) { %>
-                    <p style="color:green;font-size:13px;margin-bottom:8px;">${exito}</p>
-                <% } %>
-
-                <div class="container-input">
-                    <ion-icon name="mail-outline"></ion-icon>
-                    <input type="email" name="email" placeholder="Correo electrónico" required>
-                </div>
-
-                <div class="container-input">
-                    <ion-icon name="lock-open-outline"></ion-icon>
-                    <input type="password" name="password" placeholder="Contraseña" required>
-                </div>
-
-<<<<<<< HEAD
-                <a href="#">¿Olvidaste tu contraseña?</a>
-                <button type="submit" class="button" id="btnLogin">Iniciar sesión</button>
-=======
-                <a href="javascript:void(0)" id="btn-olvide-pass" class="link-olvide-pass"
-                   onclick="abrirModalRecuperar(); return false;">¿Olvidaste tu contraseña?</a>
-                <button type="submit" class="button">Iniciar sesión</button>
-                <br>
-
-                <!-- Solo para móvil -->
-                <p class="mobile-switch">
-                    ¿No tienes cuenta?
-                    <a href="?modo=registro">Regístrate</a>
-                </p>
-
-
-                <p>Síguenos en nuestras redes sociales</p>
-                <div class="social-networks">
-                    <ion-icon name="logo-facebook"></ion-icon>
-                    <ion-icon name="logo-instagram"></ion-icon>
-                    <ion-icon name="logo-whatsapp"></ion-icon>
-                    <ion-icon name="logo-tiktok"></ion-icon>
-                </div>
->>>>>>> Danna
-            </form>
-        </section>
-
-        <!-- FORMULARIO REGISTRO -->
-        <section class="container-form">
-            <form class="sign-up" action="${pageContext.request.contextPath}/login" method="post">
-                <input type="hidden" name="action" value="registro">
-                <input type="hidden" name="g-recaptcha-response" id="captchaRegistro">
-                <h2>Regístrate</h2>
-
-                <span>Use su correo electrónico para registrarse</span>
-
-                <% if (request.getAttribute("errorRegistro") != null) { %>
-                    <p style="color:red;font-size:13px;margin-bottom:8px;">${errorRegistro}</p>
-                <% } %>
-
-                <p id="errorDni" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
-                    El DNI debe tener exactamente 8 números.
-                </p>
-                <p id="errorTel" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
-                    El teléfono debe tener exactamente 9 números.
-                </p>
-                <p id="errorRobusta" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
-                    La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial (@$!%*?&._-)
-                </p>
-                <p id="errorNombre" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
-                    El nombre solo debe contener letras y espacios.
-                </p>
-                <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
-                    Las contraseñas no coinciden.
-                </p>
-
-                <div class="container-input">
-                    <ion-icon name="person-outline"></ion-icon>
-                    <input type="text" name="nombre" placeholder="Nombre completo" required>
-                </div>
-
-                <div class="container-input">
-                    <ion-icon name="card-outline"></ion-icon>
-                    <input type="text" name="dni" placeholder="DNI" maxlength="8" required>
-                </div>
-
-                <div class="container-input">
-                    <ion-icon name="call-outline"></ion-icon>
-                    <input type="text" name="telefono" placeholder="Teléfono" maxlength="9" required>
-                </div>
-
-                <div class="container-input">
-                    <ion-icon name="mail-outline"></ion-icon>
-                    <input type="email" name="email" placeholder="Correo electrónico" required>
-                </div>
-
-                <div class="container-input">
-                    <ion-icon name="lock-open-outline"></ion-icon>
-                    <input type="password" name="password" id="pass1" placeholder="Contraseña" required>
-                </div>
-
-                <div class="container-input">
-                    <ion-icon name="lock-closed-outline"></ion-icon>
-                    <input type="password" id="pass2" placeholder="Repetir contraseña" required>
-                </div>
-
-<<<<<<< HEAD
-                <button type="submit" class="button" id="btnRegistro">Registrarse</button>
-=======
-                <button type="submit" class="button">Registrarse</button>
-
-                    <!-- Solo para móvil -->
-                    <p class="mobile-switch">
-                        ¿Ya tienes cuenta?
-                        <a href="?">Inicia sesión</a>
-                    </p>
-
-
->>>>>>> Danna
-            </form>
-        </section>
-
-        <!-- PANEL BIENVENIDA -->
-        <section class="container-welcome">
-            <div class="welcome-sign-up welcome">
-                <h3>Bienvenido</h3>
-                <p>Ingrese sus datos personales para usar todas las funciones del sitio</p>
-                <button class="button" id="btn-sign-up">Registrarse</button>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">¡Pedido confirmado!</h1>
+            <p class="text-gray-500 text-sm mb-4">Tu pedido ha sido recibido y está siendo procesado.</p>
+            <div class="bg-gray-50 rounded-xl px-6 py-3 inline-block">
+                <p class="text-xs text-gray-400">Número de pedido</p>
+                <p class="text-2xl font-bold text-red-600">#${pedido.id}</p>
             </div>
-            <div class="welcome-sign-in welcome">
-                <h3>¡Hola!</h3>
-                <p>Regístrate con tus datos personales para usar todas las funciones del sitio</p>
-                <button class="button" id="btn-sign-in">Iniciar sesión</button>
-            </div>
-        </section>
-
-    </section>
-</div>
-
-<!-- Modal recuperar contraseña -->
-<div id="modal-recuperar" class="modal-overlay" style="display:none;" aria-hidden="true">
-    <div class="modal-recuperar">
-
-        <!-- Paso 1 y 2: correo + código -->
-        <div id="paso-email" class="modal-paso">
-            <div class="modal-header">
-                <button type="button" class="modal-volver" id="modal-cerrar-volver" onclick="cerrarModalRecuperar()">
-                    <i class="fas fa-chevron-left"></i> Volver
-                </button>
-                <button type="button" class="modal-cerrar" id="modal-cerrar-x" onclick="cerrarModalRecuperar()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <h2>Recuperar contraseña</h2>
-            <p class="modal-desc">Ingresa el <span class="text-highlight">correo electrónico</span> con el que te registraste para recibir un enlace.</p>
-
-            <div class="modal-input-row">
-                <input type="email" id="rec-email" placeholder="Correo electrónico">
-                <button type="button" id="btn-enviar-codigo" class="btn-modal-enviar" disabled>
-                    <i class="fas fa-envelope"></i> Enviar
-                </button>
-            </div>
-
-            <div id="exito-correo" class="modal-exito" style="display:none;"></div>
-
-            <div id="seccion-codigo" style="display:none;">
-                <p class="modal-desc" style="margin-top:18px;">Ingresa el <span class="text-highlight">código de 6 dígitos</span> que recibiste en tu correo.</p>
-                <div class="modal-input-row">
-                    <input type="text" id="rec-codigo" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric">
-                    <button type="button" id="btn-verificar-codigo" class="btn-modal-enviar" disabled>
-                        <i class="fas fa-check"></i> Verificar
-                    </button>
-                </div>
-                <p id="timer-codigo" class="modal-timer"></p>
-                <button type="button" id="btn-reenviar-codigo" class="btn-reenviar-codigo" style="display:none;">
-                    <i class="fas fa-redo"></i> Reenviar código
-                </button>
-            </div>
-
-            <p id="error-recuperar" class="modal-error" style="display:none;"></p>
         </div>
 
-        <!-- Paso 3: nueva contraseña -->
-        <div id="paso-password" class="modal-paso" style="display:none;">
-            <div class="modal-header-cambiar">
-                <h2>Cambiar contraseña</h2>
+        <!-- DETALLES DEL PEDIDO -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">
+                <i class="fa-solid fa-receipt text-red-600 mr-2"></i>Detalle del pedido
+            </h2>
+            <div class="flex flex-col gap-3 mb-4">
+                <c:forEach items="${detalles}" var="d">
+                    <div class="flex justify-between items-start py-2 border-b border-gray-50">
+                        <div>
+                            <p class="font-medium text-sm">${d.productoNombre} x${d.cantidad}</p>
+                            <c:if test="${not empty d.opciones}">
+                                <p class="text-xs text-gray-400">${d.opciones}</p>
+                            </c:if>
+                        </div>
+                        <span class="font-bold text-sm text-gray-700">
+                            S/<fmt:formatNumber value="${d.subtotal}" pattern="#,##0.00"/>
+                        </span>
+                    </div>
+                </c:forEach>
             </div>
-            <p class="modal-desc-cambiar">Ahora puedes ingresar tu nueva contraseña, recuerda que debe ser <span class="text-highlight">mayor a 8 caracteres</span> con mayúscula, minúscula, número y carácter especial.</p>
+            <div class="flex justify-between font-bold text-lg text-gray-800 pt-2">
+                <span>Total pagado</span>
+                <span class="text-red-600">S/<fmt:formatNumber value="${pedido.total}" pattern="#,##0.00"/></span>
+            </div>
+        </div>
 
-            <div class="modal-campo-pass">
-                <label for="rec-pass1">Contraseña</label>
-                <div class="pass-input-wrap">
-                    <input type="password" id="rec-pass1" placeholder="Nueva contraseña">
-                    <button type="button" class="toggle-pass" data-target="rec-pass1">
-                        <i class="fas fa-eye-slash"></i>
-                    </button>
+        <!-- INFO PAGO -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">
+                <i class="fa-solid fa-wallet text-red-600 mr-2"></i>Información del pago
+            </h2>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-gray-400">Método</p>
+                    <p class="font-semibold">${pago.metodo}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Estado</p>
+                    <span class="bg-green-100 text-green-600 text-xs font-bold px-2 py-1 rounded-full">
+                        ${pago.estado}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-gray-400">Referencia</p>
+                    <p class="font-semibold">${pago.referencia}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Estado del pedido</p>
+                    <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-1 rounded-full">
+                        ${pedido.estado}
+                    </span>
                 </div>
             </div>
+        </div>
 
-            <div class="modal-campo-pass">
-                <label for="rec-pass2">Repetir contraseña</label>
-                <div class="pass-input-wrap">
-                    <input type="password" id="rec-pass2" placeholder="Repetir contraseña">
-                    <button type="button" class="toggle-pass" data-target="rec-pass2">
-                        <i class="fas fa-eye-slash"></i>
-                    </button>
+        <!-- SEGUIMIENTO -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-6">
+                <i class="fa-solid fa-timeline text-red-600 mr-2"></i>Seguimiento del pedido
+            </h2>
+            <div class="relative flex items-center justify-between">
+                <div class="absolute top-4 left-0 right-0 h-1 bg-gray-200 z-0"></div>
+                <div class="absolute top-4 left-0 h-1 bg-red-500 z-0 transition-all"
+                     style="width:
+                     ${pedido.estado == 'Pendiente'     ? '0%'   :
+                        pedido.estado == 'En cocina'     ? '33%'  :
+                        pedido.estado == 'Por despachar' ? '66%'  :
+                        pedido.estado == 'Entregado'     ? '100%' : '0%'}">
+                </div>
+
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'Pendiente' || pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
+                          ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-clock text-sm"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center w-16">Pendiente</p>
+                </div>
+
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'En cocina' || pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
+                         ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-fire text-sm"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center w-16">En cocina</p>
+                </div>
+
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'Por despachar' || pedido.estado == 'Entregado'
+                         ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-motorcycle text-sm"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center w-16">Despachando</p>
+                </div>
+
+                <div class="flex flex-col items-center gap-2 z-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                         ${pedido.estado == 'Entregado'
+                        ? 'bg-green-500 text-white shadow-lg shadow-green-200' : 'bg-gray-200 text-gray-400'}">
+                        <i class="fa-solid fa-check text-sm"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center w-16">Entregado</p>
                 </div>
             </div>
+        </div>
 
-            <p id="error-password" class="modal-error" style="display:none;"></p>
-
-            <button type="button" id="btn-cambiar-pass" class="btn-cambiar-pass" disabled>
-                <i class="fas fa-lock"></i> Cambiar
-            </button>
+        <!-- BOTONES — sin botón de boleta -->
+        <div class="flex gap-3 flex-wrap">
+            <a href="${pageContext.request.contextPath}/home"
+               class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition text-center">
+                <i class="fa-solid fa-home mr-2"></i>Volver al inicio
+            </a>
+            <a href="${pageContext.request.contextPath}/historial"
+               class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-3 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-list"></i> Mis pedidos
+            </a>
         </div>
 
     </div>
-</div>
 
-<script>
-    /* Abre el modal aunque falle la carga de login.js */
-    function abrirModalRecuperar() {
-        var modal = document.getElementById('modal-recuperar');
-        if (!modal) return;
-        modal.style.display = 'flex';
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-    }
+    <%-- ── MODAL PEDIDO ENTREGADO (aparece automáticamente si el estado es Entregado) ── --%>
+    <c:if test="${pedido.estado == 'Entregado'}">
+    <div id="modalEntregado"
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-bounce-in">
 
-    function cerrarModalRecuperar() {
-        var modal = document.getElementById('modal-recuperar');
-        if (!modal) return;
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-    }
-</script>
-<script src="${pageContext.request.contextPath}/js/login.js?v=4"></script>
-<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-<script>
-    function validarRegistro() {
-        const nombre   = document.querySelector('input[name="nombre"]').value;
-        const dni      = document.querySelector('input[name="dni"]').value;
-        const telefono = document.querySelector('input[name="telefono"]').value;
-        const p1       = document.getElementById('pass1').value;
-        const p2       = document.getElementById('pass2').value;
+            <!-- Encabezado verde -->
+            <div class="bg-green-500 px-6 py-5 text-center">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-circle-check text-4xl text-green-500"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">¡Pedido entregado!</h2>
+                <p class="text-green-100 text-sm mt-1">Pedido <strong>#${pedido.id}</strong></p>
+            </div>
 
-        const regexNombre = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/;
-        if (!regexNombre.test(nombre)) {
-            document.getElementById('errorNombre').style.display = 'block';
-            return false;
-        }
+            <!-- Cuerpo -->
+            <div class="px-6 py-5 text-center">
+                <p class="text-gray-700 text-sm mb-2">
+                    Tu pedido ha sido entregado exitosamente. ¡Que lo disfrutes!
+                </p>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-5 flex items-start gap-3 text-left">
+                    <i class="fa-solid fa-envelope text-blue-500 mt-0.5"></i>
+                    <p class="text-xs text-blue-700">
+                        Tu boleta en PDF ha sido enviada a tu correo electrónico.
+                        También puedes descargarla directamente aquí.
+                    </p>
+                </div>
 
-        document.getElementById('errorNombre').style.display = 'none';
-        document.getElementById('errorPass').style.display = 'none';
-        document.getElementById('errorDni').style.display = 'none';
-        document.getElementById('errorTel').style.display = 'none';
-        document.getElementById('errorRobusta').style.display = 'none';
+                <!-- Botones del modal -->
+                <div class="flex flex-col gap-2">
+                    <a href="${pageContext.request.contextPath}/boleta?pedidoId=${pedido.id}"
+                       class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-file-pdf"></i> Descargar boleta PDF
+                    </a>
+                    <a href="${pageContext.request.contextPath}/historial"
+                       class="w-full border border-gray-200 hover:bg-gray-50 text-gray-600 font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-list"></i> Ver mis pedidos
+                    </a>
+                    <button onclick="document.getElementById('modalEntregado').classList.add('hidden')"
+                            class="w-full text-gray-400 hover:text-gray-600 text-xs py-1 transition">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </c:if>
 
-        if (!/^\d{8}$/.test(dni)) {
-            document.getElementById('errorDni').style.display = 'block';
-            return false;
-        }
+    <jsp:include page="/components/footer.jsp"/>
 
-        if (!/^\d{9}$/.test(telefono)) {
-            document.getElementById('errorTel').style.display = 'block';
-            return false;
-        }
-
-        const passRobusta = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/;
-        if (!passRobusta.test(p1)) {
-            document.getElementById('errorRobusta').style.display = 'block';
-            return false;
-        }
-
-        if (p1 !== p2) {
-            document.getElementById('errorPass').style.display = 'block';
-            return false;
-        }
-
-        return true;
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-<<<<<<< HEAD
-
-        // Solo letras en nombre
-        document.querySelector('input[name="nombre"]').addEventListener('input', function() {
-            this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '');
-        });
-=======
-        const nombreInput = document.querySelector('.sign-up input[name="nombre"]');
-        const dniInput = document.querySelector('.sign-up input[name="dni"]');
-        const telInput = document.querySelector('.sign-up input[name="telefono"]');
->>>>>>> Danna
-
-        if (nombreInput) {
-            nombreInput.addEventListener('input', function() {
-                this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '');
-            });
-        }
-
-<<<<<<< HEAD
-        // Solo números en teléfono
-        document.querySelector('input[name="telefono"]').addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);
-        });
-
-        
-        // Captcha en LOGIN
-        document.getElementById('btnLogin').addEventListener('click', function(e) {
-            e.preventDefault();
-            grecaptcha.execute('6LcthQQtAAAAABq3-5JjXFFMfPJhGlbYcYVP139S', {action: 'login'}).then(function(token) {
-                document.getElementById('captchaLogin').value = token;
-                document.querySelector('form.sign-in').submit();
-            });
-        });
-
-        // Captcha en REGISTRO
-        document.getElementById('btnRegistro').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (!validarRegistro()) return;
-            grecaptcha.execute('6LcthQQtAAAAABq3-5JjXFFMfPJhGlbYcYVP139S', {action: 'registro'}).then(function(token) {
-                document.getElementById('captchaRegistro').value = token;
-                document.querySelector('form.sign-up').submit();
-            });
-        });
-        
-        
-        /*
-
-        // Captcha en LOGIN
-        document.getElementById('btnLogin').addEventListener('click', function(e) {
-            e.preventDefault();
-            grecaptcha.ready(function() {
-                grecaptcha.execute('6LcthQQtAAAAABq3-5JjXFFMfPJhGlbYcYVP139S', {action: 'login'}).then(function(token) {
-                    document.getElementById('captchaLogin').value = token;
-                    document.querySelector('form.sign-in').submit();
-                });
-            });
-        });
-
-        // Captcha en REGISTRO
-        document.getElementById('btnRegistro').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (!validarRegistro()) return;
-            grecaptcha.ready(function() {
-                grecaptcha.execute('6LcthQQtAAAAABq3-5JjXFFMfPJhGlbYcYVP139S', {action: 'registro'}).then(function(token) {
-                    document.getElementById('captchaRegistro').value = token;
-                    document.querySelector('form.sign-up').submit();
-                });
-            });
-        }); */
-
-=======
-        if (dniInput) {
-            dniInput.addEventListener('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
-            });
-        }
-
-        if (telInput) {
-            telInput.addEventListener('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);
-            });
-        }
->>>>>>> Danna
-    });
-</script>
-
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

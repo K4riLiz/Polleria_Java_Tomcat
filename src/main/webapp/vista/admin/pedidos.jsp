@@ -20,13 +20,16 @@
 <div class="flex min-h-screen">
 
     <!-- SIDEBAR -->
-    <!-- SIDEBAR -->
     <aside class="w-64 bg-gray-900 text-white flex flex-col">
         <div class="p-6 border-b border-gray-700">
             <h1 class="text-xl font-bold text-red-400">Hola, admin</h1>
             <p class="text-xs text-gray-400 mt-1">${sessionScope.usuario.nombre}</p>
         </div>
         <nav class="flex flex-col p-4 gap-2 flex-1">
+            <a href="${pageContext.request.contextPath}/admin/dashboard"
+               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
             <a href="${pageContext.request.contextPath}/admin/usuarios"
                class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition">
                 <i class="fa-solid fa-users"></i> Usuarios
@@ -108,7 +111,37 @@
                 Por despachar
             </button>
         </div>
+        
+        <%-- Reemplaza el div exportSection actual por este --%>
+        <div id="exportSection" class="hidden flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Ventas</h2>
 
+            <div class="flex items-center gap-3">
+                <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                    <input type="checkbox" id="chkCancelados" class="w-4 h-4 rounded accent-red-600">
+                    Incluir cancelados
+                </label>
+
+                <button onclick="exportar('excel')"
+                        class="flex items-center gap-2 bg-green-600 hover:bg-green-700
+                        text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3 10h18M3 14h18M10 3v18M3 6a3 3 0 013-3h12a3 3 0 013
+                          3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6z"/>
+                    </svg>
+                    Exportar Excel
+                </button>
+
+                <button onclick="exportar('pdf')"
+                        class="flex items-center gap-2 bg-red-600 hover:bg-red-700
+                        text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    Exportar PDF
+                </button>
+            </div>
+        </div>
         <!-- TABLA -->
         <div class="bg-white rounded-2xl shadow overflow-hidden">
             <table class="w-full text-sm">
@@ -310,32 +343,41 @@
 
 <script>
     // Tab principal
-    function cambiarTab(grupo, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
-        btn.classList.add('activo');
+function cambiarTab(grupo, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
 
-        // Mostrar/ocultar subtabs
-        document.getElementById('subtabs').style.display = grupo === 'proceso' ? 'flex' : 'none';
+    // Subtabs: solo en proceso
+    document.getElementById('subtabs').style.display =
+        grupo === 'proceso' ? 'flex' : 'none';
 
-        // Filtrar filas
-        let visible = 0;
-        document.querySelectorAll('.pedido-row').forEach(row => {
-            if (row.dataset.grupo === grupo) {
-                row.style.display = '';
-                visible++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        document.getElementById('msgVacio').classList.toggle('hidden', visible > 0);
-
-        // Resetear subtabs
-        if (grupo === 'proceso') {
-            document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('activo'));
-            document.querySelector('.subtab-btn').classList.add('activo');
-        }
+    // Exportación + título "Ventas": solo en entregados
+    const exportSection = document.getElementById('exportSection');
+    if (grupo === 'entregado') {
+        exportSection.classList.remove('hidden');
+        exportSection.classList.add('flex');
+    } else {
+        exportSection.classList.add('hidden');
+        exportSection.classList.remove('flex');
     }
+
+    let visible = 0;
+    document.querySelectorAll('.pedido-row').forEach(row => {
+        if (row.dataset.grupo === grupo) {
+            row.style.display = '';
+            visible++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    document.getElementById('msgVacio').classList.toggle('hidden', visible > 0);
+
+    if (grupo === 'proceso') {
+        document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('activo'));
+        document.querySelector('.subtab-btn').classList.add('activo');
+    }
+}
 
     // Subtab de estados dentro de "proceso"
     function filtrarEstado(estado, btn) {
@@ -355,6 +397,22 @@
 
         document.getElementById('msgVacio').classList.toggle('hidden', visible > 0);
     }
+    
+      function exportar(formato) {
+        var incluirCancelados = document.getElementById('chkCancelados').checked;
+        var url = '${pageContext.request.contextPath}/admin/exportarPedidos'
+                + '?formato=' + formato
+                + '&incluirCancelados=' + incluirCancelados;
+
+        if (formato === 'excel') {
+            // Descarga directa en la misma pestaña
+            window.location.href = url;
+        } else {
+            // PDF abre en pestaña nueva (para el diálogo de impresión)
+            window.open(url, '_blank');
+        }
+    }
+
 
     // Modal
     function abrirModal(id) {

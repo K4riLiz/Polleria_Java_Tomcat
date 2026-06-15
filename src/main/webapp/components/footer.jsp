@@ -6,7 +6,7 @@
 
         <!-- Columna 1 -->
         <div class="flex flex-col gap-3">
-            <img src="${pageContext.request.contextPath}/img/logofooter.png" class="w-40">
+            <img src="${pageContext.request.contextPath}/img/logofooter.webp" class="w-40">
             <p>Av. La Marina 4534 San Miguel, Lima Perú</p>
             <p>Teléfono: +51-926884174</p>
             <p>Correo: info@ideasdigitales.com</p>

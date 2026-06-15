@@ -64,6 +64,33 @@
                             <i class="fa-solid fa-location-dot text-red-600 mr-2"></i>Dirección de entrega
                         </h2>
 
+                        <%-- Opción de usar ubicación guardada --%>
+                        <c:if test="${not empty sessionScope.usuario}">
+                            <%
+                                com.polleria.dao.ClienteDAO cDao = new com.polleria.dao.ClienteDAO();
+                                com.polleria.model.Usuario uSes = (com.polleria.model.Usuario) session.getAttribute("usuario");
+                                com.polleria.model.Cliente cSes = null;
+                                try {
+                                    cSes = cDao.obtenerPorUsuarioId(uSes.getId());
+                                } catch (Exception ignored) {
+                                }
+                                request.setAttribute("clientePerfil", cSes);
+                            %>
+                            <c:if test="${not empty clientePerfil.direccion}">
+                                <div class="bg-red-50 border border-red-100 rounded-xl p-4 mb-3 flex items-start gap-3">
+                                    <i class="fa-solid fa-location-dot text-red-500 mt-0.5"></i>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-gray-700 mb-0.5">¿Usar tu dirección guardada?</p>
+                                        <p class="text-xs text-gray-500 mb-2">${clientePerfil.direccion}</p>
+                                        <button type="button" onclick="usarDireccionGuardada()"
+                                                class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-semibold transition">
+                                            <i class="fa-solid fa-check mr-1"></i> Usar esta dirección
+                                        </button>
+                                    </div>
+                                </div>
+                            </c:if>
+                        </c:if>
+                        
                         <!-- Buscador -->
                         <div class="relative mb-3">
                             <input type="text" id="mapaBuscador"
@@ -251,132 +278,160 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+    // ── Variables globales del mapa ──────────────────────────
+    var mapa, marker;
 
-            // ── MAPA ──────────────────────────────────────────
-            const mapa = L.map('mapaLeaflet').setView([-12.0464, -77.0428], 13);
+    var latPerfil = '${clientePerfil.latitud}';
+    var lngPerfil = '${clientePerfil.longitud}';
+    var dirPerfil = '${clientePerfil.direccion}';
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(mapa);
+    document.addEventListener('DOMContentLoaded', function () {
 
-            const marker = L.marker([-12.0464, -77.0428], { draggable: true }).addTo(mapa);
+        // ── MAPA ──────────────────────────────────────────────
+        mapa = L.map('mapaLeaflet').setView([-12.0464, -77.0428], 13);
 
-            marker.on('dragend', function () {
-                const pos = marker.getLatLng();
-                geocodificarInverso(pos.lat, pos.lng);
-            });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(mapa);
 
-            mapa.on('click', function (e) {
-                marker.setLatLng(e.latlng);
-                geocodificarInverso(e.latlng.lat, e.latlng.lng);
-            });
+        marker = L.marker([-12.0464, -77.0428], { draggable: true }).addTo(mapa);
 
-            let timeoutBusqueda;
-            document.getElementById('mapaBuscador').addEventListener('input', function () {
-                clearTimeout(timeoutBusqueda);
-                const texto = this.value.trim();
-                if (texto.length < 3) {
-                    document.getElementById('mapaSugerencias').classList.add('hidden');
-                    return;
-                }
-                timeoutBusqueda = setTimeout(function() { buscarDireccion(texto); }, 400);
-            });
-
-            document.addEventListener('click', function (e) {
-                if (!e.target.closest('#mapaBuscador') && !e.target.closest('#mapaSugerencias')) {
-                    document.getElementById('mapaSugerencias').classList.add('hidden');
-                }
-            });
-
-            function buscarDireccion(texto) {
-                var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(texto) + '&countrycodes=pe&limit=5';
-                fetch(url, { headers: { 'Accept-Language': 'es' } })
-                    .then(function(r) { return r.json(); })
-                    .then(function(resultados) {
-                        var lista = document.getElementById('mapaSugerencias');
-                        lista.innerHTML = '';
-                        if (resultados.length === 0) {
-                            lista.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">Sin resultados</div>';
-                            lista.classList.remove('hidden');
-                            return;
-                        }
-                        resultados.forEach(function(r) {
-                            var div = document.createElement('div');
-                            div.className = 'px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 cursor-pointer border-b border-gray-50 last:border-0';
-                            div.innerHTML = '<i class="fa-solid fa-location-dot mr-2 text-red-400 text-xs"></i>' + r.display_name;
-                            div.addEventListener('click', function() {
-                                var la = parseFloat(r.lat);
-                                var ln = parseFloat(r.lon);
-                                mapa.setView([la, ln], 17);
-                                marker.setLatLng([la, ln]);
-                                guardarUbicacion(la, ln, r.display_name);
-                                document.getElementById('mapaBuscador').value = r.display_name;
-                                lista.classList.add('hidden');
-                            });
-                            lista.appendChild(div);
-                        });
-                        lista.classList.remove('hidden');
-                    })
-                    .catch(function() {});
-            }
-
-            function geocodificarInverso(la, ln) {
-                var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + la + '&lon=' + ln + '&accept-language=es';
-                fetch(url)
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
-                        var dir = data.display_name || (la.toFixed(6) + ', ' + ln.toFixed(6));
-                        guardarUbicacion(la, ln, dir);
-                        document.getElementById('mapaBuscador').value = dir;
-                    })
-                    .catch(function() {
-                        guardarUbicacion(la, ln, la.toFixed(6) + ', ' + ln.toFixed(6));
-                    });
-            }
-
-            function guardarUbicacion(la, ln, dir) {
-                document.getElementById('mapaLat').value = la;
-                document.getElementById('mapaLng').value = ln;
-                document.getElementById('mapaDir').value = dir;
-                document.getElementById('mapaDirSpan').textContent = dir;
-                document.getElementById('mapaDirTexto').classList.remove('hidden');
-            }
-
+        marker.on('dragend', function () {
+            var pos = marker.getLatLng();
+            geocodificarInverso(pos.lat, pos.lng);
         });
 
-        function validarFormulario() {
-            var dir = document.getElementById('mapaDir').value;
-            if (!dir) {
-                alert('Por favor selecciona tu dirección de entrega en el mapa.');
-                return false;
-            }
-            var metodo = document.querySelector('input[name="metodo"]:checked');
-            if (!metodo) {
-                alert('Por favor selecciona un método de pago.');
-                return false;
-            }
-            return true;
-        }
+        mapa.on('click', function (e) {
+            marker.setLatLng(e.latlng);
+            geocodificarInverso(e.latlng.lat, e.latlng.lng);
+        });
 
-        function mostrarSeccion(metodo) {
-            document.getElementById('seccion-tarjeta').style.display = 'none';
-            document.getElementById('seccion-yape').style.display = 'none';
-            document.getElementById('seccion-plin').style.display = 'none';
-            document.getElementById('seccion-' + metodo).style.display = 'flex';
-            document.getElementById('seccion-' + metodo).style.flexDirection = 'column';
-        }
-
-        function formatarTarjeta(input) {
-            var val = input.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-            var matches = val.match(/\d{4,16}/g);
-            var match = matches && matches[0] || '';
-            var parts = [];
-            for (var i = 0, len = match.length; i < len; i += 4) {
-                parts.push(match.substring(i, i + 4));
+        var timeoutBusqueda;
+        document.getElementById('mapaBuscador').addEventListener('input', function () {
+            clearTimeout(timeoutBusqueda);
+            var texto = this.value.trim();
+            if (texto.length < 3) {
+                document.getElementById('mapaSugerencias').classList.add('hidden');
+                return;
             }
-            input.value = parts.length ? parts.join(' ') : val;
+            timeoutBusqueda = setTimeout(function () { buscarDireccion(texto); }, 400);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#mapaBuscador') && !e.target.closest('#mapaSugerencias')) {
+                document.getElementById('mapaSugerencias').classList.add('hidden');
+            }
+        });
+
+        // Si hay dirección de perfil, pre-cargar el mapa al inicio
+        if (latPerfil && lngPerfil) {
+            var la = parseFloat(latPerfil);
+            var ln = parseFloat(lngPerfil);
+            mapa.setView([la, ln], 16);
+            marker.setLatLng([la, ln]);
         }
+    });
+
+    // ── Funciones globales (accesibles desde onclick) ─────────
+
+    function buscarDireccion(texto) {
+        var url = 'https://nominatim.openstreetmap.org/search?format=json&q='
+                + encodeURIComponent(texto) + '&countrycodes=pe&limit=5';
+        fetch(url, { headers: { 'Accept-Language': 'es' } })
+            .then(function (r) { return r.json(); })
+            .then(function (resultados) {
+                var lista = document.getElementById('mapaSugerencias');
+                lista.innerHTML = '';
+                if (resultados.length === 0) {
+                    lista.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">Sin resultados</div>';
+                    lista.classList.remove('hidden');
+                    return;
+                }
+                resultados.forEach(function (r) {
+                    var div = document.createElement('div');
+                    div.className = 'px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 cursor-pointer border-b border-gray-50 last:border-0';
+                    div.innerHTML = '<i class="fa-solid fa-location-dot mr-2 text-red-400 text-xs"></i>' + r.display_name;
+                    div.addEventListener('click', function () {
+                        var la = parseFloat(r.lat);
+                        var ln = parseFloat(r.lon);
+                        mapa.setView([la, ln], 17);
+                        marker.setLatLng([la, ln]);
+                        guardarUbicacion(la, ln, r.display_name);
+                        document.getElementById('mapaBuscador').value = r.display_name;
+                        lista.classList.add('hidden');
+                    });
+                    lista.appendChild(div);
+                });
+                lista.classList.remove('hidden');
+            })
+            .catch(function () {});
+    }
+
+    function geocodificarInverso(la, ln) {
+        var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat='
+                + la + '&lon=' + ln + '&accept-language=es';
+        fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var dir = data.display_name || (la.toFixed(6) + ', ' + ln.toFixed(6));
+                guardarUbicacion(la, ln, dir);
+                document.getElementById('mapaBuscador').value = dir;
+            })
+            .catch(function () {
+                guardarUbicacion(la, ln, la.toFixed(6) + ', ' + ln.toFixed(6));
+            });
+    }
+
+    function guardarUbicacion(la, ln, dir) {
+        document.getElementById('mapaLat').value = la;
+        document.getElementById('mapaLng').value = ln;
+        document.getElementById('mapaDir').value = dir;
+        document.getElementById('mapaDirSpan').textContent = dir;
+        document.getElementById('mapaDirTexto').classList.remove('hidden');
+    }
+
+    function usarDireccionGuardada() {
+        if (!latPerfil || !lngPerfil) return;
+        var la = parseFloat(latPerfil);
+        var ln = parseFloat(lngPerfil);
+        mapa.setView([la, ln], 17);
+        marker.setLatLng([la, ln]);
+        guardarUbicacion(la, ln, dirPerfil);
+        document.getElementById('mapaBuscador').value = dirPerfil;
+    }
+
+    function validarFormulario() {
+        var dir = document.getElementById('mapaDir').value;
+        if (!dir) {
+            alert('Por favor selecciona tu dirección de entrega en el mapa.');
+            return false;
+        }
+        var metodo = document.querySelector('input[name="metodo"]:checked');
+        if (!metodo) {
+            alert('Por favor selecciona un método de pago.');
+            return false;
+        }
+        return true;
+    }
+
+    function mostrarSeccion(metodo) {
+        document.getElementById('seccion-tarjeta').style.display = 'none';
+        document.getElementById('seccion-yape').style.display = 'none';
+        document.getElementById('seccion-plin').style.display = 'none';
+        document.getElementById('seccion-' + metodo).style.display = 'flex';
+        document.getElementById('seccion-' + metodo).style.flexDirection = 'column';
+    }
+
+    function formatarTarjeta(input) {
+        var val = input.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+        var match = (val.match(/\d{4,16}/g) || [''])[0];
+        var parts = [];
+        for (var i = 0; i < match.length; i += 4) {
+            parts.push(match.substring(i, i + 4));
+        }
+        input.value = parts.length ? parts.join(' ') : val;
+    }
     </script>
+    
 </body>
 </html>

@@ -55,6 +55,16 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
+    
+    <!-- Servlet: Perfil Cliente -->
+    <servlet>
+        <servlet-name>PerfilServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.PerfilServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PerfilServlet</servlet-name>
+        <url-pattern>/perfil</url-pattern>
+    </servlet-mapping>
 
     <!-- Servlet: Verificación de código -->
     <servlet>
@@ -93,6 +103,16 @@
     <servlet-mapping>
         <servlet-name>ProductoServlet</servlet-name>
         <url-pattern>/producto</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet: Admin Dahboard -->
+    <servlet>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.admin.AdminDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <url-pattern>/admin/dashboard</url-pattern>
     </servlet-mapping>
 
     <!-- Servlet: Admin Usuarios -->
@@ -185,6 +205,16 @@
         <url-pattern>/checkout</url-pattern>
     </servlet-mapping>
 
+<!-- Servlet: Estado de Pedido -->
+    <servlet>
+        <servlet-name>EstadoPedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.EstadoPedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EstadoPedidoServlet</servlet-name>
+        <url-pattern>/api/estadoPedido</url-pattern>
+    </servlet-mapping>
+
     <!-- Servlet: Confirmacion -->
     <servlet>
         <servlet-name>ConfirmacionServlet</servlet-name>
@@ -275,5 +305,15 @@
         <error-code>404</error-code>
         <location>/vista/error.jsp</location>
     </error-page>
+    
+    <!-- Botón de exportar pedidos a PDF o Excel -->
+    <servlet>
+        <servlet-name>ExportarPedidoServlet</servlet-name>
+        <servlet-class>com.polleria.servlet.ExportarPedidoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ExportarPedidoServlet</servlet-name>
+        <url-pattern>/admin/exportarPedidos</url-pattern>
+    </servlet-mapping>
 
 </web-app>

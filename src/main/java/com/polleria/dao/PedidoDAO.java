@@ -1,7 +1,6 @@
 package com.polleria.dao;
 
 import com.polleria.model.DetallePedido;
-import com.polleria.model.DetallePedidoOpcion;
 import com.polleria.model.ItemCarrito;
 import com.polleria.model.Pedido;
 import com.polleria.model.Producto;
@@ -9,7 +8,9 @@ import com.polleria.util.DBConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PedidoDAO {
 
@@ -252,6 +253,66 @@ public class PedidoDAO {
                 }
             }
         }
+        return lista;
+    }
+
+    public List<Map<String, Object>> getPedidosPorEstadoReporte(String estado) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+
+        // ── Columnas ajustadas a tu esquema real ──────────────────────────
+        String sql = """
+        SELECT
+            p.id                                                    AS id,
+            p.usuario_id                                            AS idCliente,
+            COALESCE(u.nombre, 'Sin nombre')                        AS cliente,
+            GROUP_CONCAT(
+                CONCAT(dp.cantidad, 'x ', dp.producto_nombre)
+                ORDER BY dp.id
+                SEPARATOR ', '
+            )                                                       AS pedido,
+            GROUP_CONCAT(
+                COALESCE(
+                    (SELECT GROUP_CONCAT(dpo.nombre_opcion SEPARATOR ', ')
+                     FROM detalle_pedido_opciones dpo
+                     WHERE dpo.detalle_pedido_id = dp.id),
+                    ''
+                )
+                ORDER BY dp.id
+                SEPARATOR ' | '
+            )                                                       AS opciones,
+            p.total                                                 AS total,
+            DATE_FORMAT(p.fecha, '%d/%m/%Y %H:%i')                  AS fecha,
+            p.estado                                                AS estado
+        FROM pedidos p
+        LEFT JOIN usuarios       u  ON u.id       = p.usuario_id
+        LEFT JOIN detalle_pedido dp ON dp.pedido_id = p.id
+        WHERE p.estado = ?
+        GROUP BY p.id, p.usuario_id, u.nombre, p.total, p.fecha, p.estado
+        ORDER BY p.fecha DESC
+        """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, estado);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("id", rs.getString("id"));
+                row.put("idCliente", rs.getString("idCliente"));
+                row.put("cliente", rs.getString("cliente"));
+                row.put("pedido", rs.getString("pedido"));
+                row.put("opciones", rs.getString("opciones"));
+                row.put("total", rs.getString("total"));
+                row.put("fecha", rs.getString("fecha"));
+                row.put("estado", rs.getString("estado"));
+                lista.add(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return lista;
     }
 }

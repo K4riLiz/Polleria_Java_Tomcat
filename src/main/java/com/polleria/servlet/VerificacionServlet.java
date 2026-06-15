@@ -76,6 +76,8 @@ public class VerificacionServlet extends HttpServlet {
                 try {
                     UsuarioDAO dao = new UsuarioDAO();
                     if (dao.registrar(u)) {
+                        String apellido = (String) session.getAttribute("apellidoPendiente");
+
                         // Limpiar sesión después de registrar
                         session.removeAttribute("codigoVerificacion");
                         session.removeAttribute("codigoExpiracion");
