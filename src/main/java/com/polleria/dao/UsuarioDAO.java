@@ -18,12 +18,13 @@ public class UsuarioDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
-            try(ResultSet rs = ps.executeQuery()){
-            if (rs.next()) {
-                if (BCrypt.checkpw(password, rs.getString("password"))) {
-                    return mapear(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    if (BCrypt.checkpw(password, rs.getString("password"))) {
+                        return mapear(rs);
+                    }
                 }
-            }}
+            }
         }
         return null;
     }
@@ -77,6 +78,19 @@ public class UsuarioDAO {
         return null;
     }
 
+    // ── OBTENER POR EMAIL ──────────────────────────────────
+    public Usuario obtenerPorEmail(String email) throws SQLException {
+        String sql = "SELECT u.*, r.nombre as rol_nombre FROM usuarios u " +
+                     "JOIN roles r ON u.rol_id = r.id WHERE u.email = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapear(rs);
+        }
+        return null;
+    }
+
     // ── ACTUALIZAR ─────────────────────────────────────────
     public boolean actualizar(Usuario u) throws SQLException {
         String sql = "UPDATE usuarios SET nombre=?, email=?, telefono=?, rol_id=?, activo=? WHERE id=?";
@@ -88,6 +102,28 @@ public class UsuarioDAO {
             ps.setInt(4, u.getRolId());
             ps.setBoolean(5, u.isActivo());
             ps.setInt(6, u.getId());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // ── ACTUALIZAR PASSWORD (recuperación) ─────────────────
+    public boolean actualizarPassword(String email, String hashPassword) throws SQLException {
+        String sql = "UPDATE usuarios SET password = ? WHERE email = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, hashPassword);
+            ps.setString(2, email);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // ── ACTUALIZAR NOMBRE (perfil) ─────────────────────────
+    public boolean actualizarNombre(int id, String nombre) throws SQLException {
+        String sql = "UPDATE usuarios SET nombre = ? WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setInt(2, id);
             return ps.executeUpdate() > 0;
         }
     }
@@ -113,36 +149,5 @@ public class UsuarioDAO {
         u.setRolNombre(rs.getString("rol_nombre"));
         u.setActivo(rs.getBoolean("activo"));
         return u;
-    }
-<<<<<<< HEAD
-
-    public Usuario obtenerPorEmail(String email) throws SQLException {
-    String sql = "SELECT u.*, r.nombre as rol_nombre FROM usuarios u " +
-                 "JOIN roles r ON u.rol_id = r.id WHERE u.email = ?";
-    try (Connection con = DBConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setString(1, email);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) return mapear(rs);
-    }
-    return null;
-    }
-
-    public boolean actualizarPassword(String email, String hashPassword) throws SQLException {
-        String sql = "UPDATE usuarios SET password = ? WHERE email = ?";
-        try (Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, hashPassword);
-            ps.setString(2, email);
-=======
-    
-    public boolean actualizarNombre(int id, String nombre) throws SQLException {
-        String sql = "UPDATE usuarios SET nombre = ? WHERE id = ?";
-        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, nombre);
-            ps.setInt(2, id);
->>>>>>> karina2
-            return ps.executeUpdate() > 0;
-        }
     }
 }

@@ -22,6 +22,7 @@ public class RecuperarPasswordServlet extends HttpServlet {
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._\\-])[A-Za-z\\d@$!%*?&._\\-]{8,}$"
     );
 
+    // Mapa en memoria: email → [codigo, expiracionMs]
     private static final Map<String, String[]> codigos = new HashMap<>();
 
     @Override
@@ -45,6 +46,7 @@ public class RecuperarPasswordServlet extends HttpServlet {
         }
     }
 
+    // ── PASO 1: enviar código al correo ───────────────────────────────────────
     private void enviarCodigo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String email = req.getParameter("email");
         if (email == null || email.trim().isEmpty()) {
@@ -60,10 +62,11 @@ public class RecuperarPasswordServlet extends HttpServlet {
                 return;
             }
 
-            String codigo = String.valueOf(100000 + new Random().nextInt(900000));
-            long expiracion = System.currentTimeMillis() + EXPIRACION_MS;
+            String codigo    = String.valueOf(100000 + new Random().nextInt(900000));
+            long expiracion  = System.currentTimeMillis() + EXPIRACION_MS;
             codigos.put(email, new String[]{codigo, String.valueOf(expiracion)});
 
+            // Brevo no lanza excepción chequeada, maneja errores internamente
             com.polleria.util.EmailService.enviarCodigoRecuperacion(email, codigo, expiracion);
 
             req.getSession().setAttribute("emailRecuperacion", email);
@@ -71,11 +74,10 @@ public class RecuperarPasswordServlet extends HttpServlet {
 
         } catch (SQLException e) {
             responderJson(resp, false, "Error del servidor: " + e.getMessage(), null);
-        } catch (javax.mail.MessagingException e) {
-            responderJson(resp, false, "No se pudo enviar el correo. Intenta más tarde.", null);
         }
     }
 
+    // ── PASO 2: verificar código ingresado ────────────────────────────────────
     private void verificarCodigo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String codigoIngresado = req.getParameter("codigo");
         String email = (String) req.getSession().getAttribute("emailRecuperacion");
@@ -91,8 +93,8 @@ public class RecuperarPasswordServlet extends HttpServlet {
             return;
         }
 
-        String[] data = codigos.get(email);
-        long expiracion = Long.parseLong(data[1]);
+        String[] data      = codigos.get(email);
+        long expiracion    = Long.parseLong(data[1]);
 
         if (System.currentTimeMillis() > expiracion) {
             codigos.remove(email);
@@ -109,8 +111,9 @@ public class RecuperarPasswordServlet extends HttpServlet {
         responderJson(resp, true, "Código verificado correctamente.", null);
     }
 
+    // ── PASO 3: cambiar contraseña ────────────────────────────────────────────
     private void cambiarPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String email = (String) req.getSession().getAttribute("emailRecuperacion");
+        String email       = (String)  req.getSession().getAttribute("emailRecuperacion");
         Boolean verificado = (Boolean) req.getSession().getAttribute("codigoVerificado");
         String nuevaPass   = req.getParameter("nuevaPassword");
         String repetirPass = req.getParameter("repetirPassword");
@@ -142,6 +145,7 @@ public class RecuperarPasswordServlet extends HttpServlet {
             String hash = BCrypt.hashpw(nuevaPass, BCrypt.gensalt());
             dao.actualizarPassword(email, hash);
 
+            // Limpiar sesión y código usado
             req.getSession().removeAttribute("emailRecuperacion");
             req.getSession().removeAttribute("codigoVerificado");
             codigos.remove(email);
@@ -153,10 +157,11 @@ public class RecuperarPasswordServlet extends HttpServlet {
         }
     }
 
+    // ── Utilidad: respuesta JSON ──────────────────────────────────────────────
     private void responderJson(HttpServletResponse resp, boolean ok, String mensaje, String email)
             throws IOException {
         PrintWriter out = resp.getWriter();
-        String emailJson = email != null ? "\"" + email.replace("\"", "\\\"") + "\"" : "null";
+        String emailJson   = email != null ? "\"" + email.replace("\"", "\\\"") + "\"" : "null";
         String mensajeJson = mensaje.replace("\\", "\\\\").replace("\"", "\\\"");
         out.print("{\"ok\":" + ok + ",\"mensaje\":\"" + mensajeJson + "\",\"email\":" + emailJson + "}");
         out.flush();

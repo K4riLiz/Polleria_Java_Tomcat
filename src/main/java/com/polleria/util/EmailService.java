@@ -9,7 +9,7 @@ import java.util.List;
 
 public class EmailService {
 
-    private static final String API_KEY  = "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";
+    private static final String API_KEY         = "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";
     private static final String REMITENTE_EMAIL = "992485707kari@gmail.com";
     private static final String REMITENTE_NOMBRE = "Pollería El Dorado";
     private static final HttpClient client = HttpClient.newHttpClient();
@@ -57,7 +57,7 @@ public class EmailService {
         }
     }
 
-    // ── Código de verificación ────────────────────────────────────────────────
+    // ── Código de verificación (registro) ─────────────────────────────────────
     public static void enviarCodigo(String destinatario, String codigo) throws Exception {
         String html = "<div style='font-family:Arial,sans-serif;max-width:480px;margin:0 auto;'>"
             + "<div style='background:#c0392b;padding:28px 32px;text-align:center;border-radius:8px 8px 0 0;'>"
@@ -83,6 +83,44 @@ public class EmailService {
             + "</div></div>";
 
         enviar(destinatario, "Código de verificación - Pollería El Dorado", html, null, null);
+    }
+
+    // ── Código de recuperación de contraseña ──────────────────────────────────
+    public static void enviarCodigoRecuperacion(String destinatario, String codigo,
+                                                 long expiracionMs) {
+        long minutosRestantes  = (expiracionMs - System.currentTimeMillis()) / 60000;
+        long segundosRestantes = ((expiracionMs - System.currentTimeMillis()) % 60000) / 1000;
+
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss");
+        String horaExpiracion = sdf.format(new java.util.Date(expiracionMs));
+
+        String html = "<div style='font-family:Arial,sans-serif;max-width:480px;margin:0 auto;'>"
+            + "<div style='background:#c0392b;padding:28px 32px;text-align:center;border-radius:8px 8px 0 0;'>"
+            + "<span style='color:white;font-size:24px;font-weight:bold;'>Pollería El Dorado</span>"
+            + "</div>"
+            + "<div style='background:white;padding:32px;border:1px solid #eee;'>"
+            + "<h2 style='color:#1a1a1a;font-size:18px;'>Recuperar contraseña</h2>"
+            + "<p style='color:#666;font-size:14px;line-height:1.6;'>Ingresa el siguiente código "
+            + "en la ventana de recuperación de contraseña:</p>"
+            + "<div style='background:#fdecea;border:2px dashed #c0392b;border-radius:10px;"
+            + "padding:20px;text-align:center;margin:24px 0;'>"
+            + "<p style='color:#a93226;font-size:12px;margin:0 0 8px;'>TU CÓDIGO DE RECUPERACIÓN</p>"
+            + "<span style='font-size:36px;font-weight:bold;color:#c0392b;letter-spacing:10px;'>"
+            + codigo + "</span>"
+            + "<p style='color:#a93226;font-size:14px;margin:14px 0 6px;font-weight:bold;'>"
+            + "Tiempo restante: " + minutosRestantes + " min " + segundosRestantes + " seg</p>"
+            + "<p style='color:#999;font-size:12px;margin:0;'>Válido hasta las "
+            + horaExpiracion + " (5 minutos)</p>"
+            + "</div>"
+            + "<p style='color:#888;font-size:13px;'>Si no solicitaste esto, ignora este correo.</p>"
+            + "<p style='color:#888;font-size:13px;'>Por seguridad, nunca compartas este código con nadie.</p>"
+            + "</div>"
+            + "<div style='background:#f9f9f9;border:1px solid #eee;border-top:none;padding:16px;"
+            + "text-align:center;border-radius:0 0 8px 8px;'>"
+            + "<p style='color:#aaa;font-size:12px;margin:0;'>© 2026 Pollería El Dorado · Lima, Perú</p>"
+            + "</div></div>";
+
+        enviar(destinatario, "Código de recuperación - Pollería El Dorado", html, null, null);
     }
 
     // ── Boleta con PDF adjunto ────────────────────────────────────────────────
@@ -127,53 +165,4 @@ public class EmailService {
                 .replace("\r", "\\r")
                 .replace("\t", "\\t");
     }
-<<<<<<< HEAD
-
-    public static void enviarCodigoRecuperacion(String destinatario, String codigo, long expiracionMs)
-            throws MessagingException {
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-
-            Session session = Session.getInstance(props, new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(REMITENTE, CLAVE);
-                }
-            });
-
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss");
-            String horaExpiracion = sdf.format(new java.util.Date(expiracionMs));
-            long minutosRestantes = (expiracionMs - System.currentTimeMillis()) / 60000;
-            long segundosRestantes = ((expiracionMs - System.currentTimeMillis()) % 60000) / 1000;
-
-            String html = "<div style='font-family:Arial;max-width:480px;margin:auto;'>"
-                + "<div style='background:#c0392b;padding:24px;text-align:center;border-radius:8px 8px 0 0;'>"
-                + "<h2 style='color:white;margin:0;'>Pollería El Dorado</h2></div>"
-                + "<div style='background:white;padding:30px;border:1px solid #eee;'>"
-                + "<h3 style='color:#333;'>Recuperar contraseña</h3>"
-                + "<p style='color:#666;'>Tu código de recuperación es:</p>"
-                + "<div style='background:#fdecea;border:2px dashed #c0392b;border-radius:10px;"
-                + "padding:20px;text-align:center;margin:20px 0;'>"
-                + "<span style='font-size:36px;font-weight:bold;color:#c0392b;letter-spacing:10px;'>"
-                + codigo + "</span>"
-                + "<p style='color:#a93226;font-size:14px;margin:14px 0 6px;font-weight:bold;'>"
-                + "Tiempo restante: " + minutosRestantes + " min " + segundosRestantes + " seg</p>"
-                + "<p style='color:#999;font-size:12px;margin:0;'>Válido hasta las " + horaExpiracion + " (5 minutos)</p>"
-                + "</div>"
-                + "<p style='color:#888;font-size:13px;'>Ingresa este código en la ventana de recuperación de contraseña de la página.</p>"
-                + "<p style='color:#888;font-size:13px;'>Si no solicitaste esto, ignora este correo.</p>"
-                + "</div></div>";
-
-            Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(REMITENTE));
-            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-            msg.setSubject("Código de recuperación - Pollería El Dorado");
-            msg.setContent(html, "text/html; charset=UTF-8");
-            Transport.send(msg);
-    }
 }
-=======
-}
->>>>>>> karina2
