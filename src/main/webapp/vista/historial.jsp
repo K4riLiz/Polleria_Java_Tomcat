@@ -21,17 +21,12 @@
     <div class="max-w-4xl mx-auto px-4 py-8">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Mis Pedidos</h2>
 
-        <!-- TABS: 3 secciones -->
         <div class="flex border-b border-gray-200 mb-6 gap-6">
-            <button class="tab-btn activo pb-3 text-sm whitespace-nowrap" onclick="filtrar('proceso', this)">En proceso
-            </button>
-            <button class="tab-btn pb-3 text-sm text-gray-500 whitespace-nowrap" onclick="filtrar('entregado', this)">Entregados
-            </button>
-            <button class="tab-btn pb-3 text-sm text-gray-500 whitespace-nowrap" onclick="filtrar('cancelado', this)">Cancelados
-            </button>
+            <button class="tab-btn activo pb-3 text-sm whitespace-nowrap" onclick="filtrar('proceso', this)">En proceso</button>
+            <button class="tab-btn pb-3 text-sm text-gray-500 whitespace-nowrap" onclick="filtrar('entregado', this)">Entregados</button>
+            <button class="tab-btn pb-3 text-sm text-gray-500 whitespace-nowrap" onclick="filtrar('cancelado', this)">Cancelados</button>
         </div>
 
-        <!-- LISTA -->
         <div class="flex flex-col gap-4">
             <c:choose>
                 <c:when test="${empty pedidos}">
@@ -46,19 +41,19 @@
                 </c:when>
                 <c:otherwise>
                     <c:forEach items="${pedidos}" var="p">
-                        <%-- Clasificar el pedido --%>
                         <c:set var="grupo"
                                value="${p.estado == 'Entregado' ? 'entregado' :
                                        p.estado == 'Cancelado'  ? 'cancelado' : 'proceso'}"/>
 
                         <div class="pedido-card bg-white rounded-2xl shadow p-5"
                              data-grupo="${grupo}"
+                             data-pedido-id="${p.id}"
                              style="${grupo != 'proceso' ? 'display:none' : ''}">
                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div class="flex flex-col gap-1">
                                     <div class="flex items-center gap-3">
                                         <span class="font-bold text-gray-800 text-lg">#${p.id}</span>
-                                        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                        <span id="badge-${p.id}" class="px-2 py-1 rounded-full text-xs font-semibold
                                             ${p.estado == 'Pendiente'     ? 'bg-yellow-100 text-yellow-600' :
                                               p.estado == 'En cocina'     ? 'bg-orange-100 text-orange-600' :
                                               p.estado == 'Por despachar' ? 'bg-blue-100 text-blue-600' :
@@ -67,12 +62,8 @@
                                             ${p.estado}
                                         </span>
                                     </div>
-                                    <p class="text-sm text-gray-500">
-                                        <i class="fa-regular fa-clock mr-1"></i>${p.fecha}
-                                    </p>
-                                    <p class="text-sm text-gray-500">
-                                        <i class="fa-solid fa-location-dot mr-1"></i>${p.direccion}
-                                    </p>
+                                    <p class="text-sm text-gray-500"><i class="fa-regular fa-clock mr-1"></i>${p.fecha}</p>
+                                    <p class="text-sm text-gray-500"><i class="fa-solid fa-location-dot mr-1"></i>${p.direccion}</p>
                                 </div>
                                 <div class="flex items-center gap-4">
                                     <p class="font-bold text-red-600 text-xl">
@@ -86,12 +77,11 @@
                             </div>
                         </div>
 
-                        <!-- MODAL DETALLE estilo confirmación -->
+                        <!-- MODAL DETALLE -->
                         <div id="detalle-${p.id}"
                              class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
                             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
 
-                                <!-- Header modal -->
                                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                                     <h3 class="text-lg font-bold text-gray-800">Pedido #${p.id}</h3>
                                     <button onclick="cerrarDetalle('detalle-${p.id}')"
@@ -102,58 +92,44 @@
 
                                 <div class="p-6 flex flex-col gap-5">
 
-                                    <!-- SEGUIMIENTO -->
+                                    <!-- SEGUIMIENTO con IDs dinámicos para polling -->
                                     <div>
                                         <p class="text-sm font-semibold text-gray-700 mb-4">
                                             <i class="fa-solid fa-timeline text-red-600 mr-2"></i>Seguimiento
                                         </p>
                                         <div class="relative flex items-center justify-between">
-                                            <!-- Línea base -->
                                             <div class="absolute top-4 left-0 right-0 h-1 bg-gray-200 z-0"></div>
-                                            <!-- Línea progreso -->
-                                            <div class="absolute top-4 left-0 h-1 bg-red-500 z-0 transition-all"
-                                                 style="width:
-                                                    ${p.estado == 'Pendiente'     ? '0%'   :
-                                                      p.estado == 'En cocina'     ? '33%'  :
-                                                      p.estado == 'Por despachar' ? '66%'  :
-                                                      p.estado == 'Entregado'     ? '100%' : '0%'}">
+                                            <div id="barra-${p.id}" class="absolute top-4 left-0 h-1 bg-red-500 z-0 transition-all duration-500"
+                                                 style="width: ${p.estado == 'Pendiente' ? '0%' :
+                                                                 p.estado == 'En cocina' ? '33%' :
+                                                                 p.estado == 'Por despachar' ? '66%' :
+                                                                 p.estado == 'Entregado' ? '100%' : '0%'}">
                                             </div>
-
-                                            <%-- Paso 1: Pendiente --%>
                                             <div class="flex flex-col items-center gap-2 z-10">
-                                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs
-                                                    ${p.estado == 'Pendiente' || p.estado == 'En cocina' || p.estado == 'Por despachar' || p.estado == 'Entregado'
-                                                      ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-400'}">
+                                                <div id="h-paso1-${p.id}" class="w-8 h-8 rounded-full flex items-center justify-center text-xs bg-red-600 text-white">
                                                     <i class="fa-solid fa-clock"></i>
                                                 </div>
                                                 <p class="text-xs text-gray-500 text-center w-16">Pendiente</p>
                                             </div>
-
-                                            <%-- Paso 2: En cocina --%>
                                             <div class="flex flex-col items-center gap-2 z-10">
-                                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs
+                                                <div id="h-paso2-${p.id}" class="w-8 h-8 rounded-full flex items-center justify-center text-xs
                                                     ${p.estado == 'En cocina' || p.estado == 'Por despachar' || p.estado == 'Entregado'
                                                       ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-400'}">
                                                     <i class="fa-solid fa-fire"></i>
                                                 </div>
                                                 <p class="text-xs text-gray-500 text-center w-16">En cocina</p>
                                             </div>
-
-                                            <%-- Paso 3: Por despachar --%>
                                             <div class="flex flex-col items-center gap-2 z-10">
-                                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs
+                                                <div id="h-paso3-${p.id}" class="w-8 h-8 rounded-full flex items-center justify-center text-xs
                                                     ${p.estado == 'Por despachar' || p.estado == 'Entregado'
                                                       ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-400'}">
                                                     <i class="fa-solid fa-motorcycle"></i>
                                                 </div>
                                                 <p class="text-xs text-gray-500 text-center w-16">Despachando</p>
                                             </div>
-
-                                            <%-- Paso 4: Entregado --%>
                                             <div class="flex flex-col items-center gap-2 z-10">
-                                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs
-                                                    ${p.estado == 'Entregado'
-                                                      ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}">
+                                                <div id="h-paso4-${p.id}" class="w-8 h-8 rounded-full flex items-center justify-center text-xs
+                                                    ${p.estado == 'Entregado' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}">
                                                     <i class="fa-solid fa-check"></i>
                                                 </div>
                                                 <p class="text-xs text-gray-500 text-center w-16">Entregado</p>
@@ -201,7 +177,7 @@
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-400 mb-1">Estado</p>
-                                            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                            <span id="modal-badge-${p.id}" class="px-2 py-1 rounded-full text-xs font-semibold
                                                 ${p.estado == 'Pendiente'     ? 'bg-yellow-100 text-yellow-600' :
                                                   p.estado == 'En cocina'     ? 'bg-orange-100 text-orange-600' :
                                                   p.estado == 'Por despachar' ? 'bg-blue-100 text-blue-600' :
@@ -225,12 +201,10 @@
                                 </div>
                             </div>
                         </div>
-
                     </c:forEach>
                 </c:otherwise>
             </c:choose>
 
-            <!-- Mensaje vacío por tab -->
             <div id="msgVacio" class="hidden bg-white rounded-2xl shadow p-10 text-center text-gray-400">
                 <i class="fa-solid fa-inbox text-4xl mb-3 text-gray-300"></i>
                 <p class="font-medium">No hay pedidos en esta sección</p>
@@ -241,20 +215,16 @@
     <jsp:include page="/components/footer.jsp"/>
 
     <script>
+        var contextPath = '${pageContext.request.contextPath}';
+
         function filtrar(grupo, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('activo'); });
             btn.classList.add('activo');
-
-            let visible = 0;
-            document.querySelectorAll('.pedido-card').forEach(card => {
-                if (card.dataset.grupo === grupo) {
-                    card.style.display = '';
-                    visible++;
-                } else {
-                    card.style.display = 'none';
-                }
+            var visible = 0;
+            document.querySelectorAll('.pedido-card').forEach(function(card) {
+                if (card.dataset.grupo === grupo) { card.style.display = ''; visible++; }
+                else card.style.display = 'none';
             });
-
             document.getElementById('msgVacio').classList.toggle('hidden', visible > 0);
         }
 
@@ -266,17 +236,108 @@
             document.getElementById(id).classList.add('hidden');
             document.body.style.overflow = '';
         }
-        document.querySelectorAll('[id^="detalle-"]').forEach(modal => {
+        document.querySelectorAll('[id^="detalle-"]').forEach(function(modal) {
             modal.addEventListener('click', function(e) {
                 if (e.target === this) cerrarDetalle(this.id);
             });
         });
 
-        // Mostrar mensaje vacío al cargar si no hay pedidos en proceso
-        window.addEventListener('load', () => {
-            const cards = document.querySelectorAll('.pedido-card[data-grupo="proceso"]');
+        window.addEventListener('load', function() {
+            var cards = document.querySelectorAll('.pedido-card[data-grupo="proceso"]');
             document.getElementById('msgVacio').classList.toggle('hidden', cards.length > 0);
         });
+
+        // ── Polling para pedidos en proceso en el historial ───────────────────
+        var pedidosEnProceso = [];
+        document.querySelectorAll('.pedido-card[data-grupo="proceso"]').forEach(function(card) {
+            pedidosEnProceso.push(card.dataset.pedidoId);
+        });
+
+        if (pedidosEnProceso.length > 0) {
+            var intervaloHistorial = setInterval(function() {
+                pedidosEnProceso.forEach(function(pid) {
+                    fetch(contextPath + '/api/estadoPedido?pedidoId=' + pid)
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (!data.estado) return;
+                            actualizarHistorialPedido(pid, data.estado);
+                            // Si ya terminó, quitar de la lista
+                            if (data.estado === 'Entregado' || data.estado === 'Cancelado') {
+                                pedidosEnProceso = pedidosEnProceso.filter(function(id) { return id !== pid; });
+                                if (pedidosEnProceso.length === 0) clearInterval(intervaloHistorial);
+                            }
+                        })
+                        .catch(function() {});
+                });
+            }, 5000);
+        }
+
+        function actualizarHistorialPedido(pid, estado) {
+            // Actualizar badge en la tarjeta
+            var badge = document.getElementById('badge-' + pid);
+            if (badge) {
+                badge.textContent = estado;
+                badge.className = 'px-2 py-1 rounded-full text-xs font-semibold ';
+                if      (estado === 'Pendiente')     badge.className += 'bg-yellow-100 text-yellow-600';
+                else if (estado === 'En cocina')     badge.className += 'bg-orange-100 text-orange-600';
+                else if (estado === 'Por despachar') badge.className += 'bg-blue-100 text-blue-600';
+                else if (estado === 'Entregado')     badge.className += 'bg-green-100 text-green-600';
+                else                                 badge.className += 'bg-red-100 text-red-600';
+            }
+
+            // Actualizar badge dentro del modal
+            var modalBadge = document.getElementById('modal-badge-' + pid);
+            if (modalBadge) {
+                modalBadge.textContent = estado;
+                modalBadge.className = 'px-2 py-1 rounded-full text-xs font-semibold ';
+                if      (estado === 'Pendiente')     modalBadge.className += 'bg-yellow-100 text-yellow-600';
+                else if (estado === 'En cocina')     modalBadge.className += 'bg-orange-100 text-orange-600';
+                else if (estado === 'Por despachar') modalBadge.className += 'bg-blue-100 text-blue-600';
+                else if (estado === 'Entregado')     modalBadge.className += 'bg-green-100 text-green-600';
+                else                                 modalBadge.className += 'bg-red-100 text-red-600';
+            }
+
+            // Actualizar barra de seguimiento en el modal
+            var activo   = 'w-8 h-8 rounded-full flex items-center justify-center text-xs bg-red-600 text-white';
+            var inactivo = 'w-8 h-8 rounded-full flex items-center justify-center text-xs bg-gray-200 text-gray-400';
+            var verde    = 'w-8 h-8 rounded-full flex items-center justify-center text-xs bg-green-500 text-white';
+            var barra    = document.getElementById('barra-' + pid);
+
+            var p1 = document.getElementById('h-paso1-' + pid);
+            var p2 = document.getElementById('h-paso2-' + pid);
+            var p3 = document.getElementById('h-paso3-' + pid);
+            var p4 = document.getElementById('h-paso4-' + pid);
+
+            if (p1) p1.className = activo;
+
+            if (estado === 'Pendiente') {
+                if (p2) p2.className = inactivo;
+                if (p3) p3.className = inactivo;
+                if (p4) p4.className = inactivo;
+                if (barra) barra.style.width = '0%';
+            } else if (estado === 'En cocina') {
+                if (p2) p2.className = activo;
+                if (p3) p3.className = inactivo;
+                if (p4) p4.className = inactivo;
+                if (barra) barra.style.width = '33%';
+            } else if (estado === 'Por despachar') {
+                if (p2) p2.className = activo;
+                if (p3) p3.className = activo;
+                if (p4) p4.className = inactivo;
+                if (barra) barra.style.width = '66%';
+            } else if (estado === 'Entregado') {
+                if (p2) p2.className = activo;
+                if (p3) p3.className = activo;
+                if (p4) p4.className = verde;
+                if (barra) barra.style.width = '100%';
+                // Mover tarjeta a tab entregados visualmente
+                var card = document.querySelector('.pedido-card[data-pedido-id="' + pid + '"]');
+                if (card) {
+                    card.dataset.grupo = 'entregado';
+                    card.style.display = 'none';
+                }
+            }
+        }
     </script>
 </body>
 </html>
