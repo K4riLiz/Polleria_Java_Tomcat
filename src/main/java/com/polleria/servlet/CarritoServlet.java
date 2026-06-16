@@ -1,6 +1,7 @@
 package com.polleria.servlet;
 
 import com.polleria.dao.ProductoDAO;
+import com.polleria.dao.PromocionDAO;
 import com.polleria.model.ItemCarrito;
 import com.polleria.util.StockService;
 
@@ -75,12 +76,18 @@ public class CarritoServlet extends HttpServlet {
         if (carrito == null || carrito.isEmpty()) return;
 
         try {
-            List<Integer> ids = carrito.stream()
+            List<Integer> idsProductos = carrito.stream()
                     .filter(i -> "producto".equals(i.getTipo()))
                     .map(ItemCarrito::getProductoId)
                     .distinct()
                     .collect(Collectors.toList());
-            req.setAttribute("stocks", new ProductoDAO().obtenerStocks(ids));
+            List<Integer> idsPromociones = carrito.stream()
+                    .filter(i -> "promocion".equals(i.getTipo()))
+                    .map(ItemCarrito::getProductoId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            req.setAttribute("stocks", new ProductoDAO().obtenerStocks(idsProductos));
+            req.setAttribute("stocksPromociones", new PromocionDAO().obtenerStocks(idsPromociones));
         } catch (SQLException e) {
             throw new ServletException(e);
         }
@@ -100,11 +107,9 @@ public class CarritoServlet extends HttpServlet {
         String tipo    = req.getParameter("tipo") != null ? req.getParameter("tipo") : "producto";
         String opciones = req.getParameter("opciones");
 
-        // Validar stock solo para productos (no promociones)
-        if ("producto".equals(tipo)) {
-            String error = StockService.validarAgregar(productoId, cantidad, carrito);
-            if (error != null) return error;
-        }
+        // Validar stock para productos y promociones
+        String error = StockService.validarAgregar(productoId, cantidad, carrito, tipo);
+        if (error != null) return error;
 
         boolean encontrado = false;
         for (ItemCarrito item : carrito) {
@@ -133,8 +138,8 @@ public class CarritoServlet extends HttpServlet {
         int cantidad   = Integer.parseInt(req.getParameter("cantidad"));
         String tipo    = req.getParameter("tipo");
 
-        if ("producto".equals(tipo) && cantidad > 0) {
-            String error = StockService.validarCantidad(productoId, cantidad, carrito);
+        if (cantidad > 0) {
+            String error = StockService.validarCantidad(productoId, cantidad, carrito, tipo);
             if (error != null) return error;
         }
 

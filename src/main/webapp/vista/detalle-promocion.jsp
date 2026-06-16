@@ -70,7 +70,7 @@
 
             <!-- IMAGEN -->
             <div class="md:w-1/2 relative min-h-[280px]">
-                <img src="${pageContext.request.contextPath}/img/${promocion.imagen}"
+                <img src="${promocion.imagen}"
                      alt="${promocion.nombre}"
                      class="w-full h-full object-cover min-h-[280px]">
                 <span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
@@ -86,6 +86,10 @@
                     <p class="text-gray-500 text-sm leading-relaxed mb-3">${promocion.descripcion}</p>
                     <p class="text-3xl font-bold text-red-600">
                         S/ <fmt:formatNumber value="${promocion.precio}" pattern="#,##0.00"/>
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <i class="fa-solid fa-box-open mr-1"></i>
+                        ${promocion.stock} disponible(s)
                     </p>
                 </div>
 
@@ -190,6 +194,7 @@
 
     <script>
         const precioBase = ${promocion.precio};
+        const stockMax = ${promocion.stock};
 
         function agregarAlPedido() {
             let precioExtra = 0;
@@ -223,7 +228,7 @@
             const el = document.getElementById('cantidad');
             let v = parseInt(el.textContent) + delta;
             if (v < 1) v = 1;
-            if (v > 20) v = 20;
+            if (v > stockMax) v = stockMax;
             el.textContent = v;
 
             let precioExtra = 0;

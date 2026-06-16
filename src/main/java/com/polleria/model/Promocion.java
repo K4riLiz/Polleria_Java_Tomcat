@@ -7,6 +7,7 @@ public class Promocion {
     private double precio;
     private String imagen;
     private boolean activo;
+    private int stock;
     private int categoriaId;
     
     public Promocion() {}
@@ -22,6 +23,8 @@ public class Promocion {
     public void setImagen(String imagen) { this.imagen = imagen; }
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
     public int getCategoriaId() { return categoriaId; }
     public void setCategoriaId(int categoriaId) { this.categoriaId = categoriaId; }
 }

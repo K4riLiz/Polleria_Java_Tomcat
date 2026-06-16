@@ -46,10 +46,13 @@ function initRecuperarPassword() {
         return;
     }
 
-    const PASS_ROBUSTA = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/;
+    const PASS_ROBUSTA = window.PasswordValidatorUI
+        ? window.PasswordValidatorUI.PASS_ROBUSTA
+        : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/;
     const EXPIRACION_MS = 5 * 60 * 1000;
     let timerInterval = null;
     let expiracionCodigo = null;
+    let recuperarPasswordValidator = null;
 
     function abrirModal() {
         resetModal();
@@ -92,6 +95,7 @@ function initRecuperarPassword() {
             btnReenviar.style.display = 'none';
             btnReenviar.disabled = false;
         }
+        recPass1.dispatchEvent(new Event('input'));
     }
 
     function mostrarError(el, msg) {
@@ -235,8 +239,18 @@ function initRecuperarPassword() {
         btnCambiar.classList.toggle('activo', valido);
     }
 
-    recPass1.addEventListener('input', validarPassForm);
-    recPass2.addEventListener('input', validarPassForm);
+    if (window.PasswordValidatorUI) {
+        recuperarPasswordValidator = PasswordValidatorUI.init({
+            passInput: recPass1,
+            confirmInput: recPass2,
+            requirementsList: document.getElementById('passRequirementsRecuperar'),
+            matchList: document.getElementById('passMatchRecuperar'),
+            submitBtn: btnCambiar
+        });
+    } else {
+        recPass1.addEventListener('input', validarPassForm);
+        recPass2.addEventListener('input', validarPassForm);
+    }
 
     document.querySelectorAll('.toggle-pass').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -278,6 +292,7 @@ function initRecuperarPassword() {
                 if (timerInterval) clearInterval(timerInterval);
                 pasoEmail.style.display = 'none';
                 pasoPassword.style.display = 'block';
+                recPass1.dispatchEvent(new Event('input'));
             } else {
                 mostrarError(errorRecuperar, data.mensaje);
                 if (data.mensaje && (data.mensaje.indexOf('expiró') !== -1 || data.mensaje.indexOf('Solicita') !== -1)) {
@@ -297,6 +312,11 @@ function initRecuperarPassword() {
     btnCambiar.addEventListener('click', async function () {
         if (btnCambiar.disabled) return;
         ocultarError(errorPassword);
+
+        if (recuperarPasswordValidator && !recuperarPasswordValidator.esValido()) {
+            mostrarError(errorPassword, 'Completa todos los requisitos de contraseña.');
+            return;
+        }
 
         if (!PASS_ROBUSTA.test(recPass1.value)) {
             mostrarError(errorPassword, 'La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.');

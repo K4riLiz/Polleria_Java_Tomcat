@@ -13,14 +13,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.regex.Pattern;
+import com.polleria.util.PasswordValidator;
 
 public class RecuperarPasswordServlet extends HttpServlet {
 
     private static final long EXPIRACION_MS = 5 * 60 * 1000L;
-    private static final Pattern PASS_ROBUSTA = Pattern.compile(
-            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._\\-])[A-Za-z\\d@$!%*?&._\\-]{8,}$"
-    );
 
     // Mapa en memoria: email → [codigo, expiracionMs]
     private static final Map<String, String[]> codigos = new HashMap<>();
@@ -133,10 +130,8 @@ public class RecuperarPasswordServlet extends HttpServlet {
             return;
         }
 
-        if (!PASS_ROBUSTA.matcher(nuevaPass).matches()) {
-            responderJson(resp, false,
-                    "La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial (@$!%*?&._-).",
-                    null);
+        if (!PasswordValidator.esValida(nuevaPass)) {
+            responderJson(resp, false, PasswordValidator.MENSAJE_ERROR, null);
             return;
         }
 

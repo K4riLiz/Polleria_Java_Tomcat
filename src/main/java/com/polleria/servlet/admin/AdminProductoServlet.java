@@ -2,8 +2,10 @@ package com.polleria.servlet.admin;
 
 import com.polleria.dao.CategoriaDAO;
 import com.polleria.dao.ProductoDAO;
+import com.polleria.dao.PromocionDAO;
 import com.polleria.model.Categoria;
 import com.polleria.model.Producto;
+import com.polleria.model.Promocion;
 import com.polleria.model.Usuario;
 import com.polleria.util.CloudinaryService;
 import org.apache.commons.fileupload.FileItem;
@@ -32,6 +34,7 @@ public class AdminProductoServlet extends HttpServlet {
         try {
             ProductoDAO prodDAO = new ProductoDAO();
             CategoriaDAO catDAO = new CategoriaDAO();
+            PromocionDAO promoDAO = new PromocionDAO();
 
             if ("editar".equals(action)) {
                 int id = Integer.parseInt(req.getParameter("id"));
@@ -40,10 +43,15 @@ public class AdminProductoServlet extends HttpServlet {
                 int id = Integer.parseInt(req.getParameter("id"));
                 req.setAttribute("categoriaEditar", catDAO.obtenerPorId(id));
                 req.setAttribute("tabActivo", "categorias");
+            } else if ("editarPromocion".equals(action)) {
+                int id = Integer.parseInt(req.getParameter("id"));
+                req.setAttribute("promocionEditar", promoDAO.obtenerPorId(id));
+                req.setAttribute("tabActivo", "promociones");
             }
 
-            req.setAttribute("productos", prodDAO.listarTodosAdmin());
-            req.setAttribute("categorias", catDAO.listarTodas());
+            req.setAttribute("productos",   prodDAO.listarTodosAdmin());
+            req.setAttribute("categorias",  catDAO.listarTodas());
+            req.setAttribute("promociones", promoDAO.listarTodosAdmin());
             req.getRequestDispatcher("/vista/admin/productos.jsp").forward(req, resp);
 
         } catch (SQLException e) {
@@ -60,7 +68,7 @@ public class AdminProductoServlet extends HttpServlet {
 
         String actionParam = req.getParameter("action");
 
-        // ── Stock rápido (no multipart) ───────────────────────────────────────
+        // ── Stock rápido producto (no multipart) ──────────────────────────────
         if ("actualizarStock".equals(actionParam)) {
             try {
                 int id    = Integer.parseInt(req.getParameter("id"));
@@ -71,6 +79,20 @@ public class AdminProductoServlet extends HttpServlet {
                 req.getSession().setAttribute("error", "Error al actualizar stock: " + e.getMessage());
             }
             resp.sendRedirect(req.getContextPath() + "/admin/productos");
+            return;
+        }
+
+        // ── Stock rápido promoción (no multipart) ─────────────────────────────
+        if ("actualizarStockPromocion".equals(actionParam)) {
+            try {
+                int id    = Integer.parseInt(req.getParameter("id"));
+                int stock = parseStock(req.getParameter("stock"));
+                new PromocionDAO().actualizarStock(id, stock);
+                req.getSession().setAttribute("exito", "Stock de promoción actualizado.");
+            } catch (Exception e) {
+                req.getSession().setAttribute("error", "Error al actualizar stock: " + e.getMessage());
+            }
+            resp.sendRedirect(req.getContextPath() + "/admin/productos?tab=promociones");
             return;
         }
 
@@ -100,6 +122,8 @@ public class AdminProductoServlet extends HttpServlet {
                     if (ok) req.getSession().setAttribute("exito", "Categoría eliminada.");
                     else    req.getSession().setAttribute("error", "No se puede eliminar: tiene productos asociados.");
                 }
+                // Limpiar cache de categorías del header
+                req.getSession().removeAttribute("categoriasNav");
             } catch (Exception e) {
                 req.getSession().setAttribute("error", "Error: " + e.getMessage());
             }
@@ -107,7 +131,7 @@ public class AdminProductoServlet extends HttpServlet {
             return;
         }
 
-        // ── Acciones de producto (multipart) ──────────────────────────────────
+        // ── Multipart (productos y promociones con imagen) ────────────────────
         if (!ServletFileUpload.isMultipartContent(req)) {
             req.getSession().setAttribute("error", "Formulario inválido.");
             resp.sendRedirect(req.getContextPath() + "/admin/productos");
@@ -120,7 +144,7 @@ public class AdminProductoServlet extends HttpServlet {
             List<FileItem> items = upload.parseRequest(req);
 
             String action = "", nombre = "", descripcion = "", imagen = "";
-            String id = "", precio = "", categoriaId = "", activo = "1", stock = "0";
+            String id = "", precio = "", categoriaId = "", activo = "1", stock = "0", tab = "productos";
 
             for (FileItem item : items) {
                 if (item.isFormField()) {
@@ -134,17 +158,55 @@ public class AdminProductoServlet extends HttpServlet {
                         case "activo"       -> activo      = item.getString("UTF-8");
                         case "stock"        -> stock       = item.getString("UTF-8");
                         case "imagenActual" -> imagen      = item.getString("UTF-8");
+                        case "tab"          -> tab         = item.getString("UTF-8");
                     }
                 } else {
-                    // Archivo de imagen -> subir a Cloudinary en vez de guardarlo localmente
-                    if (item.getFieldName().equals("imagenFile") && item.getSize() > 0) {
+                    // Subir imagen a Cloudinary (tu implementación)
+                    if ("imagenFile".equals(item.getFieldName()) && item.getSize() > 0) {
                         byte[] datos = item.get();
                         String urlImagen = CloudinaryService.subirImagen(datos);
-                        imagen = urlImagen; // ahora "imagen" guarda la URL completa de Cloudinary
+                        imagen = urlImagen;
                     }
                 }
             }
 
+            // ── Promociones ───────────────────────────────────────────────────
+            if ("promociones".equals(tab) || action.contains("Promocion")) {
+                PromocionDAO dao = new PromocionDAO();
+                switch (action) {
+                    case "crearPromocion" -> {
+                        Promocion p = new Promocion();
+                        p.setNombre(nombre);
+                        p.setDescripcion(descripcion);
+                        p.setPrecio(Double.parseDouble(precio));
+                        p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
+                        p.setStock(parseStock(stock));
+                        p.setActivo(true);
+                        dao.crear(p);
+                        req.getSession().setAttribute("exito", "Promoción creada correctamente.");
+                    }
+                    case "actualizarPromocion" -> {
+                        Promocion p = new Promocion();
+                        p.setId(Integer.parseInt(id));
+                        p.setNombre(nombre);
+                        p.setDescripcion(descripcion);
+                        p.setPrecio(Double.parseDouble(precio));
+                        p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
+                        p.setActivo("1".equals(activo));
+                        p.setStock(parseStock(stock));
+                        dao.actualizar(p);
+                        req.getSession().setAttribute("exito", "Promoción actualizada correctamente.");
+                    }
+                    case "eliminarPromocion" -> {
+                        dao.eliminar(Integer.parseInt(id));
+                        req.getSession().setAttribute("exito", "Promoción eliminada correctamente.");
+                    }
+                }
+                resp.sendRedirect(req.getContextPath() + "/admin/productos?tab=promociones");
+                return;
+            }
+
+            // ── Productos ─────────────────────────────────────────────────────
             ProductoDAO dao = new ProductoDAO();
             switch (action) {
                 case "crear" -> {

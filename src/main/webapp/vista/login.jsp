@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css?v=3">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.google.com/recaptcha/api.js?render=6LcthQQtAAAAABq3-5JjXFFMfPJhGlbYcYVP139S"></script>
     <style>
@@ -110,17 +110,11 @@
                 <p id="errorTel" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
                     El teléfono debe tener exactamente 9 números.
                 </p>
-                <p id="errorRobusta" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
-                    La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial (@$!%*?&._-)
-                </p>
                 <p id="errorNombre" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
                     El nombre solo debe contener letras y espacios.
                 </p>
                 <p id="errorApellido" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
                     El apellido solo debe contener letras y espacios.
-                </p>
-                <p id="errorPass" style="color:red;font-size:13px;margin-bottom:8px;display:none;">
-                    Las contraseñas no coinciden.
                 </p>
 
                 <div class="container-input">
@@ -155,11 +149,14 @@
 
                 <div class="container-input">
                     <ion-icon name="lock-closed-outline"></ion-icon>
-                    <input type="password" id="pass2" placeholder="Repetir contraseña" required>
+                    <input type="password" id="pass2" name="confirmPassword" placeholder="Repetir contraseña" required>
                 </div>
 
+                <ul id="passRequirementsRegistro"></ul>
+                <ul id="passMatchRegistro" class="pass-match-list"></ul>
+
                 <!-- ID agregado para que reCAPTCHA pueda interceptar el click -->
-                <button type="submit" class="button" id="btnRegistro">Registrarse</button>
+                <button type="submit" class="button pass-submit-disabled" id="btnRegistro" disabled>Registrarse</button>
 
                 <!-- Solo para móvil -->
                 <p class="mobile-switch">
@@ -257,6 +254,9 @@
                 </div>
             </div>
 
+            <ul id="passRequirementsRecuperar"></ul>
+            <ul id="passMatchRecuperar" class="pass-match-list"></ul>
+
             <p id="error-password" class="modal-error" style="display:none;"></p>
 
             <button type="button" id="btn-cambiar-pass" class="btn-cambiar-pass" disabled>
@@ -285,25 +285,23 @@
         document.body.style.overflow = '';
     }
 </script>
-<script src="${pageContext.request.contextPath}/js/login.js?v=4"></script>
+<script src="${pageContext.request.contextPath}/js/password-validator.js?v=1"></script>
+<script src="${pageContext.request.contextPath}/js/login.js?v=5"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script>
+    var registroPasswordValidator = null;
+
     function validarRegistro() {
         const nombre   = document.querySelector('.sign-up input[name="nombre"]').value;
         const apellido = document.querySelector('.sign-up input[name="apellido"]').value;
         const dni      = document.querySelector('.sign-up input[name="dni"]').value;
         const telefono = document.querySelector('.sign-up input[name="telefono"]').value;
-        const p1       = document.getElementById('pass1').value;
-        const p2       = document.getElementById('pass2').value;
 
-        // Ocultar todos los errores primero
         document.getElementById('errorNombre').style.display   = 'none';
         document.getElementById('errorApellido').style.display = 'none';
         document.getElementById('errorDni').style.display      = 'none';
         document.getElementById('errorTel').style.display      = 'none';
-        document.getElementById('errorRobusta').style.display  = 'none';
-        document.getElementById('errorPass').style.display     = 'none';
 
         const regexNombre = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/;
         if (!regexNombre.test(nombre)) {
@@ -326,14 +324,7 @@
             return false;
         }
 
-        const passRobusta = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/;
-        if (!passRobusta.test(p1)) {
-            document.getElementById('errorRobusta').style.display = 'block';
-            return false;
-        }
-
-        if (p1 !== p2) {
-            document.getElementById('errorPass').style.display = 'block';
+        if (registroPasswordValidator && !registroPasswordValidator.esValido()) {
             return false;
         }
 
@@ -383,6 +374,14 @@
                 document.getElementById('captchaLogin').value = token;
                 document.querySelector('form.sign-in').submit();
             });
+        });
+
+        registroPasswordValidator = PasswordValidatorUI.init({
+            passInput: document.getElementById('pass1'),
+            confirmInput: document.getElementById('pass2'),
+            requirementsList: document.getElementById('passRequirementsRegistro'),
+            matchList: document.getElementById('passMatchRegistro'),
+            submitBtn: document.getElementById('btnRegistro')
         });
 
         // reCAPTCHA en REGISTRO

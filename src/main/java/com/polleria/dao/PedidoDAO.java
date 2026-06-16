@@ -4,6 +4,7 @@ import com.polleria.model.DetallePedido;
 import com.polleria.model.ItemCarrito;
 import com.polleria.model.Pedido;
 import com.polleria.model.Producto;
+import com.polleria.model.Promocion;
 import com.polleria.util.DBConnection;
 
 import java.sql.*;
@@ -18,20 +19,32 @@ public class PedidoDAO {
         Connection con = DBConnection.getConnection();
         con.setAutoCommit(false);
         try {
-            // 0. Agrupar cantidades por producto y descontar stock
-            java.util.Map<Integer, Integer> cantidades = new java.util.HashMap<>();
+            // 0. Agrupar cantidades y descontar stock
+            java.util.Map<Integer, Integer> cantidadesProductos = new java.util.HashMap<>();
+            java.util.Map<Integer, Integer> cantidadesPromociones = new java.util.HashMap<>();
             for (ItemCarrito item : items) {
                 if ("producto".equals(item.getTipo())) {
-                    cantidades.merge(item.getProductoId(), item.getCantidad(), Integer::sum);
+                    cantidadesProductos.merge(item.getProductoId(), item.getCantidad(), Integer::sum);
+                } else if ("promocion".equals(item.getTipo())) {
+                    cantidadesPromociones.merge(item.getProductoId(), item.getCantidad(), Integer::sum);
                 }
             }
 
             ProductoDAO productoDAO = new ProductoDAO();
-            for (java.util.Map.Entry<Integer, Integer> entry : cantidades.entrySet()) {
+            for (java.util.Map.Entry<Integer, Integer> entry : cantidadesProductos.entrySet()) {
                 if (!productoDAO.descontarStock(con, entry.getKey(), entry.getValue())) {
                     Producto p = productoDAO.obtenerPorId(entry.getKey());
                     String nombre = p != null ? p.getNombre() : "ID " + entry.getKey();
                     throw new SQLException("Stock insuficiente para: " + nombre);
+                }
+            }
+
+            PromocionDAO promocionDAO = new PromocionDAO();
+            for (java.util.Map.Entry<Integer, Integer> entry : cantidadesPromociones.entrySet()) {
+                if (!promocionDAO.descontarStock(con, entry.getKey(), entry.getValue())) {
+                    com.polleria.model.Promocion promo = promocionDAO.obtenerPorId(entry.getKey());
+                    String nombre = promo != null ? promo.getNombre() : "ID " + entry.getKey();
+                    throw new SQLException("Stock insuficiente para promoción: " + nombre);
                 }
             }
 

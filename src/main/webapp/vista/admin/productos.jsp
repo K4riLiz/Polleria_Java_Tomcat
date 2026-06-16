@@ -66,7 +66,6 @@
         </nav>
     </aside>
 
-    <!-- CONTENIDO -->
     <main class="flex-1 p-8 overflow-auto">
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Gestión de Productos</h2>
 
@@ -82,7 +81,7 @@
             </div>
         </c:if>
 
-        <!-- TABS -->
+        <!-- TABS: 3 pestañas -->
         <div class="flex border-b border-gray-200 mb-6 gap-6">
             <button id="tabProductosBtn" onclick="cambiarTab('productos')"
                     class="tab-btn activo pb-3 text-sm whitespace-nowrap">
@@ -92,19 +91,19 @@
                     class="tab-btn pb-3 text-sm text-gray-500 whitespace-nowrap">
                 <i class="fa-solid fa-tags mr-1"></i> Categorías
             </button>
+            <button id="tabPromocionesBtn" onclick="cambiarTab('promociones')"
+                    class="tab-btn pb-3 text-sm text-gray-500 whitespace-nowrap">
+                <i class="fa-solid fa-percent mr-1"></i> Promociones
+            </button>
         </div>
 
-        <!-- ══════════════════════════════════════════════════════ -->
-        <!-- TAB PRODUCTOS                                          -->
-        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- ══════════════ TAB PRODUCTOS ══════════════ -->
         <div id="tabProductos">
-
             <p class="text-sm text-gray-500 mb-4">
                 <i class="fa-solid fa-boxes-stacked mr-1"></i>
-                Actualiza el <strong>stock del día</strong> de cada plato.
+                Actualiza el <strong>stock del día</strong>. Los productos con stock 0 no se muestran al cliente.
             </p>
 
-            <!-- FORMULARIO PRODUCTO -->
             <div class="bg-white rounded-2xl shadow p-6 mb-8">
                 <h3 class="text-lg font-semibold mb-4">
                     <c:choose>
@@ -115,7 +114,6 @@
                 <form action="${pageContext.request.contextPath}/admin/productos"
                       method="post" enctype="multipart/form-data"
                       class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
                     <c:choose>
                         <c:when test="${not empty productoEditar}">
                             <input type="hidden" name="action" value="actualizar">
@@ -141,9 +139,7 @@
                         <label class="block text-sm font-medium text-gray-600 mb-1">Categoría</label>
                         <select name="categoriaId" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
                             <c:forEach items="${categorias}" var="cat">
-                                <option value="${cat.id}" <c:if test="${cat.id == productoEditar.categoriaId}">selected</c:if>>
-                                    ${cat.nombre}
-                                </option>
+                                <option value="${cat.id}" <c:if test="${cat.id == productoEditar.categoriaId}">selected</c:if>>${cat.nombre}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -168,14 +164,13 @@
                     </div>
                     </c:if>
                     <div class="md:col-span-3">
-                        <label class="block text-sm font-medium text-gray-600 mb-2">Imagen del producto</label>
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Imagen</label>
                         <div class="flex items-start gap-4">
                             <c:if test="${not empty productoEditar.imagen}">
                                 <div class="flex-shrink-0">
                                     <p class="text-xs text-gray-400 mb-1">Imagen actual:</p>
-                                    <img src="${productoEditar.imagen}" 
-                                         id="previewActual" class="preview-img border"
-                                         onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.webp'">
+                                    <img src="${productoEditar.imagen}" id="previewActual" class="preview-img border"
+                                         onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
                                 </div>
                             </c:if>
                             <div class="flex-1">
@@ -185,7 +180,7 @@
                                     <p class="text-xs text-gray-400 mt-1">PNG, JPG — máx. 5MB</p>
                                     <p id="fileName" class="text-xs text-green-600 mt-2 font-medium"></p>
                                 </div>
-                                <input type="file" name="imagenFile" id="imagenFile" accept="image/*" class="hidden" onchange="mostrarPreview(this)">
+                                <input type="file" name="imagenFile" id="imagenFile" accept="image/*" class="hidden" onchange="mostrarPreview(this, 'imgPreview', 'previewNueva', 'fileName')">
                                 <div id="previewNueva" class="mt-3 hidden">
                                     <p class="text-xs text-gray-400 mb-1">Nueva imagen:</p>
                                     <img id="imgPreview" class="preview-img border">
@@ -194,8 +189,7 @@
                         </div>
                     </div>
                     <div class="md:col-span-3 flex gap-3">
-                        <button type="submit"
-                                class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition">
                             <c:choose>
                                 <c:when test="${not empty productoEditar}"><i class="fa-solid fa-floppy-disk mr-1"></i> Actualizar</c:when>
                                 <c:otherwise><i class="fa-solid fa-plus mr-1"></i> Crear Producto</c:otherwise>
@@ -203,9 +197,7 @@
                         </button>
                         <c:if test="${not empty productoEditar}">
                             <a href="${pageContext.request.contextPath}/admin/productos"
-                               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-semibold transition">
-                                Cancelar
-                            </a>
+                               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-semibold transition">Cancelar</a>
                         </c:if>
                     </div>
                 </form>
@@ -231,54 +223,40 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3 text-gray-400">${p.id}</td>
                                 <td class="px-4 py-3">
-                                    <img src="${p.imagen}"
-                                         class="w-12 h-12 object-cover rounded-lg"
+                                    <img src="${p.imagen}" class="w-12 h-12 object-cover rounded-lg"
                                          onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
                                 </td>
                                 <td class="px-4 py-3 font-medium">${p.nombre}</td>
                                 <td class="px-4 py-3">
-                                    <span class="bg-orange-100 text-orange-600 text-xs font-semibold px-2 py-1 rounded-full">
-                                        ${p.categoriaNombre}
-                                    </span>
+                                    <span class="bg-orange-100 text-orange-600 text-xs font-semibold px-2 py-1 rounded-full">${p.categoriaNombre}</span>
                                 </td>
-                                <td class="px-4 py-3 font-bold text-red-600">
-                                    S/<fmt:formatNumber value="${p.precio}" pattern="#,##0.00"/>
-                                </td>
+                                <td class="px-4 py-3 font-bold text-red-600">S/<fmt:formatNumber value="${p.precio}" pattern="#,##0.00"/></td>
                                 <td class="px-4 py-3">
-                                    <form action="${pageContext.request.contextPath}/admin/productos"
-                                          method="post" class="flex items-center gap-2">
+                                    <form action="${pageContext.request.contextPath}/admin/productos" method="post" class="flex items-center gap-2">
                                         <input type="hidden" name="action" value="actualizarStock">
                                         <input type="hidden" name="id" value="${p.id}">
                                         <input type="number" name="stock" min="0" value="${p.stock}"
-                                               class="w-16 border rounded px-2 py-1 text-sm text-center
-                                               ${p.stock == 0 ? 'border-red-400 bg-red-50' : 'border-gray-300'}">
+                                               class="w-16 border rounded px-2 py-1 text-sm text-center ${p.stock == 0 ? 'border-red-400 bg-red-50' : 'border-gray-300'}">
                                         <button type="submit" class="text-green-600 hover:text-green-800">
                                             <i class="fa-solid fa-floppy-disk"></i>
                                         </button>
                                     </form>
-                                    <c:if test="${p.stock == 0}">
-                                        <span class="text-xs text-red-500 font-semibold">Agotado</span>
-                                    </c:if>
+                                    <c:if test="${p.stock == 0}"><span class="text-xs text-red-500 font-semibold">Agotado</span></c:if>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="px-2 py-1 rounded-full text-xs font-semibold
-                                        ${p.activo ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${p.activo ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}">
                                         ${p.activo ? 'Activo' : 'Inactivo'}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <a href="${pageContext.request.contextPath}/admin/productos?action=editar&id=${p.id}"
-                                       class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </a>
+                                       class="text-blue-500 hover:text-blue-700 mr-3"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <form action="${pageContext.request.contextPath}/admin/productos"
                                           method="post" enctype="multipart/form-data" class="inline"
                                           onsubmit="return confirm('¿Eliminar este producto?')">
                                         <input type="hidden" name="action" value="eliminar">
                                         <input type="hidden" name="id" value="${p.id}">
-                                        <button type="submit" class="text-red-500 hover:text-red-700">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                        <button type="submit" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -288,12 +266,8 @@
             </div>
         </div>
 
-        <!-- ══════════════════════════════════════════════════════ -->
-        <!-- TAB CATEGORÍAS                                         -->
-        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- ══════════════ TAB CATEGORÍAS ══════════════ -->
         <div id="tabCategorias" class="hidden">
-
-            <!-- FORMULARIO CATEGORÍA -->
             <div class="bg-white rounded-2xl shadow p-6 mb-8">
                 <h3 class="text-lg font-semibold mb-4">
                     <c:choose>
@@ -303,7 +277,6 @@
                 </h3>
                 <form action="${pageContext.request.contextPath}/admin/productos"
                       method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                     <c:choose>
                         <c:when test="${not empty categoriaEditar}">
                             <input type="hidden" name="action" value="actualizarCategoria">
@@ -314,9 +287,8 @@
                             <input type="hidden" name="action" value="crearCategoria">
                         </c:otherwise>
                     </c:choose>
-
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Nombre de la categoría</label>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Nombre</label>
                         <input type="text" name="catNombre" required value="${categoriaEditar.nombre}"
                                placeholder="Ej: Pollo a la brasa"
                                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
@@ -328,8 +300,7 @@
                                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
                     </div>
                     <div class="md:col-span-2 flex gap-3">
-                        <button type="submit"
-                                class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition">
                             <c:choose>
                                 <c:when test="${not empty categoriaEditar}"><i class="fa-solid fa-floppy-disk mr-1"></i> Actualizar</c:when>
                                 <c:otherwise><i class="fa-solid fa-plus mr-1"></i> Crear Categoría</c:otherwise>
@@ -337,15 +308,11 @@
                         </button>
                         <c:if test="${not empty categoriaEditar}">
                             <a href="${pageContext.request.contextPath}/admin/productos?tab=categorias"
-                               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-semibold transition">
-                                Cancelar
-                            </a>
+                               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-semibold transition">Cancelar</a>
                         </c:if>
                     </div>
                 </form>
             </div>
-
-            <!-- TABLA CATEGORÍAS -->
             <div class="bg-white rounded-2xl shadow overflow-hidden">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
@@ -361,28 +328,180 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3 text-gray-400">${cat.id}</td>
                                 <td class="px-4 py-3 font-medium">
-                                    <span class="bg-orange-100 text-orange-600 text-xs font-semibold px-2 py-1 rounded-full">
-                                        ${cat.nombre}
-                                    </span>
+                                    <span class="bg-orange-100 text-orange-600 text-xs font-semibold px-2 py-1 rounded-full">${cat.nombre}</span>
                                 </td>
                                 <td class="px-4 py-3 text-gray-500 text-xs">${cat.descripcion}</td>
                                 <td class="px-4 py-3 text-center">
                                     <a href="${pageContext.request.contextPath}/admin/productos?action=editarCategoria&id=${cat.id}"
-                                       class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </a>
-                                    <form action="${pageContext.request.contextPath}/admin/productos"
-                                          method="post" class="inline"
-                                          onsubmit="return confirm('¿Eliminar esta categoría? Solo se puede si no tiene productos.')">
+                                       class="text-blue-500 hover:text-blue-700 mr-3"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <form action="${pageContext.request.contextPath}/admin/productos" method="post" class="inline"
+                                          onsubmit="return confirm('¿Eliminar? Solo si no tiene productos.')">
                                         <input type="hidden" name="action" value="eliminarCategoria">
                                         <input type="hidden" name="catId" value="${cat.id}">
-                                        <button type="submit" class="text-red-500 hover:text-red-700">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                        <button type="submit" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
                         </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══════════════ TAB PROMOCIONES ══════════════ -->
+        <div id="tabPromociones" class="hidden">
+            <p class="text-sm text-gray-500 mb-4">
+                <i class="fa-solid fa-percent mr-1"></i>
+                Gestiona las promociones y su stock del día.
+            </p>
+            <div class="bg-white rounded-2xl shadow p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">
+                    <c:choose>
+                        <c:when test="${not empty promocionEditar}">✏️ Editar Promoción</c:when>
+                        <c:otherwise>➕ Nueva Promoción</c:otherwise>
+                    </c:choose>
+                </h3>
+                <form action="${pageContext.request.contextPath}/admin/productos"
+                      method="post" enctype="multipart/form-data"
+                      class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="hidden" name="tab" value="promociones">
+                    <c:choose>
+                        <c:when test="${not empty promocionEditar}">
+                            <input type="hidden" name="action" value="actualizarPromocion">
+                            <input type="hidden" name="id" value="${promocionEditar.id}">
+                            <input type="hidden" name="imagenActual" value="${promocionEditar.imagen}">
+                        </c:when>
+                        <c:otherwise>
+                            <input type="hidden" name="action" value="crearPromocion">
+                        </c:otherwise>
+                    </c:choose>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Nombre</label>
+                        <input type="text" name="nombre" required value="${promocionEditar.nombre}"
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Precio (S/)</label>
+                        <input type="number" name="precio" step="0.01" min="0" required value="${promocionEditar.precio}"
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Stock del día</label>
+                        <input type="number" name="stock" min="0" required
+                               value="${empty promocionEditar ? 0 : promocionEditar.stock}"
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Descripción</label>
+                        <textarea name="descripcion" rows="2"
+                                  class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">${promocionEditar.descripcion}</textarea>
+                    </div>
+                    <c:if test="${not empty promocionEditar}">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Estado</label>
+                        <select name="activo" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                            <option value="1" <c:if test="${promocionEditar.activo}">selected</c:if>>Activo</option>
+                            <option value="0" <c:if test="${!promocionEditar.activo}">selected</c:if>>Inactivo</option>
+                        </select>
+                    </div>
+                    </c:if>
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Imagen</label>
+                        <div class="flex items-start gap-4">
+                            <c:if test="${not empty promocionEditar.imagen}">
+                                <div class="flex-shrink-0">
+                                    <p class="text-xs text-gray-400 mb-1">Imagen actual:</p>
+                                    <img src="${promocionEditar.imagen}" class="preview-img border"
+                                         onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
+                                </div>
+                            </c:if>
+                            <div class="flex-1">
+                                <div class="drop-zone" onclick="document.getElementById('imagenFilePromo').click()">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-300 mb-2"></i>
+                                    <p class="text-sm text-gray-500">Arrastra una imagen o <span class="text-red-500 font-medium">haz clic</span></p>
+                                    <p id="fileNamePromo" class="text-xs text-green-600 mt-2 font-medium"></p>
+                                </div>
+                                <input type="file" name="imagenFile" id="imagenFilePromo" accept="image/*" class="hidden"
+                                       onchange="mostrarPreview(this, 'imgPreviewPromo', 'previewNuevaPromo', 'fileNamePromo')">
+                                <div id="previewNuevaPromo" class="mt-3 hidden">
+                                    <img id="imgPreviewPromo" class="preview-img border">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 flex gap-3">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition">
+                            <c:choose>
+                                <c:when test="${not empty promocionEditar}"><i class="fa-solid fa-floppy-disk mr-1"></i> Actualizar</c:when>
+                                <c:otherwise><i class="fa-solid fa-plus mr-1"></i> Crear Promoción</c:otherwise>
+                            </c:choose>
+                        </button>
+                        <c:if test="${not empty promocionEditar}">
+                            <a href="${pageContext.request.contextPath}/admin/productos?tab=promociones"
+                               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-semibold transition">Cancelar</a>
+                        </c:if>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TABLA PROMOCIONES -->
+            <div class="bg-white rounded-2xl shadow overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                        <tr>
+                            <th class="px-4 py-3 text-left">#</th>
+                            <th class="px-4 py-3 text-left">Imagen</th>
+                            <th class="px-4 py-3 text-left">Nombre</th>
+                            <th class="px-4 py-3 text-left">Precio</th>
+                            <th class="px-4 py-3 text-left">Stock</th>
+                            <th class="px-4 py-3 text-left">Estado</th>
+                            <th class="px-4 py-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <c:forEach items="${promociones}" var="promo">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-gray-400">${promo.id}</td>
+                                <td class="px-4 py-3">
+                                    <img src="${promo.imagen}" class="w-12 h-12 object-cover rounded-lg"
+                                         onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
+                                </td>
+                                <td class="px-4 py-3 font-medium">${promo.nombre}</td>
+                                <td class="px-4 py-3 font-bold text-red-600">S/<fmt:formatNumber value="${promo.precio}" pattern="#,##0.00"/></td>
+                                <td class="px-4 py-3">
+                                    <form action="${pageContext.request.contextPath}/admin/productos" method="post" class="flex items-center gap-2">
+                                        <input type="hidden" name="action" value="actualizarStockPromocion">
+                                        <input type="hidden" name="id" value="${promo.id}">
+                                        <input type="number" name="stock" min="0" value="${promo.stock}"
+                                               class="w-16 border rounded px-2 py-1 text-sm text-center ${promo.stock == 0 ? 'border-red-400 bg-red-50' : 'border-gray-300'}">
+                                        <button type="submit" class="text-green-600 hover:text-green-800">
+                                            <i class="fa-solid fa-floppy-disk"></i>
+                                        </button>
+                                    </form>
+                                    <c:if test="${promo.stock == 0}"><span class="text-xs text-red-500 font-semibold">Agotado</span></c:if>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${promo.activo ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}">
+                                        ${promo.activo ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <a href="${pageContext.request.contextPath}/admin/productos?action=editarPromocion&id=${promo.id}"
+                                       class="text-blue-500 hover:text-blue-700 mr-3"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <form action="${pageContext.request.contextPath}/admin/productos"
+                                          method="post" enctype="multipart/form-data" class="inline"
+                                          onsubmit="return confirm('¿Eliminar esta promoción?')">
+                                        <input type="hidden" name="action" value="eliminarPromocion">
+                                        <input type="hidden" name="tab" value="promociones">
+                                        <input type="hidden" name="id" value="${promo.id}">
+                                        <button type="submit" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty promociones}">
+                            <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No hay promociones. Crea la primera arriba.</td></tr>
+                        </c:if>
                     </tbody>
                 </table>
             </div>
@@ -393,52 +512,59 @@
 
 <script>
     // ── TABS ──────────────────────────────────────────────────────────────────
+    var tabs = ['productos', 'categorias', 'promociones'];
+
     function cambiarTab(tab) {
-        var esCat = tab === 'categorias';
-        document.getElementById('tabProductos').classList.toggle('hidden', esCat);
-        document.getElementById('tabCategorias').classList.toggle('hidden', !esCat);
-        document.getElementById('tabProductosBtn').classList.toggle('activo', !esCat);
-        document.getElementById('tabCategoriasBtn').classList.toggle('activo', esCat);
-        document.getElementById('tabProductosBtn').classList.toggle('text-gray-500', esCat);
-        document.getElementById('tabCategoriasBtn').classList.toggle('text-gray-500', !esCat);
+        tabs.forEach(function(t) {
+            var panel = document.getElementById('tab' + capitalizar(t));
+            var btn   = document.getElementById('tab' + capitalizar(t) + 'Btn');
+            var esTuyo = t === tab;
+            panel.classList.toggle('hidden', !esTuyo);
+            btn.classList.toggle('activo', esTuyo);
+            btn.classList.toggle('text-gray-500', !esTuyo);
+        });
     }
 
-    // Si viene de una acción de categoría, abrir tab categorías
-    var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tab') === 'categorias' || '${tabActivo}' === 'categorias'
-            || '${not empty categoriaEditar}' === 'true') {
+    function capitalizar(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    // Detectar tab activo al cargar
+    var tabActivo = '${tabActivo}';
+    var urlTab    = new URLSearchParams(window.location.search).get('tab');
+    var hayCategoria  = '${not empty categoriaEditar}' === 'true';
+    var hayPromocion  = '${not empty promocionEditar}' === 'true';
+
+    if (hayCategoria || tabActivo === 'categorias' || urlTab === 'categorias') {
         cambiarTab('categorias');
+    } else if (hayPromocion || tabActivo === 'promociones' || urlTab === 'promociones') {
+        cambiarTab('promociones');
     }
 
-    // ── IMAGEN PRODUCTO ───────────────────────────────────────────────────────
-    function mostrarPreview(input) {
+    // ── PREVIEW IMAGEN GENÉRICO ───────────────────────────────────────────────
+    function mostrarPreview(input, imgId, previewId, fileNameId) {
         if (input.files && input.files[0]) {
             var file = input.files[0];
-            document.getElementById('fileName').textContent = '✅ ' + file.name;
+            document.getElementById(fileNameId).textContent = '✅ ' + file.name;
             var reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('imgPreview').src = e.target.result;
-                document.getElementById('previewNueva').classList.remove('hidden');
+                document.getElementById(imgId).src = e.target.result;
+                document.getElementById(previewId).classList.remove('hidden');
             };
             reader.readAsDataURL(file);
         }
     }
 
+    // ── DRAG AND DROP para producto ───────────────────────────────────────────
     var dropZone = document.getElementById('dropZone');
     if (dropZone) {
-        dropZone.addEventListener('dragover', function(e) {
-            e.preventDefault(); dropZone.classList.add('dragover');
-        });
+        dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dragover'); });
         dropZone.addEventListener('drop', function(e) {
             e.preventDefault(); dropZone.classList.remove('dragover');
             var file = e.dataTransfer.files[0];
             if (file && file.type.startsWith('image/')) {
                 var input = document.getElementById('imagenFile');
-                var dt = new DataTransfer();
-                dt.items.add(file);
-                input.files = dt.files;
-                mostrarPreview(input);
+                var dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+                mostrarPreview(input, 'imgPreview', 'previewNueva', 'fileName');
             }
         });
     }
