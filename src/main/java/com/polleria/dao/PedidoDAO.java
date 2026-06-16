@@ -180,9 +180,25 @@ public class PedidoDAO {
         
         p.setFecha(rs.getString("fecha"));
         // usuarioNombre solo viene cuando hay JOIN con usuarios
+        // ANTES — quitar esto:
         try {
             p.setUsuarioNombre(rs.getString("usuario_nombre"));
         } catch (SQLException e) {
+        }
+
+// DESPUÉS — poner esto:
+        try {
+            String nombreCompleto = rs.getString("usuario_nombre_completo");
+            if (nombreCompleto != null && !nombreCompleto.trim().isEmpty()) {
+                p.setUsuarioNombre(nombreCompleto.trim());
+            } else {
+                p.setUsuarioNombre(rs.getString("usuario_nombre"));
+            }
+        } catch (SQLException e) {
+            try {
+                p.setUsuarioNombre(rs.getString("usuario_nombre"));
+            } catch (SQLException ex) {
+            }
         }
         return p;
     }
@@ -219,8 +235,11 @@ public class PedidoDAO {
 // ── NUEVO: listar por estado (chef / delivery) ─────────
     public List<Pedido> listarPorEstado(String estado) throws SQLException {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT p.*, u.nombre as usuario_nombre FROM pedidos p "
+        String sql = "SELECT p.*, u.nombre as usuario_nombre, "
+                + "CONCAT(u.nombre, ' ', COALESCE(c.apellido, '')) as usuario_nombre_completo "
+                + "FROM pedidos p "
                 + "JOIN usuarios u ON p.usuario_id = u.id "
+                + "LEFT JOIN clientes c ON c.usuario_id = u.id "
                 + "WHERE p.estado = ? ORDER BY p.fecha ASC";
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, estado);

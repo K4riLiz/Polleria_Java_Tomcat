@@ -103,6 +103,9 @@
                         <p class="text-sm text-gray-500">
                             <i class="fa-regular fa-clock mr-1"></i>${p.fecha}
                         </p>
+                        <p class="text-sm font-semibold text-gray-700">
+                            <i class="fa-solid fa-user mr-1 text-gray-400"></i>${p.usuarioNombre}
+                        </p>
                         <p class="text-sm text-gray-500">
                             <i class="fa-solid fa-location-dot mr-1"></i>${p.direccion}
                         </p>
@@ -142,6 +145,10 @@
 
                             <!-- Info básica -->
                             <div class="px-6 py-4 border-b border-gray-100 grid grid-cols-2 gap-3 text-sm">
+                                <div class="col-span-2">
+                                <p class="text-xs text-gray-400 font-semibold uppercase mb-1">Cliente</p>
+                                <p class="text-gray-700 font-semibold">${p.usuarioNombre}</p>
+                                </div>
                                 <div>
                                     <p class="text-xs text-gray-400 font-semibold uppercase mb-1">Fecha</p>
                                     <p class="text-gray-700">${p.fecha}</p>
