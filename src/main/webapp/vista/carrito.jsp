@@ -77,9 +77,9 @@
                                         −
                                     </button>
                                     <span class="w-8 text-center font-bold text-gray-800">${item.cantidad}</span>
-                                    <c:set var="stockItem" value="${item.tipo == 'producto' ? stocks[item.productoId] : 999}"/>
+                                    <c:set var="stockItem" value="${item.tipo == 'producto' ? stocks[item.productoId] : stocksPromociones[item.productoId]}"/>
                                     <c:choose>
-                                        <c:when test="${item.tipo == 'producto' && item.cantidad >= stockItem}">
+                                        <c:when test="${item.cantidad >= stockItem}">
                                             <span class="w-8 h-8 rounded-full border-2 border-gray-200 text-gray-300 flex items-center justify-center cursor-not-allowed" title="Stock máximo">+</span>
                                         </c:when>
                                         <c:otherwise>

@@ -3,6 +3,7 @@ package com.polleria.servlet;
 import com.polleria.dao.UsuarioDAO;
 import com.polleria.model.Usuario;
 import com.polleria.util.EmailService;
+import com.polleria.util.PasswordValidator;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -177,6 +178,18 @@ public class LoginServlet extends HttpServlet {
             UsuarioDAO dao = new UsuarioDAO();
             if (dao.emailExiste(email)) {
                 req.setAttribute("errorRegistro", "El correo ya está registrado");
+                req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+                return;
+            }
+
+            String confirmPassword = req.getParameter("confirmPassword");
+            if (!PasswordValidator.esValida(password)) {
+                req.setAttribute("errorRegistro", PasswordValidator.MENSAJE_ERROR);
+                req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
+                return;
+            }
+            if (confirmPassword == null || !PasswordValidator.coinciden(password, confirmPassword)) {
+                req.setAttribute("errorRegistro", "Las contraseñas no coinciden.");
                 req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
                 return;
             }

@@ -87,6 +87,10 @@
                     <p class="text-3xl font-bold text-red-600">
                         S/ <fmt:formatNumber value="${promocion.precio}" pattern="#,##0.00"/>
                     </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <i class="fa-solid fa-box-open mr-1"></i>
+                        ${promocion.stock} disponible(s)
+                    </p>
                 </div>
 
                 <p class="text-xs text-gray-400 italic">
@@ -190,6 +194,7 @@
 
     <script>
         const precioBase = ${promocion.precio};
+        const stockMax = ${promocion.stock};
 
         function agregarAlPedido() {
             let precioExtra = 0;
@@ -223,7 +228,7 @@
             const el = document.getElementById('cantidad');
             let v = parseInt(el.textContent) + delta;
             if (v < 1) v = 1;
-            if (v > 20) v = 20;
+            if (v > stockMax) v = stockMax;
             el.textContent = v;
 
             let precioExtra = 0;

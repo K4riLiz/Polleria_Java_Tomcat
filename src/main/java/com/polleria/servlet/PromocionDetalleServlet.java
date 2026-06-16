@@ -27,7 +27,7 @@ public class PromocionDetalleServlet extends HttpServlet {
             int id = Integer.parseInt(idParam);
             PromocionDAO dao = new PromocionDAO();
             Promocion promocion = dao.obtenerPorId(id);
-            if (promocion == null) {
+            if (promocion == null || !promocion.isActivo() || promocion.getStock() <= 0) {
                 resp.sendRedirect(req.getContextPath() + "/promociones");
                 return;
             }

@@ -2,7 +2,9 @@ package com.polleria.servlet.admin;
 
 import com.polleria.dao.CategoriaDAO;
 import com.polleria.dao.ProductoDAO;
+import com.polleria.dao.PromocionDAO;
 import com.polleria.model.Producto;
+import com.polleria.model.Promocion;
 import com.polleria.model.Usuario;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -20,7 +22,6 @@ import java.util.List;
 
 public class AdminProductoServlet extends HttpServlet {
 
-    // Carpeta donde se guardarán las imágenes
     private static final String IMG_DIR = "img";
 
     @Override
@@ -29,19 +30,31 @@ public class AdminProductoServlet extends HttpServlet {
 
         if (!esAdmin(req, resp)) return;
 
+        String tab = req.getParameter("tab");
+        if (tab == null || tab.isEmpty()) tab = "productos";
+        req.setAttribute("tab", tab);
+
         String action = req.getParameter("action");
 
         try {
-            ProductoDAO prodDAO = new ProductoDAO();
-            CategoriaDAO catDAO = new CategoriaDAO();
-
-            if ("editar".equals(action)) {
-                int id = Integer.parseInt(req.getParameter("id"));
-                req.setAttribute("productoEditar", prodDAO.obtenerPorId(id));
+            if ("promociones".equals(tab)) {
+                PromocionDAO promoDAO = new PromocionDAO();
+                if ("editar".equals(action)) {
+                    int id = Integer.parseInt(req.getParameter("id"));
+                    req.setAttribute("promocionEditar", promoDAO.obtenerPorId(id));
+                }
+                req.setAttribute("promociones", promoDAO.listarTodosAdmin());
+            } else {
+                ProductoDAO prodDAO = new ProductoDAO();
+                CategoriaDAO catDAO = new CategoriaDAO();
+                if ("editar".equals(action)) {
+                    int id = Integer.parseInt(req.getParameter("id"));
+                    req.setAttribute("productoEditar", prodDAO.obtenerPorId(id));
+                }
+                req.setAttribute("productos", prodDAO.listarTodosAdmin());
+                req.setAttribute("categorias", catDAO.listarTodas());
             }
 
-            req.setAttribute("productos", prodDAO.listarTodosAdmin());
-            req.setAttribute("categorias", catDAO.listarTodas());
             req.getRequestDispatcher("/vista/admin/productos.jsp").forward(req, resp);
 
         } catch (SQLException e) {
@@ -56,8 +69,10 @@ public class AdminProductoServlet extends HttpServlet {
 
         if (!esAdmin(req, resp)) return;
 
-        // Actualización rápida de stock (formulario simple, sin multipart)
         String actionParam = req.getParameter("action");
+        String tabParam = req.getParameter("tab");
+        String redirectTab = "promociones".equals(tabParam) ? "?tab=promociones" : "";
+
         if ("actualizarStock".equals(actionParam)) {
             try {
                 int id = Integer.parseInt(req.getParameter("id"));
@@ -71,27 +86,36 @@ public class AdminProductoServlet extends HttpServlet {
             return;
         }
 
-        // Verificar si es multipart (subida de archivo)
+        if ("actualizarStockPromocion".equals(actionParam)) {
+            try {
+                int id = Integer.parseInt(req.getParameter("id"));
+                int stock = parseStock(req.getParameter("stock"));
+                new PromocionDAO().actualizarStock(id, stock);
+                req.getSession().setAttribute("exito", "Stock de promoción actualizado correctamente.");
+            } catch (Exception e) {
+                req.getSession().setAttribute("error", "Error al actualizar stock: " + e.getMessage());
+            }
+            resp.sendRedirect(req.getContextPath() + "/admin/productos?tab=promociones");
+            return;
+        }
+
         if (!ServletFileUpload.isMultipartContent(req)) {
             req.getSession().setAttribute("error", "Formulario inválido.");
-            resp.sendRedirect(req.getContextPath() + "/admin/productos");
+            resp.sendRedirect(req.getContextPath() + "/admin/productos" + redirectTab);
             return;
         }
 
         try {
-            // Configurar directorio de subida
             String uploadPath = getServletContext().getRealPath("") + File.separator + IMG_DIR;
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) uploadDir.mkdirs();
 
-            // Procesar el formulario multipart
             DiskFileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
             List<FileItem> items = upload.parseRequest(req);
 
-            // Variables del formulario
             String action = "", nombre = "", descripcion = "", imagen = "";
-            String id = "", precio = "", categoriaId = "", activo = "1", stock = "0";
+            String id = "", precio = "", categoriaId = "", activo = "1", stock = "0", tab = "productos";
 
             for (FileItem item : items) {
                 if (item.isFormField()) {
@@ -105,10 +129,10 @@ public class AdminProductoServlet extends HttpServlet {
                         case "activo"      -> activo      = item.getString("UTF-8");
                         case "stock"       -> stock       = item.getString("UTF-8");
                         case "imagenActual"-> imagen      = item.getString("UTF-8");
+                        case "tab"         -> tab         = item.getString("UTF-8");
                     }
                 } else {
-                    // Es un archivo
-                    if (item.getFieldName().equals("imagenFile") && item.getSize() > 0) {
+                    if ("imagenFile".equals(item.getFieldName()) && item.getSize() > 0) {
                         String fileName = System.currentTimeMillis() + "_" +
                                 new File(item.getName()).getName();
                         File file = new File(uploadDir + File.separator + fileName);
@@ -118,8 +142,13 @@ public class AdminProductoServlet extends HttpServlet {
                 }
             }
 
-            ProductoDAO dao = new ProductoDAO();
+            if ("promociones".equals(tab)) {
+                procesarPromocion(req, action, id, nombre, descripcion, precio, activo, stock, imagen);
+                resp.sendRedirect(req.getContextPath() + "/admin/productos?tab=promociones");
+                return;
+            }
 
+            ProductoDAO dao = new ProductoDAO();
             switch (action) {
                 case "crear" -> {
                     Producto p = new Producto();
@@ -156,7 +185,42 @@ public class AdminProductoServlet extends HttpServlet {
             req.getSession().setAttribute("error", "Error: " + e.getMessage());
         }
 
-        resp.sendRedirect(req.getContextPath() + "/admin/productos");
+        resp.sendRedirect(req.getContextPath() + "/admin/productos" + redirectTab);
+    }
+
+    private void procesarPromocion(HttpServletRequest req, String action, String id,
+                                   String nombre, String descripcion, String precio,
+                                   String activo, String stock, String imagen) throws SQLException {
+        PromocionDAO dao = new PromocionDAO();
+        switch (action) {
+            case "crearPromocion" -> {
+                Promocion p = new Promocion();
+                p.setNombre(nombre);
+                p.setDescripcion(descripcion);
+                p.setPrecio(Double.parseDouble(precio));
+                p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
+                p.setStock(parseStock(stock));
+                p.setActivo(true);
+                dao.crear(p);
+                req.getSession().setAttribute("exito", "Promoción creada correctamente.");
+            }
+            case "actualizarPromocion" -> {
+                Promocion p = new Promocion();
+                p.setId(Integer.parseInt(id));
+                p.setNombre(nombre);
+                p.setDescripcion(descripcion);
+                p.setPrecio(Double.parseDouble(precio));
+                p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
+                p.setActivo("1".equals(activo));
+                p.setStock(parseStock(stock));
+                dao.actualizar(p);
+                req.getSession().setAttribute("exito", "Promoción actualizada correctamente.");
+            }
+            case "eliminarPromocion" -> {
+                dao.eliminar(Integer.parseInt(id));
+                req.getSession().setAttribute("exito", "Promoción eliminada correctamente.");
+            }
+        }
     }
 
     private boolean esAdmin(HttpServletRequest req, HttpServletResponse resp)

@@ -29,7 +29,7 @@ body{
     height: 40px;
     border: 2px solid #a0594b;
     border-radius: 50%;
-    padding: 10px;
+    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -52,13 +52,13 @@ body{
 
 
 .close ion-icon {
-    /* El valor por defecto es 32px. Prueba con 48px o 64px para que sea grueso */
-    --ionicon-stroke-width: 100px; 
-    font-size: 100px; /* Esto ajusta el tamaño general del icono */
+    /* El valor por defecto es 32px */
+    --ionicon-stroke-width: 80px; 
+    font-size: 80px; 
 }
 .container{
     width: 800px;
-    height: 500px;
+    height: 700px;
     display: flex;
     position: relative;  
     background-color: white;
@@ -665,4 +665,93 @@ button{
     .btn-modal-enviar{
         justify-content: center;
     }
+}
+
+/* =========================
+   VALIDACIÓN VISUAL CONTRASEÑA
+========================= */
+.pass-requirements{
+    list-style: none;
+    margin: 4px 0 6px;
+    padding: 6px 8px 3px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+ /*desde aqui*/
+.pass-req-item{
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    margin: 2px 0;
+    font-size: 11px;
+    line-height: 0.4;
+    color: #9ca3af;
+    transition: color 0.2s;
+}
+
+.pass-req-item .pass-req-icon{
+    font-size: 6px;
+    width: 10px;
+    margin-top: 4px; /* ajusta el punto a la primera línea */
+    flex-shrink: 0;
+}
+
+.pass-req-item span{
+    flex: 1;
+    word-break: break-word;
+}
+/*s*/
+.pass-req-item.pending .pass-req-icon{
+    color: #d1d5db;
+}
+
+.pass-req-item.valid{
+    color: #16a34a;
+}
+
+.pass-req-item.valid .pass-req-icon{
+    color: #16a34a;
+}
+
+.pass-req-item.invalid{
+    color: #dc2626;
+}
+
+.pass-req-item.invalid .pass-req-icon{
+    color: #dc2626;
+}
+
+.pass-req-item:last-child{
+    margin-bottom: 0 !important;
+}
+
+.pass-match-list{
+    margin-top: -4px;
+    padding: 4px 8px !important;
+}
+
+.pass-match-list .pass-req-item{
+    margin: 0;
+}
+
+.button.pass-submit-disabled,
+.sign-up .button:disabled{
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.modal-campo-pass .pass-requirements{
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+/*Espacio entre requisitos*/
+.pass-req-item + .pass-req-item{
+    margin-top: 3px;
+}
+
+.pass-req-item{
+    margin: 1px 0;
 }
