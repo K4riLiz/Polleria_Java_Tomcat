@@ -49,8 +49,9 @@
                         <a href="${pageContext.request.contextPath}/producto?id=${prod.id}"
                            class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col group hover:shadow-xl transition">
                             <div class="overflow-hidden">
-                                <img src="${pageContext.request.contextPath}/img/${prod.imagen}"
-                                     class="w-full h-[160px] object-cover group-hover:scale-105 transition duration-400">
+                                <img src="${prod.imagen}"
+                                     class="w-full h-[160px] object-cover group-hover:scale-105 transition duration-400"
+                                     onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.webp'">
                             </div>
                             <div class="p-4 flex flex-col flex-1">
                                 <h3 class="font-semibold text-sm mb-1">${prod.nombre}</h3>

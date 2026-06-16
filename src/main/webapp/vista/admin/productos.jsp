@@ -173,9 +173,9 @@
                             <c:if test="${not empty productoEditar.imagen}">
                                 <div class="flex-shrink-0">
                                     <p class="text-xs text-gray-400 mb-1">Imagen actual:</p>
-                                    <img src="${pageContext.request.contextPath}/img/${productoEditar.imagen}"
+                                    <img src="${productoEditar.imagen}" 
                                          id="previewActual" class="preview-img border"
-                                         onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
+                                         onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.webp'">
                                 </div>
                             </c:if>
                             <div class="flex-1">
@@ -231,7 +231,7 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3 text-gray-400">${p.id}</td>
                                 <td class="px-4 py-3">
-                                    <img src="${pageContext.request.contextPath}/img/${p.imagen}"
+                                    <img src="${p.imagen}"
                                          class="w-12 h-12 object-cover rounded-lg"
                                          onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
                                 </td>

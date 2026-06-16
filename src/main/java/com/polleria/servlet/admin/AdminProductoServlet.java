@@ -5,6 +5,7 @@ import com.polleria.dao.ProductoDAO;
 import com.polleria.model.Categoria;
 import com.polleria.model.Producto;
 import com.polleria.model.Usuario;
+import com.polleria.util.CloudinaryService;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -14,14 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
 public class AdminProductoServlet extends HttpServlet {
-
-    private static final String IMG_DIR = "img";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -117,10 +115,6 @@ public class AdminProductoServlet extends HttpServlet {
         }
 
         try {
-            String uploadPath = getServletContext().getRealPath("") + File.separator + IMG_DIR;
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
-
             DiskFileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
             List<FileItem> items = upload.parseRequest(req);
@@ -142,11 +136,11 @@ public class AdminProductoServlet extends HttpServlet {
                         case "imagenActual" -> imagen      = item.getString("UTF-8");
                     }
                 } else {
+                    // Archivo de imagen -> subir a Cloudinary en vez de guardarlo localmente
                     if (item.getFieldName().equals("imagenFile") && item.getSize() > 0) {
-                        String fileName = System.currentTimeMillis() + "_" +
-                                new File(item.getName()).getName();
-                        item.write(new File(uploadDir + File.separator + fileName));
-                        imagen = fileName;
+                        byte[] datos = item.get();
+                        String urlImagen = CloudinaryService.subirImagen(datos);
+                        imagen = urlImagen; // ahora "imagen" guarda la URL completa de Cloudinary
                     }
                 }
             }
@@ -158,7 +152,7 @@ public class AdminProductoServlet extends HttpServlet {
                     p.setNombre(nombre);
                     p.setDescripcion(descripcion);
                     p.setPrecio(Double.parseDouble(precio));
-                    p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
+                    p.setImagen(imagen.isEmpty() ? "" : imagen);
                     p.setCategoriaId(Integer.parseInt(categoriaId));
                     p.setStock(parseStock(stock));
                     p.setActivo(true);
@@ -171,7 +165,7 @@ public class AdminProductoServlet extends HttpServlet {
                     p.setNombre(nombre);
                     p.setDescripcion(descripcion);
                     p.setPrecio(Double.parseDouble(precio));
-                    p.setImagen(imagen.isEmpty() ? "pollobrasa.png" : imagen);
+                    p.setImagen(imagen.isEmpty() ? "" : imagen);
                     p.setCategoriaId(Integer.parseInt(categoriaId));
                     p.setActivo("1".equals(activo));
                     p.setStock(parseStock(stock));
