@@ -16,7 +16,7 @@
 
     <%-- BANNER CATEGORÍA --%>
     <div class="relative w-full h-[200px] overflow-hidden">
-        <img src="${categoria.imagen}"
+        <img src="${pageContext.request.contextPath}/img/${categoria.imagen}"
              class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
             <h1 class="text-white text-4xl font-bold">${categoria.nombre}</h1>
