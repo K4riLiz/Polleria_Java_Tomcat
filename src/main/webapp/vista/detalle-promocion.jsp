@@ -33,10 +33,8 @@
         }
         .btn-cantidad:hover { background: #c0392b; color: white; }
         .opciones-scroll {
-            max-height: 320px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #f87171 #f3f4f6;
+            max-height: 320px; overflow-y: auto;
+            scrollbar-width: thin; scrollbar-color: #f87171 #f3f4f6;
         }
         .opciones-scroll::-webkit-scrollbar { width: 4px; }
         .opciones-scroll::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 4px; }
@@ -47,7 +45,6 @@
 
     <jsp:include page="/components/header.jsp"/>
 
-    <!-- BREADCRUMB -->
     <div class="max-w-5xl mx-auto px-4 py-3 text-sm text-gray-400 flex items-center gap-2">
         <a href="${pageContext.request.contextPath}/home" class="hover:text-red-600">Inicio</a>
         <span>/</span>
@@ -56,7 +53,6 @@
         <span class="text-gray-700 font-medium">${promocion.nombre}</span>
     </div>
 
-    <!-- VOLVER -->
     <div class="max-w-5xl mx-auto px-4 mb-3">
         <a href="${pageContext.request.contextPath}/promociones"
            class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-red-600 transition font-medium">
@@ -64,23 +60,19 @@
         </a>
     </div>
 
-    <!-- CONTENIDO -->
     <div class="max-w-5xl mx-auto px-4 pb-20">
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
 
-            <!-- IMAGEN -->
             <div class="md:w-1/2 relative min-h-[280px]">
-                <img src="${promocion.imagen}"
-                     alt="${promocion.nombre}"
-                     class="w-full h-full object-cover min-h-[280px]">
+                <img src="${promocion.imagen}" alt="${promocion.nombre}"
+                     class="w-full h-full object-cover min-h-[280px]"
+                     onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
                 <span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
                     Promoción
                 </span>
             </div>
 
-            <!-- INFO -->
             <div class="md:w-1/2 p-6 md:p-8 flex flex-col gap-4">
-
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 mb-1">${promocion.nombre}</h1>
                     <p class="text-gray-500 text-sm leading-relaxed mb-3">${promocion.descripcion}</p>
@@ -93,11 +85,10 @@
                     </p>
                 </div>
 
-                <p class="text-xs text-gray-400 italic">
-                    Por favor, elige tus opciones para continuar con tu pedido.
-                </p>
+                <c:if test="${not empty opcionesPorGrupo}">
+                    <p class="text-xs text-gray-400 italic">Por favor, elige tus opciones para continuar.</p>
+                </c:if>
 
-                <!-- OPCIONES con scroll interno -->
                 <div class="border border-gray-100 rounded-xl overflow-hidden">
                     <c:choose>
                         <c:when test="${not empty opcionesPorGrupo}">
@@ -106,7 +97,6 @@
                                     <c:set var="grupo" value="${entrada.key}"/>
                                     <c:set var="listaOpciones" value="${entrada.value}"/>
                                     <c:set var="color" value="${coloresPorGrupo[grupo] != null ? coloresPorGrupo[grupo] : 'bg-gray-500'}"/>
-
                                     <div>
                                         <div class="flex items-center justify-between px-4 py-3 ${color} text-white cursor-pointer select-none" onclick="toggle(this)">
                                             <div class="flex items-center gap-2 text-sm font-semibold">
@@ -122,8 +112,7 @@
                                                                name="${grupo}"
                                                                id="op${op.id}"
                                                                value="${op.nombre}"
-                                                               data-precio="${op.precioAdicional}"
-                                                               data-grupo="${grupo}">
+                                                               data-precio="${op.precioAdicional}">
                                                         <label for="op${op.id}">
                                                             ${op.nombre}
                                                             <c:if test="${op.precioAdicional > 0}">
@@ -149,7 +138,6 @@
                     </c:choose>
                 </div>
 
-                <!-- COMENTARIO -->
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">
                         <i class="fa-regular fa-comment mr-1"></i> Comentario
@@ -158,26 +146,23 @@
                               class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 resize-none"></textarea>
                 </div>
 
-                <!-- CANTIDAD + BOTÓN -->
                 <div class="flex items-center gap-4 mt-auto">
                     <div class="flex items-center gap-3">
-                        <button class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
+                        <button type="button" class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
                         <span id="cantidad" class="text-xl font-bold w-8 text-center">1</span>
-                        <button class="btn-cantidad" onclick="cambiarCantidad(1)">+</button>
+                        <button type="button" class="btn-cantidad" id="btnMas" onclick="cambiarCantidad(1)">+</button>
                     </div>
-                    <button onclick="agregarAlPedido()"
+                    <button type="button" id="btnAgregar" onclick="agregarAlPedido()"
                             class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-cart-plus"></i>
                         Añadir a mi pedido — S/ <span id="precioTotal"><fmt:formatNumber value="${promocion.precio}" pattern="#,##0.00"/></span>
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
 
     <jsp:include page="/components/footer.jsp"/>
-
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
@@ -193,56 +178,104 @@
     </form>
 
     <script>
-        const precioBase = ${promocion.precio};
-        const stockMax = ${promocion.stock};
+        var precioBase  = ${promocion.precio};
+        var stockMax    = ${promocion.stock};
+        var yaEnCarrito = false;
 
-        function agregarAlPedido() {
-            let precioExtra = 0;
-            const opcionesSeleccionadas = [];
-
-            const todosInputs = document.querySelectorAll('input[type="radio"][data-grupo]');
-            const gruposUnicos = [...new Set([...todosInputs].map(i => i.name))];
-
-            for (const nombre of gruposUnicos) {
-                const checked = document.querySelector(`input[name="${CSS.escape(nombre)}"]:checked`);
-                const hayInputs = document.querySelector(`input[name="${CSS.escape(nombre)}"]`);
-                if (hayInputs && !checked) {
-                    alert(`Por favor selecciona una opción de: ${nombre}`);
-                    return;
-                }
-                if (checked) {
-                    precioExtra += parseFloat(checked.dataset.precio || 0);
-                    opcionesSeleccionadas.push(checked.value);
-                }
-            }
-
-            const cantidad = parseInt(document.getElementById('cantidad').textContent);
-            const precioFinal = (precioBase + precioExtra) * cantidad;
-            document.getElementById('precioTotal').textContent = precioFinal.toFixed(2);
-            document.getElementById('opcionesInput').value = opcionesSeleccionadas.join(', ');
+        // ── Recalcular precio ─────────────────────────────────────────────────
+        function recalcularPrecio() {
+            var cantidad    = parseInt(document.getElementById('cantidad').textContent);
+            var precioExtra = 0;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(function(i) {
+                precioExtra += parseFloat(i.dataset.precio || 0);
+            });
+            var total = (precioBase + precioExtra) * cantidad;
+            document.getElementById('precioTotal').textContent = total.toFixed(2);
+            document.getElementById('cantidadInput').value = cantidad;
             document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
-            document.getElementById('formCarrito').submit();
         }
 
+        // Actualizar precio al seleccionar opción
+        document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                recalcularPrecio();
+                if (yaEnCarrito) {
+                    yaEnCarrito = false;
+                    restaurarBtn();
+                }
+            });
+        });
+
+        // ── Cantidad ──────────────────────────────────────────────────────────
         function cambiarCantidad(delta) {
-            const el = document.getElementById('cantidad');
-            let v = parseInt(el.textContent) + delta;
+            var el = document.getElementById('cantidad');
+            var v  = parseInt(el.textContent) + delta;
             if (v < 1) v = 1;
             if (v > stockMax) v = stockMax;
             el.textContent = v;
+            recalcularPrecio();
+            if (yaEnCarrito) {
+                yaEnCarrito = false;
+                restaurarBtn();
+            }
+        }
 
-            let precioExtra = 0;
-            document.querySelectorAll('input[type="radio"]:checked').forEach(i => {
-                precioExtra += parseFloat(i.dataset.precio || 0);
+        // ── Estados del botón ─────────────────────────────────────────────────
+        function setBtnExito() {
+            var btn = document.getElementById('btnAgregar');
+            btn.onclick = null;
+            btn.className = 'flex-1 bg-green-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm';
+            btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Añadido al pedido!';
+            yaEnCarrito = true;
+        }
+
+        function restaurarBtn() {
+            var btn = document.getElementById('btnAgregar');
+            btn.onclick = agregarAlPedido;
+            btn.className = 'flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm';
+            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Añadir a mi pedido — S/ <span id="precioTotal">0.00</span>';
+            recalcularPrecio();
+        }
+
+        // ── Agregar al carrito ────────────────────────────────────────────────
+        function agregarAlPedido() {
+            // Recoger grupos únicos por name
+            var radios = document.querySelectorAll('input[type="radio"]');
+            var grupos = [];
+            radios.forEach(function(r) {
+                if (grupos.indexOf(r.name) === -1) grupos.push(r.name);
             });
 
-            document.getElementById('precioTotal').textContent = ((precioBase + precioExtra) * v).toFixed(2);
-            document.getElementById('cantidadInput').value = v;
+            var opcionesSeleccionadas = [];
+            var precioExtra = 0;
+
+            for (var i = 0; i < grupos.length; i++) {
+                var checked = document.querySelector('input[name="' + grupos[i] + '"]:checked');
+                if (!checked) {
+                    alert('Por favor selecciona una opción de: ' + grupos[i]);
+                    return;
+                }
+                precioExtra += parseFloat(checked.dataset.precio || 0);
+                opcionesSeleccionadas.push(checked.value);
+            }
+
+            var cantidad = parseInt(document.getElementById('cantidad').textContent);
+            if (cantidad > stockMax) {
+                alert('Solo puedes pedir ' + stockMax + ' unidad(es).');
+                return;
+            }
+
+            document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
+            document.getElementById('opcionesInput').value       = opcionesSeleccionadas.join(', ');
+            document.getElementById('cantidadInput').value       = cantidad;
+
+            setBtnExito();
+            document.getElementById('formCarrito').submit();
         }
 
         function toggle(header) {
-            const content = header.nextElementSibling;
-            const chevron = header.querySelector('.chevron');
+            var content = header.nextElementSibling;
+            var chevron = header.querySelector('.chevron');
             if (chevron.classList.contains('abierto')) {
                 content.style.maxHeight = '0px';
                 chevron.classList.remove('abierto');
