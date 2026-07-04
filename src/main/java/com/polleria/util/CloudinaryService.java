@@ -11,22 +11,21 @@ public class CloudinaryService {
     private static Cloudinary getInstance() {
         if (cloudinary == null) {
             cloudinary = new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", "ddtnuqqs7",
-                "api_key", "923397728892225",
-                "api_secret", "LKOCda_aevFdb27NL-Ck2jRhZNE"
+                "cloud_name", ConfigLoader.get("cloudinary.cloud_name"),
+                "api_key",    ConfigLoader.get("cloudinary.api_key"),
+                "api_secret", ConfigLoader.get("cloudinary.api_secret")
             ));
         }
         return cloudinary;
     }
 
-    // Sube una imagen y devuelve la URL pública
     public static String subirImagen(byte[] datosImagen) throws Exception {
         Map uploadResult = getInstance().uploader().upload(datosImagen, ObjectUtils.asMap(
-                "folder", "polleria/productos",
-                "transformation", new com.cloudinary.Transformation()
-                        .width(800)
-                        .quality("auto")
-                        .fetchFormat("auto")
+            "folder", "polleria/productos",
+            "transformation", new com.cloudinary.Transformation()
+                .width(800)
+                .quality("auto")
+                .fetchFormat("auto")
         ));
         return (String) uploadResult.get("secure_url");
     }

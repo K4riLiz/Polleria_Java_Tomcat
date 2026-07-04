@@ -9,8 +9,8 @@ import java.util.List;
 
 public class EmailService {
 
-    private static final String API_KEY         = "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";
-    private static final String REMITENTE_EMAIL = "992485707kari@gmail.com";
+    private static final String API_KEY = ConfigLoader.get("brevo.api_key");
+    private static final String REMITENTE_EMAIL = ConfigLoader.get("brevo.remitente_email");
     private static final String REMITENTE_NOMBRE = "Pollería El Dorado";
     private static final HttpClient client = HttpClient.newHttpClient();
 

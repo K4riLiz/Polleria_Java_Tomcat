@@ -2,6 +2,7 @@ package com.polleria.servlet;
 
 import com.polleria.dao.UsuarioDAO;
 import com.polleria.model.Usuario;
+import com.polleria.util.ConfigLoader;
 import com.polleria.util.EmailService;
 import com.polleria.util.PasswordValidator;
 import javax.servlet.ServletException;
@@ -38,9 +39,8 @@ public class LoginServlet extends HttpServlet {
 
     // ── CAPTCHA V3 ──────────────────────────────────────────────────────────────────
     private boolean verificarCaptcha(String token) {
-      
         try {
-            String secretKey = "6LcthQQtAAAAAI2EqzSF_4VOyEW3ydK1SncOt8JS";
+            String secretKey = ConfigLoader.get("recaptcha.secret_key");  // ← solo esta línea
             java.net.URL url = new java.net.URL("https://www.google.com/recaptcha/api/siteverify");
             java.net.HttpURLConnection con = (java.net.HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
