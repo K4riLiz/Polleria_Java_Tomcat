@@ -1,0 +1,10 @@
+cloudinary.cloud_name=
+cloudinary.api_key=
+cloudinary.api_secret=
+recaptcha.secret_key=
+brevo.api_key=
+culqi.public_key=
+culqi.private_key=
+db.url=
+db.user=
+db.password=
