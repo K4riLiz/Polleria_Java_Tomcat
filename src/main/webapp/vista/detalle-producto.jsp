@@ -161,6 +161,7 @@
                         <span id="cantidad" class="text-xl font-bold w-8 text-center">1</span>
                         <button type="button" class="btn-cantidad" id="btnMas" onclick="cambiarCantidad(1)">+</button>
                     </div>
+                    <%-- El span id="precioTotal" siempre existe aquí para el estado inicial --%>
                     <button type="button" id="btnAgregar" onclick="agregarAlPedido()"
                             class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-cart-plus"></i>
@@ -191,29 +192,43 @@
         var stockMax        = ${producto.stock};
         var enCarrito       = ${not empty cantidadEnCarrito ? cantidadEnCarrito : 0};
         var stockDisponible = Math.max(0, stockMax - enCarrito);
-        var yaEnCarrito     = false;
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+
+        // Calcula el precio extra de las opciones seleccionadas
+        function getPrecioExtra() {
+            var extra = 0;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(function(i) {
+                extra += parseFloat(i.dataset.precio || 0);
+            });
+            return extra;
+        }
+
+        // Actualiza el span #precioTotal si existe (puede no existir cuando el botón es verde)
+        function actualizarSpanPrecio(cantidad, precioExtra) {
+            var span = document.getElementById('precioTotal');
+            if (span) {
+                span.textContent = ((precioBase + precioExtra) * cantidad).toFixed(2);
+            }
+            // Siempre actualizar el input hidden del precio unitario
+            document.querySelector('input[name="precio"]').value =
+                (precioBase + precioExtra).toFixed(2);
+            document.getElementById('cantidadInput').value = cantidad;
+        }
 
         // ── Recalcular precio ─────────────────────────────────────────────────
         function recalcularPrecio() {
             var cantidad    = parseInt(document.getElementById('cantidad').textContent);
-            var precioExtra = 0;
-            document.querySelectorAll('input[type="radio"]:checked').forEach(function(i) {
-                precioExtra += parseFloat(i.dataset.precio || 0);
-            });
-            var total = (precioBase + precioExtra) * cantidad;
-            document.getElementById('precioTotal').textContent = total.toFixed(2);
-            document.getElementById('cantidadInput').value = cantidad;
-            document.querySelector('input[name="precio"]').value = (precioBase + precioExtra).toFixed(2);
+            var precioExtra = getPrecioExtra();
+            actualizarSpanPrecio(cantidad, precioExtra);
         }
 
-        // Actualizar precio al seleccionar opción
+        // Escuchar cambios en radios
         document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
             radio.addEventListener('change', function() {
+                var cantActual = parseInt(document.getElementById('cantidad').textContent);
                 recalcularPrecio();
-                if (yaEnCarrito) {
-                    yaEnCarrito = false;
-                    restaurarBtn();
-                }
+                actualizarEstadoBtn(cantActual);
             });
         });
 
@@ -222,86 +237,144 @@
             var el = document.getElementById('cantidad');
             var v  = parseInt(el.textContent) + delta;
             if (v < 1) v = 1;
-            if (v > stockDisponible) v = stockDisponible;
+            if (v > stockMax) v = stockMax;
             el.textContent = v;
+            document.getElementById('btnMas').disabled = (v >= stockMax);
+            // Actualizar estado ANTES de recalcular precio
+            // para que el span exista en el botón cuando se llame actualizarSpanPrecio
+            actualizarEstadoBtn(v);
             recalcularPrecio();
-            document.getElementById('btnMas').disabled = (v >= stockDisponible);
-            // Si sube cantidad y ya estaba en carrito → volver a "agregar"
-            if (yaEnCarrito) {
-                yaEnCarrito = false;
-                restaurarBtn();
+        }
+
+        // ── Lógica central del estado del botón ───────────────────────────────
+        function actualizarEstadoBtn(cantidadActual) {
+            if (enCarrito > 0) {
+                if (cantidadActual === enCarrito) {
+                    setBtnVerde();
+                } else {
+                    setBtnActualizar(cantidadActual);
+                }
+            } else {
+                setBtnAgregar();
             }
         }
 
         // ── Estados del botón ─────────────────────────────────────────────────
-        function setBtnExito() {
+        function setBtnVerde() {
             var btn = document.getElementById('btnAgregar');
-            btn.onclick = null; // deshabilitar temporalmente
-            btn.className = 'flex-1 bg-green-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm';
-            btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Añadido al pedido!';
-            yaEnCarrito = true;
+            btn.onclick = null;
+            btn.className = 'flex-1 bg-green-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm cursor-default';
+            // Verde NO tiene span de precio — está confirmado
+            btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡En tu pedido!';
         }
 
-        function restaurarBtn() {
+        function setBtnAgregar() {
             var btn = document.getElementById('btnAgregar');
             btn.onclick = agregarAlPedido;
             btn.className = 'flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm';
-            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Añadir a mi pedido — S/ <span id="precioTotal">0.00</span>';
-            recalcularPrecio();
+            // Crear span con precio calculado
+            var extra    = getPrecioExtra();
+            var cantidad = parseInt(document.getElementById('cantidad').textContent);
+            var total    = ((precioBase + extra) * cantidad).toFixed(2);
+            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Añadir a mi pedido — S/ <span id="precioTotal">' + total + '</span>';
         }
 
-        // ── Agregar al carrito ────────────────────────────────────────────────
-        function agregarAlPedido() {
-            if (stockDisponible <= 0) {
-                alert('Este producto está agotado.');
-                return;
-            }
+        function setBtnActualizar(cantidad) {
+            var btn = document.getElementById('btnAgregar');
+            btn.onclick = actualizarPedido;
+            btn.className = 'flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm';
+            // Crear span con precio calculado
+            var extra = getPrecioExtra();
+            var total = ((precioBase + extra) * cantidad).toFixed(2);
+            btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Actualizar pedido (' + cantidad + ') — S/ <span id="precioTotal">' + total + '</span>';
+        }
 
-            // Recoger grupos únicos por name
+        // ── Recolectar opciones (devuelve null si falta alguna) ───────────────
+        function recolectarOpciones() {
             var radios = document.querySelectorAll('input[type="radio"]');
             var grupos = [];
             radios.forEach(function(r) {
                 if (grupos.indexOf(r.name) === -1) grupos.push(r.name);
             });
-
             var opcionesSeleccionadas = [];
             var precioExtra = 0;
-
             for (var i = 0; i < grupos.length; i++) {
                 var checked = document.querySelector('input[name="' + grupos[i] + '"]:checked');
                 if (!checked) {
                     alert('Por favor selecciona una opción de: ' + grupos[i]);
-                    return;
+                    return null;
                 }
                 precioExtra += parseFloat(checked.dataset.precio || 0);
                 opcionesSeleccionadas.push(checked.value);
             }
+            return { opciones: opcionesSeleccionadas, precioExtra: precioExtra };
+        }
+
+        // ── Agregar al carrito ────────────────────────────────────────────────
+        function agregarAlPedido() {
+            if (stockDisponible <= 0 && enCarrito === 0) {
+                alert('Este producto está agotado.');
+                return;
+            }
+            var resultado = recolectarOpciones();
+            if (resultado === null) return;
 
             var cantidad = parseInt(document.getElementById('cantidad').textContent);
-            if (cantidad > stockDisponible) {
-                alert('Solo puedes pedir ' + stockDisponible + ' unidad(es).');
+            if (cantidad > stockMax) {
+                alert('Solo puedes pedir ' + stockMax + ' unidad(es).');
                 return;
             }
 
-            document.querySelector('input[name="precio"]').value    = (precioBase + precioExtra).toFixed(2);
-            document.getElementById('opcionesInput').value          = opcionesSeleccionadas.join(', ');
-            document.getElementById('cantidadInput').value          = cantidad;
+            document.querySelector('input[name="precio"]').value = (precioBase + resultado.precioExtra).toFixed(2);
+            document.getElementById('opcionesInput').value       = resultado.opciones.join(', ');
+            document.getElementById('cantidadInput').value       = cantidad;
+            document.querySelector('input[name="action"]').value = 'agregar';
 
-            setBtnExito();
+            enCarrito = cantidad;
+            setBtnVerde();
+            document.getElementById('formCarrito').submit();
+        }
+
+        // ── Actualizar cantidad en carrito ────────────────────────────────────
+        function actualizarPedido() {
+            var resultado = recolectarOpciones();
+            if (resultado === null) return;
+
+            var cantidad = parseInt(document.getElementById('cantidad').textContent);
+            document.querySelector('input[name="precio"]').value = (precioBase + resultado.precioExtra).toFixed(2);
+            document.getElementById('opcionesInput').value       = resultado.opciones.join(', ');
+            document.getElementById('cantidadInput').value       = cantidad;
+            document.querySelector('input[name="action"]').value = 'actualizar';
+
+            enCarrito = cantidad;
+            setBtnVerde();
             document.getElementById('formCarrito').submit();
         }
 
         // ── Init ──────────────────────────────────────────────────────────────
-        if (stockDisponible <= 0) {
-            var btn = document.getElementById('btnAgregar');
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            document.getElementById('btnMas').disabled = true;
-        } else {
-            document.getElementById('btnMas').disabled =
-                (parseInt(document.getElementById('cantidad').textContent) >= stockDisponible);
-        }
+        (function init() {
+            if (enCarrito > 0) {
+                // Ya hay cantidad en el carrito → mostrar esa cantidad y botón verde
+                document.getElementById('cantidad').textContent = enCarrito;
+                document.getElementById('cantidadInput').value  = enCarrito;
+                document.getElementById('btnMas').disabled      = (enCarrito >= stockMax);
+                setBtnVerde();
+                // Recalcular precio en el form oculto aunque el botón esté verde
+                document.querySelector('input[name="precio"]').value = precioBase.toFixed(2);
+                document.getElementById('cantidadInput').value       = enCarrito;
+            } else if (stockDisponible <= 0) {
+                var btn = document.getElementById('btnAgregar');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.onclick = null;
+                document.getElementById('btnMas').disabled = true;
+            } else {
+                document.getElementById('btnMas').disabled =
+                    (parseInt(document.getElementById('cantidad').textContent) >= stockDisponible);
+            }
+        })();
 
+        // ── Toggle secciones de opciones ──────────────────────────────────────
         function toggle(header) {
             var content = header.nextElementSibling;
             var chevron = header.querySelector('.chevron');
