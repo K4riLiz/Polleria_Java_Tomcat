@@ -8,13 +8,13 @@ import java.sql.*;
 public class PagoDAO {
 
     public boolean registrar(Pago pago) throws SQLException {
-        String sql = "INSERT INTO pagos (pedido_id, metodo, monto, estado, referencia) VALUES (?, ?, ?, 'Aprobado', ?)";
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql = "INSERT INTO pagos (pedido_id, metodo, monto, estado, referencia) VALUES (?, ?, ?, ?, ?)";
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, pago.getPedidoId());
             ps.setString(2, pago.getMetodo());
             ps.setDouble(3, pago.getMonto());
-            ps.setString(4, pago.getReferencia());
+            ps.setString(4, pago.getEstado() != null ? pago.getEstado() : "Aprobado");
+            ps.setString(5, pago.getReferencia());
             return ps.executeUpdate() > 0;
         }
     }
