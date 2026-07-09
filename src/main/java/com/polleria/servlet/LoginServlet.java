@@ -80,6 +80,11 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("usuario", usuario);
                 session.setAttribute("rolNombre", usuario.getRolNombre());
 
+                // Toast de bienvenida solo para clientes (una vez por login)
+                if ("CLIENTE".equals(usuario.getRolNombre())) {
+                    session.setAttribute("mostrarBienvenida", true);
+                }
+
                 // Redirigir según rol
                 switch (usuario.getRolNombre()){
                     case "ADMIN":

@@ -107,6 +107,10 @@
                                    class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
                                     <i class="fa-solid fa-clock-rotate-left w-4"></i> Mis pedidos
                                 </a>
+                                <a href="${pageContext.request.contextPath}/mis-reclamos"
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-clipboard-list w-4"></i> Mis Reclamos
+                                </a>
                                 <a href="${pageContext.request.contextPath}/carrito"
                                    class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
                                     <i class="fa-solid fa-bag-shopping w-4"></i> Mi carrito

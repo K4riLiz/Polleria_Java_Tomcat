@@ -1,6 +1,19 @@
 package com.polleria.model;
 
+/**
+ * Modelo del Libro de Reclamaciones.
+ * Campos nuevos: asunto, respuestaAdmin, fechaRespuesta.
+ */
 public class LibroReclamacion {
+
+    public static final int MAX_ASUNTO       = 200;
+    public static final int MAX_DESCRIPCION  = 2000;
+    public static final int MAX_RESPUESTA    = 2000;
+
+    public static final String ESTADO_PENDIENTE   = "Pendiente";
+    public static final String ESTADO_EN_PROCESO  = "En proceso";
+    public static final String ESTADO_RESPONDIDO  = "Respondido";
+
     private int id;
     private String nombre;
     private String email;
@@ -8,7 +21,10 @@ public class LibroReclamacion {
     private String tipoDocumento;
     private String numeroDocumento;
     private String tipoReclamo;
+    private String asunto;
     private String descripcion;
+    private String respuestaAdmin;
+    private String fechaRespuesta;
     private String pedidoId;
     private String fecha;
     private String estado;
@@ -37,8 +53,17 @@ public class LibroReclamacion {
     public String getTipoReclamo() { return tipoReclamo; }
     public void setTipoReclamo(String tipoReclamo) { this.tipoReclamo = tipoReclamo; }
 
+    public String getAsunto() { return asunto; }
+    public void setAsunto(String asunto) { this.asunto = asunto; }
+
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getRespuestaAdmin() { return respuestaAdmin; }
+    public void setRespuestaAdmin(String respuestaAdmin) { this.respuestaAdmin = respuestaAdmin; }
+
+    public String getFechaRespuesta() { return fechaRespuesta; }
+    public void setFechaRespuesta(String fechaRespuesta) { this.fechaRespuesta = fechaRespuesta; }
 
     public String getPedidoId() { return pedidoId; }
     public void setPedidoId(String pedidoId) { this.pedidoId = pedidoId; }
