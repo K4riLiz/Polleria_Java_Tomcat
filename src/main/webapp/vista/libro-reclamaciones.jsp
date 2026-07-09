@@ -27,21 +27,22 @@
         </div>
 
         <!-- ALERTA ÉXITO -->
-        <c:if test="${not empty exito}">
+        <c:if test="${not empty sessionScope.exito}">
             <div class="bg-green-100 border border-green-300 text-green-700 px-4 py-4 rounded-xl mb-6 flex items-start gap-3">
                 <i class="fa-solid fa-circle-check text-xl mt-0.5"></i>
                 <div>
                     <p class="font-semibold">Reclamo registrado exitosamente</p>
-                    <p class="text-sm">${exito}</p>
+                    <p class="text-sm"><c:out value="${sessionScope.exito}"/></p>
                     <p class="text-sm mt-1">Nos comunicaremos contigo en un plazo de 30 días hábiles.</p>
                 </div>
             </div>
+            <c:remove var="exito" scope="session"/>
         </c:if>
 
         <!-- ALERTA ERROR -->
         <c:if test="${not empty error}">
             <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-xl mb-6">
-                <i class="fa-solid fa-triangle-exclamation mr-2"></i>${error}
+                <i class="fa-solid fa-triangle-exclamation mr-2"></i><c:out value="${error}"/>
             </div>
         </c:if>
 
@@ -49,7 +50,7 @@
         <div class="bg-white rounded-2xl shadow-sm p-8">
 
             <form action="${pageContext.request.contextPath}/libro-reclamaciones" method="post"
-                  class="flex flex-col gap-5">
+                  class="flex flex-col gap-5" id="formReclamo" onsubmit="return enviarReclamo()">
 
                 <!-- Tipo de reclamo -->
                 <div>
@@ -123,10 +124,19 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Asunto *</label>
+                    <input type="text" name="asunto" required maxlength="200"
+                           placeholder="Resumen breve de su reclamo o queja"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <p class="text-xs text-gray-400 mt-1">Máximo 200 caracteres</p>
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">Descripción del reclamo *</label>
-                    <textarea name="descripcion" required rows="5"
+                    <textarea name="descripcion" required rows="5" maxlength="2000"
                               placeholder="Describe detalladamente tu reclamo o queja..."
                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 resize-none"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Máximo 2000 caracteres</p>
                 </div>
 
                 <p class="text-xs text-gray-400">
@@ -134,7 +144,7 @@
                     La empresa responderá tu reclamo en un plazo máximo de 30 días hábiles.
                 </p>
 
-                <button type="submit"
+                <button type="submit" id="btnEnviarReclamo"
                         class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Enviar reclamo
                 </button>
@@ -145,6 +155,15 @@
 
     <jsp:include page="/components/footer.jsp"/>
 
+    <script>
+        function enviarReclamo() {
+            var btn = document.getElementById('btnEnviarReclamo');
+            if (btn.disabled) return false;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+            return true;
+        }
+    </script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>

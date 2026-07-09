@@ -128,6 +128,25 @@
                     </c:choose>
                 </div>
 
+                <!-- Accesos rápidos -->
+                <div class="border-t border-gray-100 pt-4">
+                    <p class="text-xs text-gray-400 font-semibold uppercase mb-3">Mis gestiones</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="${pageContext.request.contextPath}/historial"
+                           class="flex items-center gap-2 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-300 text-gray-700 hover:text-red-600 px-4 py-2.5 rounded-xl text-sm font-medium transition">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Mis pedidos
+                        </a>
+                        <a href="${pageContext.request.contextPath}/mis-reclamos"
+                           class="flex items-center gap-2 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-300 text-gray-700 hover:text-red-600 px-4 py-2.5 rounded-xl text-sm font-medium transition">
+                            <i class="fa-solid fa-clipboard-list"></i> Mis Reclamos
+                        </a>
+                        <a href="${pageContext.request.contextPath}/libro-reclamaciones"
+                           class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">
+                            <i class="fa-solid fa-plus"></i> Nuevo reclamo
+                        </a>
+                    </div>
+                </div>
+
             </div>
         </div>
 

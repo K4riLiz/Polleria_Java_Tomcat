@@ -9,8 +9,48 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/887a835504.js" crossorigin="anonymous"></script>
     <title>Inicio - Pollería</title>
+    <style>
+        #toast-bienvenida {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            z-index: 99999;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+        }
+        #toast-bienvenida.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        #toast-bienvenida.fade-out {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
+    </style>
 </head>
 <body>
+
+    <%-- Toast de bienvenida (solo tras login de cliente) --%>
+    <c:if test="${sessionScope.mostrarBienvenida}">
+        <div id="toast-bienvenida" class="visible">
+            <div class="bg-white border border-red-200 shadow-2xl rounded-2xl px-6 py-4 flex items-start gap-4 max-w-md">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-hand-sparkles text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-800 text-base">
+                        ¡Bienvenido(a), <c:out value="${sessionScope.usuario.nombre}"/>!
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Nos alegra tenerte de vuelta. Esperamos que disfrutes de nuestros deliciosos productos.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <c:remove var="mostrarBienvenida" scope="session"/>
+    </c:if>
 
     <%-- HEADER --%>
     <jsp:include page="/components/header.jsp"/>
@@ -106,6 +146,17 @@
     <jsp:include page="/components/footer.jsp"/>
 
     <script src="${pageContext.request.contextPath}/js/carrusel.js"></script>
+    <script>
+        (function() {
+            var toast = document.getElementById('toast-bienvenida');
+            if (!toast) return;
+            setTimeout(function() {
+                toast.classList.remove('visible');
+                toast.classList.add('fade-out');
+                setTimeout(function() { toast.remove(); }, 400);
+            }, 4000);
+        })();
+    </script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
