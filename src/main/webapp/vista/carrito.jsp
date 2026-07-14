@@ -50,9 +50,9 @@
                             <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex items-center gap-4 p-4">
 
                                 <!-- Imagen -->
-                                <img src="${pageContext.request.contextPath}/img/${item.imagen}"
+                                <img src="${item.imagen}"
                                      class="w-20 h-20 object-cover rounded-xl flex-shrink-0"
-                                     onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
+                                     onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.web.png'">
 
                                 <!-- Info -->
                                 <div class="flex-1">

@@ -44,8 +44,9 @@
                         <a href="${pageContext.request.contextPath}/promocion?id=${promo.id}"
                            class="card-promo bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col hover:shadow-xl transition">
                             <div class="overflow-hidden relative">
-                                <img src="${pageContext.request.contextPath}/img/${promo.imagen}"
-                                     class="card-img w-full h-[160px] object-cover">
+                                <img src="${promo.imagen}"
+                                     class="card-img w-full h-[160px] object-cover"
+                                     onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.webp'">
                                 <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                                     PROMO
                                 </div>

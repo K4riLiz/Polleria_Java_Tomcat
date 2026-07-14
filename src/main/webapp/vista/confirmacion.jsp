@@ -230,6 +230,11 @@
         var intervalo;
         var storageKey = 'modal_pedido_' + pedidoId;
 
+        // Guardar pedido activo para que el header lo detecte en cualquier página
+        if (estadoActual !== 'Entregado' && estadoActual !== 'Cancelado') {
+            localStorage.setItem('pedido_activo_id', pedidoId);
+        }
+
         if (estadoActual === 'Entregado' && !localStorage.getItem(storageKey)) {
             mostrarModal();
         } else if (estadoActual !== 'Entregado') {
@@ -245,7 +250,11 @@
                     actualizarSeguimiento(data.estado);
                     if (data.estado === 'Entregado' && !modalMostrado && !localStorage.getItem(storageKey)) {
                         clearInterval(intervalo);
+                        localStorage.removeItem('pedido_activo_id');
                         mostrarModal();
+                    } else if (data.estado === 'Cancelado') {
+                        clearInterval(intervalo);
+                        localStorage.removeItem('pedido_activo_id');
                     }
                 })
                 .catch(function() {});

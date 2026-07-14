@@ -78,9 +78,10 @@
 
             <!-- IMAGEN -->
             <div class="md:w-1/2 relative min-h-[280px]">
-                <img src="${pageContext.request.contextPath}/img/${producto.imagen}"
+                <img src="${producto.imagen}"
                      alt="${producto.nombre}"
-                     class="w-full h-full object-cover min-h-[280px]">
+                     class="w-full h-full object-cover min-h-[280px]"
+                     onerror="this.src='${pageContext.request.contextPath}/img/pollobrasa.png'">
                 <span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
                     ${producto.categoriaNombre}
                 </span>
