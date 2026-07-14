@@ -2,6 +2,7 @@ package com.polleria.servlet;
 
 import com.polleria.dao.UsuarioDAO;
 import org.mindrot.jbcrypt.BCrypt;
+import com.polleria.util.EventLogger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,6 +56,7 @@ public class RecuperarPasswordServlet extends HttpServlet {
         try {
             UsuarioDAO dao = new UsuarioDAO();
             if (!dao.emailExiste(email)) {
+                EventLogger.warning("RECUPERACION", "Correo no registrado: " + email);
                 responderJson(resp, false, "No existe una cuenta con ese correo.", null);
                 return;
             }
@@ -65,11 +67,14 @@ public class RecuperarPasswordServlet extends HttpServlet {
 
             // Brevo no lanza excepción chequeada, maneja errores internamente
             com.polleria.util.EmailService.enviarCodigoRecuperacion(email, codigo, expiracion);
+            // Código enviado:
+            EventLogger.info("RECUPERACION", "Código enviado a: " + email);
 
             req.getSession().setAttribute("emailRecuperacion", email);
             responderJson(resp, true, "Se le envió un correo a " + email, email);
 
         } catch (SQLException e) {
+            EventLogger.error("RECUPERACION", "Error al buscar correo: " + email, e);
             responderJson(resp, false, "Error del servidor: " + e.getMessage(), null);
         }
     }
@@ -94,12 +99,14 @@ public class RecuperarPasswordServlet extends HttpServlet {
         long expiracion    = Long.parseLong(data[1]);
 
         if (System.currentTimeMillis() > expiracion) {
+            EventLogger.warning("RECUPERACION", "Código expirado para: " + email); 
             codigos.remove(email);
             responderJson(resp, false, "El código expiró. Solicita uno nuevo.", null);
             return;
         }
 
         if (!data[0].equals(codigoIngresado)) {
+            EventLogger.warning("RECUPERACION", "Código incorrecto para: " + email);
             responderJson(resp, false, "Código incorrecto. Intenta de nuevo.", null);
             return;
         }
@@ -139,6 +146,7 @@ public class RecuperarPasswordServlet extends HttpServlet {
             UsuarioDAO dao = new UsuarioDAO();
             String hash = BCrypt.hashpw(nuevaPass, BCrypt.gensalt());
             dao.actualizarPassword(email, hash);
+            EventLogger.info("RECUPERACION", "Contraseña actualizada para: " + email);
 
             // Limpiar sesión y código usado
             req.getSession().removeAttribute("emailRecuperacion");
@@ -148,6 +156,7 @@ public class RecuperarPasswordServlet extends HttpServlet {
             responderJson(resp, true, "Contraseña actualizada. Ya puedes iniciar sesión.", null);
 
         } catch (SQLException e) {
+            EventLogger.error("RECUPERACION", "Error al actualizar contraseña: " + email, e);
             responderJson(resp, false, "Error del servidor: " + e.getMessage(), null);
         }
     }

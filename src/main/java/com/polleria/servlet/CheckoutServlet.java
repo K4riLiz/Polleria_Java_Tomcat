@@ -5,6 +5,7 @@ import com.polleria.dao.PagoDAO;
 import com.polleria.dao.PedidoDAO;
 import com.polleria.model.*;
 import com.polleria.util.StockService;
+import com.polleria.util.EventLogger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -101,7 +102,7 @@ public class CheckoutServlet extends HttpServlet {
 
             PedidoDAO pedidoDAO = new PedidoDAO();
             int pedidoId = pedidoDAO.crear(pedido, carrito);
-
+            EventLogger.info("PEDIDO", "Pedido #" + pedidoId + " creado para: " + usuario.getEmail());
             Pago pago = new Pago();
             pago.setPedidoId(pedidoId);
             pago.setMetodo(metodo);
@@ -129,6 +130,7 @@ public class CheckoutServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/confirmacion?pedidoId=" + pedidoId);
 
         } catch (SQLException e) {
+            EventLogger.error("PEDIDO", "Error al crear pedido para: " + usuario.getEmail(), e);
             req.setAttribute("error", "Error al procesar el pago: " + e.getMessage());
             req.setAttribute("total", total);
             req.getRequestDispatcher("/vista/checkout.jsp").forward(req, resp);

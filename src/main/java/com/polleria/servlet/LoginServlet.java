@@ -4,6 +4,7 @@ import com.polleria.dao.UsuarioDAO;
 import com.polleria.model.Usuario;
 import com.polleria.util.EmailService;
 import com.polleria.util.PasswordValidator;
+import com.polleria.util.EventLogger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -75,6 +76,8 @@ public class LoginServlet extends HttpServlet {
             Usuario usuario = dao.login(email, password);
 
             if (usuario != null) {
+                // Login exitoso:
+                EventLogger.info("LOGIN", "Usuario autenticado: " + email);
                 // Guardar usuario en sesión
                 HttpSession session = req.getSession();
                 session.setAttribute("usuario", usuario);
@@ -106,10 +109,13 @@ public class LoginServlet extends HttpServlet {
                 //termina
                
             } else {
+                // Login fallido:
+                EventLogger.warning("LOGIN", "Intento fallido para: " + email);
                 req.setAttribute("error", "Correo o contraseña incorrectos");
                 req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
             }
         } catch (SQLException e) {
+            EventLogger.error("LOGIN", "Error de base de datos", e);
             req.setAttribute("error", "Error del servidor: " + e.getMessage());
             req.getRequestDispatcher("/vista/login.jsp").forward(req, resp);
         }

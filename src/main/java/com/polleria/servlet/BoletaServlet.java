@@ -8,6 +8,7 @@ import com.polleria.model.Pago;
 import com.polleria.model.Pedido;
 import com.polleria.model.Usuario;
 import com.polleria.util.BoletaPDFGenerator;
+import com.polleria.util.EventLogger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -62,9 +63,11 @@ public class BoletaServlet extends HttpServlet {
             resp.setContentType("application/pdf");
             resp.setHeader("Content-Disposition", "attachment; filename=boleta-" + pedidoId + ".pdf");
             resp.setContentLength(pdfBytes.length);
+            EventLogger.info("BOLETA", "Boleta generada para pedido #" + pedidoId);
             resp.getOutputStream().write(pdfBytes);
 
         } catch (Exception e) {
+            EventLogger.error("BOLETA", "Error generando boleta #" + idParam, e);
             resp.sendRedirect(req.getContextPath() + "/home");
         }
     }
